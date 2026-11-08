@@ -26,6 +26,9 @@
       <File Source="target\release\startline.exe" Name="startline.exe" KeyPath="yes">
         <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="Startline" WorkingDirectory="APPLICATIONFOLDER" Icon="app.ico" Advertise="no" />
       </File>
+    </Component>
+    <!-- On its own: the program has no version resource, so WiX can only make IDs for one-file components. -->
+    <Component Directory="APPLICATIONFOLDER">
       <File Source="LICENSE" Name="LICENSE.txt" />
     </Component>
     <!-- Startline stays running in the background, so it would otherwise always hold its own file during an upgrade or uninstall. -->
