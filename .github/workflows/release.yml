@@ -129,6 +129,8 @@ jobs:
           $run = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
           $p = Start-Process msiexec -ArgumentList '/i',"`"$msi`"",'/qn','/norestart','ALLUSERS=2','MSIINSTALLPERUSER=1' -Wait -PassThru
           if ($p.ExitCode) { throw "MSI did not install for one account: $($p.ExitCode)" }
+          # A fresh account may not have the key yet.
+          if (-not (Test-Path $run)) { New-Item $run | Out-Null }
           Set-ItemProperty $run -Name Startline -Value "`"$own`" --background"
           $p = Start-Process msiexec -ArgumentList '/x',"`"$msi`"",'/qn','/norestart','ALLUSERS=2','MSIINSTALLPERUSER=1' -Wait -PassThru
           if ($p.ExitCode) { throw "MSI did not uninstall for one account: $($p.ExitCode)" }
