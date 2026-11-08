@@ -1,0 +1,145 @@
+<div align="center">
+
+<img src="assets/logo.png" width="128" alt="Startline logo">
+
+# Startline
+
+**A Start menu for Windows that's yours to arrange, with search that answers as you type.**
+
+Native, written in Rust, with no web view and no runtime to install.
+
+[![CI](https://github.com/MyDrift-user/startline/actions/workflows/ci.yml/badge.svg)](https://github.com/MyDrift-user/startline/actions/workflows/ci.yml)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-4CA3FF)
+![Rust](https://img.shields.io/badge/rust-2024-CE422B?logo=rust&logoColor=white)
+![UI](https://img.shields.io/badge/UI-egui-4C6EF5)
+![License](https://img.shields.io/badge/license-GPL--3.0-blue)
+
+<img src="assets/screenshot.png" width="420" alt="Startline's Start menu with pinned apps and recent files">&nbsp;<img src="assets/screenshot-search.png" width="420" alt="Startline searching files for lisbon">
+
+</div>
+
+---
+
+## ✨ Features
+
+### 🪟 Takes over the Start key
+While Startline runs, the Start key and the Start button open it instead of the Windows menu. **Shift + Start** still opens the Windows one, and quitting Startline from its tray icon gives everything back.
+
+### ⚡ Search as you type
+- Apps and settings are answered in the same frame as the key press
+- Files come from an index that keeps every name in one block of memory, so a million files is one fast scan. It's saved to disk, so search works from the first moment, and kept fresh by watching for changes
+- Filter chips for folders, documents, pictures and each file type in the results, with the time the search took
+- Choose where to search and what to skip, including network and USB drives as they're attached
+- A web search for what you typed
+
+### 🎚️ Settings right in the search
+Type what you want and act on it from the result: "dark mode", "volume 40", "louder", "bluetooth off", "wlan aus". There are dozens of switches and sliders, from dark mode, Wi-Fi, Bluetooth, volume and brightness to file extensions, hidden files, the clock's seconds, Game Mode and keeping the PC awake. Nothing changes until you act on the row.
+
+### 🎨 Make it yours
+- Five looks: Windows 11, Windows 10, Windows 7, Windows XP, or Startline's own, which you can place anywhere on screen
+- Colour presets (Stone, Graphite, Moss, Harbor, Clay, Black, Daylight and Paper) or your own colours
+- Pin apps, files, folders, web addresses and programs with arguments, in the order you like
+- Choose which sections the menu shows (Pinned, Recent files, Most used, All apps) and how many
+- Size, position, corners and transparency
+- Start with Windows, on by default
+
+### 🏢 Ready for IT departments
+Every setting can be fixed by **Group Policy**, for computers or users, with ADMX/ADML templates included. Open menus pick up changes within a minute. See [`PolicyDefinitions/README.txt`](PolicyDefinitions/README.txt).
+
+## ⌨️ Keyboard
+
+| Keys | Action |
+|---|---|
+| `Start` | Open or close Startline |
+| `Shift + Start` | The Windows Start menu |
+| Just type | Search right away |
+| `Enter` | Open, or apply a setting |
+| `Ctrl + Enter` | Run as administrator |
+| `Shift + Enter` | Show in its folder |
+| `↓`, then `←` `→` | Change a selected setting |
+| `.pdf` | Only one kind of file |
+| `Esc` | Clear, go back, then close |
+
+---
+
+## 📦 Install
+
+Download what you need from **[Releases](../../releases)**, for Windows 10 or 11 (x64):
+
+| File | What it is |
+|---|---|
+| `...-windows-x64-setup.exe` | Installer, for this PC or just your account |
+| `...-windows-x64.msi` | MSI installer with a setup wizard, or silent for managed deployment |
+| `...-windows-x64-portable.exe` | Portable, runs without installing |
+| `...-windows-x64.zip` | The same portable program, zipped |
+| `...-policy-definitions.zip` | Group Policy templates |
+| `SHA256SUMS.txt` | Checksums of all the files |
+
+Both installers can install for this PC or for just your account. To install without any screens:
+
+```bat
+:: For this PC, from an administrator prompt. The folder is optional.
+msiexec /i startline-windows-x64.msi /qn ALLUSERS=1 APPLICATIONFOLDER="D:\Apps\Startline"
+startline-windows-x64-setup.exe /VERYSILENT /ALLUSERS /DIR="D:\Apps\Startline"
+
+:: For one account, without admin rights.
+msiexec /i startline-windows-x64.msi /qn ALLUSERS=2 MSIINSTALLPERUSER=1
+startline-windows-x64-setup.exe /VERYSILENT /CURRENTUSER
+```
+
+Nothing is signed by a known publisher, so SmartScreen may show a warning. Uninstalling closes Startline and removes its Start with Windows entry.
+
+## ⚙️ Settings and data
+
+Settings, the app list and the search index are in `%LOCALAPPDATA%\Startline\`. Settings are a JSON file, `config.json`, and survive updates.
+
+## 🛠️ Build from source
+
+You need [Rust](https://rustup.rs).
+
+```sh
+cargo build --release
+```
+
+The program ends up in `target/release/startline.exe`. With the `x86_64-pc-windows-gnu` toolchain, the `windows` crate needs a working `dlltool`, for example MSYS2's, set with `-C dlltool=...` in `.cargo/config.toml`. The MSVC toolchain needs nothing extra.
+
+`assets/make-assets.ps1` draws the logo, the icon and the installer's pictures from the same shape as the app's icon.
+
+## 🚀 Releasing
+
+Every push is built and tested by the CI workflow, which also checks that `PolicyDefinitions` matches what the program writes with `startline.exe --write-policy-templates PolicyDefinitions`. Releases only start by hand:
+
+1. Raise `version` in `Cargo.toml` and push. A version can't change once it's released.
+2. Go to **Actions → Release → Run workflow**. Turning off **Publish** only builds and tests, leaving the files on the run.
+
+The workflow builds and tests the program, builds every download, checks that both installers install and uninstall (for this PC, for one account and into a chosen folder) and that the MSI upgrades the published release, then tags `v<version>` and publishes a GitHub Release.
+
+## 🗺️ Project layout
+
+```
+src/
+  main.rs                 entry point and the app's icon
+  ui.rs, popup.rs         the window and how it opens and closes
+  home.rs, classic.rs     the Start menu, in Startline's look and the older Windows looks
+  search.rs, search_page.rs, matching.rs   search and its results
+  index.rs, scope.rs      the file index and where it looks
+  apps.rs, icons.rs       installed apps and their icons
+  intent.rs, settings.rs, actions.rs   settings you can change from a search
+  system.rs, platform.rs  the Start key, tray icon and Windows calls
+  customize.rs, pins_page.rs, setting_list.rs, widgets.rs, styles.rs   Settings and the looks
+  config.rs               what's saved
+  policy.rs               Group Policy
+PolicyDefinitions/        ADMX / ADML templates
+assets/                   logo, icon, screenshots and the script that draws them
+installer/windows/        setup.exe (Inno Setup) and MSI (WiX) definitions, and the packaging script
+```
+
+## 📄 License
+
+Copyright (C) 2026 MyDrift. Startline is free software, released under the [GNU General Public License v3.0](LICENSE).
+
+---
+
+<div align="center">
+<sub>Made with 🦀 Rust and <a href="https://github.com/emilk/egui">egui</a>.</sub>
+</div>

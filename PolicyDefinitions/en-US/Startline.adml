@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+  <displayName>Startline</displayName>
+  <description>Settings for the Startline Start menu and search.</description>
+  <resources>
+    <stringTable>
+      <string id="Supported">Startline 0.1 and later</string>
+      <string id="Cat_Startline">Startline</string>
+      <string id="Cat_Appearance">Appearance</string>
+      <string id="Cat_StartMenu">Start menu</string>
+      <string id="Cat_Pins">Pinned apps</string>
+      <string id="Cat_Search">Search</string>
+      <string id="Cat_General">General</string>
+      <string id="Cat_Limits">What people can do</string>
+      <string id="P_Experience">Look</string>
+      <string id="E_Experience">Which look the Start menu, search and the settings window use.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="I_Experience_0">Windows 11</string>
+      <string id="I_Experience_1">Windows 10</string>
+      <string id="I_Experience_2">Windows 7</string>
+      <string id="I_Experience_3">Windows XP</string>
+      <string id="I_Experience_4">Startline</string>
+      <string id="P_TextAndIconSize">Text and icon size</string>
+      <string id="E_TextAndIconSize">In percent. The settings window offers 90 (small), 100 (normal) and 115 (large).
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_ColorTheme">Color theme</string>
+      <string id="E_ColorTheme">Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="I_ColorTheme_0">Stone</string>
+      <string id="I_ColorTheme_1">Graphite</string>
+      <string id="I_ColorTheme_2">Moss</string>
+      <string id="I_ColorTheme_3">Harbor</string>
+      <string id="I_ColorTheme_4">Clay</string>
+      <string id="I_ColorTheme_5">Black</string>
+      <string id="I_ColorTheme_6">Daylight</string>
+      <string id="I_ColorTheme_7">Paper</string>
+      <string id="P_Color_Background">Background color</string>
+      <string id="E_Color_Background">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_Color_Panels">Panel color</string>
+      <string id="E_Color_Panels">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_Color_Text">Text color</string>
+      <string id="E_Color_Text">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_Color_QuietText">Quiet text color</string>
+      <string id="E_Color_QuietText">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_Color_Accent">Accent color</string>
+      <string id="E_Color_Accent">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_Corners">Window corners</string>
+      <string id="E_Corners">Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="I_Corners_0">Round</string>
+      <string id="I_Corners_1">Slight</string>
+      <string id="I_Corners_2">Square</string>
+      <string id="P_FrostedGlass">Frosted glass</string>
+      <string id="E_FrostedGlass">Blurs what's behind the menu. Only the Startline look uses this.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_Opacity">How solid the menu is</string>
+      <string id="E_Opacity">In percent, from 50 (most see-through) to 100 (solid). Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_Sections">What the Start menu shows</string>
+      <string id="E_Sections">One per line, in the order they should appear: Pinned, Recent, Frequent, AllApps. Any left out are hidden.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_RecentCount">Number of recent files</string>
+      <string id="E_RecentCount">Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_FrequentCount">Number of most-used items</string>
+      <string id="E_FrequentCount">Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_SearchAtBottom">Search bar at the bottom</string>
+      <string id="E_SearchAtBottom">Only the Startline look uses this.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_Columns">Pinned apps per row</string>
+      <string id="E_Columns">Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_TileSize">Pinned app size</string>
+      <string id="E_TileSize">Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_ShowLabels">Names under pinned apps</string>
+      <string id="E_ShowLabels">Only the Startline look uses this.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_CompactRows">Compact lists</string>
+      <string id="E_CompactRows">Only the Startline look uses this.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_HorizontalPosition">Where it opens across the screen</string>
+      <string id="E_HorizontalPosition">Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="I_HorizontalPosition_0">Left</string>
+      <string id="I_HorizontalPosition_1">Center</string>
+      <string id="I_HorizontalPosition_2">Right</string>
+      <string id="I_HorizontalPosition_3">Beside the Start button</string>
+      <string id="P_VerticalPosition">Where it opens up and down the screen</string>
+      <string id="E_VerticalPosition">Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="I_VerticalPosition_0">Top</string>
+      <string id="I_VerticalPosition_1">Middle</string>
+      <string id="I_VerticalPosition_2">Bottom</string>
+      <string id="P_Margin">Gap from the screen edge</string>
+      <string id="E_Margin">Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_Width">Menu width</string>
+      <string id="E_Width">Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_Height">Menu height</string>
+      <string id="E_Height">Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_PinnedApps">Pinned apps</string>
+      <string id="E_PinnedApps">One per line: Section|Name|Target or Section|Name|Target|Arguments. Target is a file, folder, program or web address, or app:ID for an installed app. Environment variables such as %USERPROFILE% work. This replaces the person's pins and stops them changing pins.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_SearchFolders">Folders to search</string>
+      <string id="E_SearchFolders">One folder or drive per line. Environment variables such as %USERPROFILE% work.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_ExcludedFolders">Exact folders to leave out</string>
+      <string id="E_ExcludedFolders">One folder per line, such as %USERPROFILE%\AppData. Everything inside is left out too.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_ExcludedFolderNames">Folder names to leave out</string>
+      <string id="E_ExcludedFolderNames">One name per line. A folder with this name is left out wherever it appears.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_ExcludedFileTypes">File types to leave out</string>
+      <string id="E_ExcludedFileTypes">One per line, such as .iso.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_SearchNetworkDrives">Search network drives</string>
+      <string id="E_SearchNetworkDrives">Includes any network drive as it gets attached. Big shares can take a while to read.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_SearchUsbDrives">Search USB drives</string>
+      <string id="E_SearchUsbDrives">Includes USB sticks and disks as they get plugged in.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_IncludeHiddenFiles">Search hidden files and folders</string>
+      <string id="E_IncludeHiddenFiles">Includes things Windows keeps out of sight.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_ResultOrder">Order of the results</string>
+      <string id="E_ResultOrder">One per line, first to last: Apps, Settings, Files, Web.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_MaxFiles">Most files shown in the results</string>
+      <string id="E_MaxFiles">Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_ShowFolderUnderFile">Show the folder under each file</string>
+      <string id="E_ShowFolderUnderFile">Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_ShowSearchTime">Show how long a search took</string>
+      <string id="E_ShowSearchTime">Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_OfferWebSearch">Offer a web search</string>
+      <string id="E_OfferWebSearch">A last line under the results.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_WebSearchName">Name of the web search</string>
+      <string id="E_WebSearchName">Shown as: Search &lt;name&gt; for ...
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_WebSearchAddress">Web search address</string>
+      <string id="E_WebSearchAddress">Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_StartWithWindows">Start with Windows</string>
+      <string id="E_StartWithWindows">Keeps the Start menu working after a restart.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_TakeOverStartKey">Start key and button open this menu</string>
+      <string id="E_TakeOverStartKey">Shift + Start still opens the Windows menu.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_TakeOverSearchKey">Start + S opens this menu too</string>
+      <string id="E_TakeOverSearchKey">Other Windows shortcuts keep working.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_SkipWelcome">Skip the welcome note</string>
+      <string id="E_SkipWelcome">Enabled hides the note shown on the first run.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_ChangeWindowsSettings">Change Windows settings from search</string>
+      <string id="E_ChangeWindowsSettings">Disabled removes every Windows setting from search.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_WindowsSettingsPages">Shortcuts to Windows settings and tools</string>
+      <string id="E_WindowsSettingsPages">Disabled removes search's shortcuts to Windows settings pages and tools, and the Control Panel, printer and default program links.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_FileTypeButtons">File type buttons under search</string>
+      <string id="E_FileTypeButtons">Disabled removes the buttons that narrow results to one kind of file.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_Skip_Appdata">Skip: App data</string>
+      <string id="E_Skip_Appdata">Settings and caches programs keep in AppData.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_Skip_Windowsandinstalledprograms">Skip: Windows and installed programs</string>
+      <string id="E_Skip_Windowsandinstalledprograms">Windows, Program Files and other system folders.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_Skip_Developerclutter">Skip: Developer clutter</string>
+      <string id="E_Skip_Developerclutter">node_modules, .git, build output and similar.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_Skip_Cloudfolders">Skip: Cloud folders</string>
+      <string id="E_Skip_Cloudfolders">OneDrive, Dropbox and Google Drive folders.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_Skip_Temporaryandlogfiles">Skip: Temporary and log files</string>
+      <string id="E_Skip_Temporaryandlogfiles">Leftovers such as .tmp, .log and .bak.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_Skip_Programparts">Skip: Program parts</string>
+      <string id="E_Skip_Programparts">Files you never open yourself, such as .dll and .sys.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_Commands">Commands people can use</string>
+      <string id="E_Commands">Unticked commands are removed everywhere they appear. Removing Customize Startline also closes off the settings window.
+
+Enabled applies the ticks below. Disabled or Not configured allows everything.</string>
+      <string id="P_RightClickOptions">Right-click options</string>
+      <string id="E_RightClickOptions">Unticked options are removed. Their keyboard shortcuts stop working too.
+
+Enabled applies the ticks below. Disabled or Not configured allows everything.</string>
+      <string id="P_WindowsSettingsInSearch">Windows settings search can change</string>
+      <string id="E_WindowsSettingsInSearch">Unticked settings are removed from search.
+
+Enabled applies the ticks below. Disabled or Not configured allows everything.</string>
+    </stringTable>
+    <presentationTable>
+      <presentation id="P_Experience">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Look:</dropdownList>
+      </presentation>
+      <presentation id="P_TextAndIconSize">
+        <decimalTextBox refId="Value" defaultValue="100">Text and icon size:</decimalTextBox>
+      </presentation>
+      <presentation id="P_ColorTheme">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Color theme:</dropdownList>
+      </presentation>
+      <presentation id="P_Color_Background">
+        <textBox refId="Value">
+          <label>Background color:</label>
+          <defaultValue>#1B1B1A</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Color_Panels">
+        <textBox refId="Value">
+          <label>Panel color:</label>
+          <defaultValue>#272725</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Color_Text">
+        <textBox refId="Value">
+          <label>Text color:</label>
+          <defaultValue>#ECEAE5</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Color_QuietText">
+        <textBox refId="Value">
+          <label>Quiet text color:</label>
+          <defaultValue>#94928C</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Color_Accent">
+        <textBox refId="Value">
+          <label>Accent color:</label>
+          <defaultValue>#D9A46B</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Corners">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Window corners:</dropdownList>
+      </presentation>
+      <presentation id="P_Opacity">
+        <decimalTextBox refId="Value" defaultValue="96">How solid the menu is:</decimalTextBox>
+      </presentation>
+      <presentation id="P_Sections">
+        <listBox refId="Value">What the Start menu shows:</listBox>
+      </presentation>
+      <presentation id="P_RecentCount">
+        <decimalTextBox refId="Value" defaultValue="6">Number of recent files:</decimalTextBox>
+      </presentation>
+      <presentation id="P_FrequentCount">
+        <decimalTextBox refId="Value" defaultValue="6">Number of most-used items:</decimalTextBox>
+      </presentation>
+      <presentation id="P_Columns">
+        <decimalTextBox refId="Value" defaultValue="6">Pinned apps per row:</decimalTextBox>
+      </presentation>
+      <presentation id="P_TileSize">
+        <decimalTextBox refId="Value" defaultValue="84">Pinned app size:</decimalTextBox>
+      </presentation>
+      <presentation id="P_HorizontalPosition">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Where it opens across the screen:</dropdownList>
+      </presentation>
+      <presentation id="P_VerticalPosition">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Where it opens up and down the screen:</dropdownList>
+      </presentation>
+      <presentation id="P_Margin">
+        <decimalTextBox refId="Value" defaultValue="12">Gap from the screen edge:</decimalTextBox>
+      </presentation>
+      <presentation id="P_Width">
+        <decimalTextBox refId="Value" defaultValue="660">Menu width:</decimalTextBox>
+      </presentation>
+      <presentation id="P_Height">
+        <decimalTextBox refId="Value" defaultValue="720">Menu height:</decimalTextBox>
+      </presentation>
+      <presentation id="P_PinnedApps">
+        <listBox refId="Value">Pinned apps:</listBox>
+      </presentation>
+      <presentation id="P_SearchFolders">
+        <listBox refId="Value">Folders to search:</listBox>
+      </presentation>
+      <presentation id="P_ExcludedFolders">
+        <listBox refId="Value">Exact folders to leave out:</listBox>
+      </presentation>
+      <presentation id="P_ExcludedFolderNames">
+        <listBox refId="Value">Folder names to leave out:</listBox>
+      </presentation>
+      <presentation id="P_ExcludedFileTypes">
+        <listBox refId="Value">File types to leave out:</listBox>
+      </presentation>
+      <presentation id="P_ResultOrder">
+        <listBox refId="Value">Order of the results:</listBox>
+      </presentation>
+      <presentation id="P_MaxFiles">
+        <decimalTextBox refId="Value" defaultValue="30">Most files shown in the results:</decimalTextBox>
+      </presentation>
+      <presentation id="P_WebSearchName">
+        <textBox refId="Value">
+          <label>Name of the web search:</label>
+          <defaultValue>the web</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_WebSearchAddress">
+        <textBox refId="Value">
+          <label>Web search address:</label>
+          <defaultValue>https://duckduckgo.com/?q={}</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Commands">
+        <checkBox refId="Command_Lock" defaultChecked="true">Lock screen</checkBox>
+        <checkBox refId="Command_Sleep" defaultChecked="true">Sleep</checkBox>
+        <checkBox refId="Command_SignOut" defaultChecked="true">Sign out</checkBox>
+        <checkBox refId="Command_SwitchUser" defaultChecked="true">Switch user</checkBox>
+        <checkBox refId="Command_Restart" defaultChecked="true">Restart</checkBox>
+        <checkBox refId="Command_ShutDown" defaultChecked="true">Shut down</checkBox>
+        <checkBox refId="Command_EmptyRecycleBin" defaultChecked="true">Empty Recycle Bin</checkBox>
+        <checkBox refId="Command_Customize" defaultChecked="true">Customize Startline</checkBox>
+        <checkBox refId="Command_PinPage" defaultChecked="true">Pin something to Start</checkBox>
+        <checkBox refId="Command_RealStart" defaultChecked="true">Open the Windows Start menu</checkBox>
+        <checkBox refId="Command_Quit" defaultChecked="true">Quit Startline</checkBox>
+        <checkBox refId="Command_SettingsFolder" defaultChecked="true">Open my settings folder</checkBox>
+        <checkBox refId="Command_ResetSettings" defaultChecked="true">Reset all settings</checkBox>
+      </presentation>
+      <presentation id="P_RightClickOptions">
+        <checkBox refId="Menu_RunAsAdmin" defaultChecked="true">Run as administrator</checkBox>
+        <checkBox refId="Menu_OpenWith" defaultChecked="true">Open with</checkBox>
+        <checkBox refId="Menu_OpenLocation" defaultChecked="true">Open file location</checkBox>
+        <checkBox refId="Menu_Copy" defaultChecked="true">Copy path, name or address</checkBox>
+        <checkBox refId="Menu_Uninstall" defaultChecked="true">Uninstall</checkBox>
+        <checkBox refId="Menu_Recycle" defaultChecked="true">Move to Recycle Bin</checkBox>
+        <checkBox refId="Menu_Properties" defaultChecked="true">Properties</checkBox>
+        <checkBox refId="Menu_ShellMenu" defaultChecked="true">More options (the Windows menu)</checkBox>
+      </presentation>
+      <presentation id="P_WindowsSettingsInSearch">
+        <checkBox refId="Setting_Wifi" defaultChecked="true">Wi-Fi</checkBox>
+        <checkBox refId="Setting_Bluetooth" defaultChecked="true">Bluetooth</checkBox>
+        <checkBox refId="Setting_DarkMode" defaultChecked="true">Dark mode</checkBox>
+        <checkBox refId="Setting_AppsDark" defaultChecked="true">Dark mode for apps</checkBox>
+        <checkBox refId="Setting_SystemDark" defaultChecked="true">Dark taskbar and Start</checkBox>
+        <checkBox refId="Setting_KeepAwake" defaultChecked="true">Keep awake</checkBox>
+        <checkBox refId="Setting_Mute" defaultChecked="true">Mute</checkBox>
+        <checkBox refId="Setting_MicMute" defaultChecked="true">Mic mute</checkBox>
+        <checkBox refId="Setting_Transparency" defaultChecked="true">See-through effects</checkBox>
+        <checkBox refId="Setting_AccentTaskbar" defaultChecked="true">Accent color on taskbar</checkBox>
+        <checkBox refId="Setting_AccentTitleBars" defaultChecked="true">Accent color on title bars</checkBox>
+        <checkBox refId="Setting_AutoHideTaskbar" defaultChecked="true">Hide taskbar</checkBox>
+        <checkBox refId="Setting_TaskbarAlign" defaultChecked="true">Taskbar alignment</checkBox>
+        <checkBox refId="Setting_TaskViewButton" defaultChecked="true">Task view button</checkBox>
+        <checkBox refId="Setting_ClockSeconds" defaultChecked="true">Seconds in the clock</checkBox>
+        <checkBox refId="Setting_FileExtensions" defaultChecked="true">File extensions</checkBox>
+        <checkBox refId="Setting_HiddenFiles" defaultChecked="true">Hidden files</checkBox>
+        <checkBox refId="Setting_ItemCheckboxes" defaultChecked="true">File checkboxes</checkBox>
+        <checkBox refId="Setting_CompactExplorer" defaultChecked="true">Compact file view</checkBox>
+        <checkBox refId="Setting_ClipboardHistory" defaultChecked="true">Clipboard history</checkBox>
+        <checkBox refId="Setting_GameMode" defaultChecked="true">Game Mode</checkBox>
+        <checkBox refId="Setting_Animations" defaultChecked="true">Animations</checkBox>
+        <checkBox refId="Setting_SnapWindows" defaultChecked="true">Snap windows</checkBox>
+        <checkBox refId="Setting_DragContents" defaultChecked="true">Show window contents while dragging</checkBox>
+        <checkBox refId="Setting_FontSmoothing" defaultChecked="true">Smooth fonts</checkBox>
+        <checkBox refId="Setting_WindowShadows" defaultChecked="true">Window shadows</checkBox>
+        <checkBox refId="Setting_HoverActivate" defaultChecked="true">Focus window on hover</checkBox>
+        <checkBox refId="Setting_ScreenSaver" defaultChecked="true">Screen saver</checkBox>
+        <checkBox refId="Setting_PointerPrecision" defaultChecked="true">Enhance pointer precision</checkBox>
+        <checkBox refId="Setting_SwapMouseButtons" defaultChecked="true">Swap mouse buttons</checkBox>
+        <checkBox refId="Setting_StickyKeys" defaultChecked="true">Sticky Keys</checkBox>
+        <checkBox refId="Setting_Autostart" defaultChecked="true">Start Startline with Windows</checkBox>
+        <checkBox refId="Setting_Volume" defaultChecked="true">Volume</checkBox>
+        <checkBox refId="Setting_MicVolume" defaultChecked="true">Mic level</checkBox>
+        <checkBox refId="Setting_Brightness" defaultChecked="true">Brightness</checkBox>
+        <checkBox refId="Setting_MouseSpeed" defaultChecked="true">Mouse speed</checkBox>
+        <checkBox refId="Setting_ScrollLines" defaultChecked="true">Scroll lines</checkBox>
+        <checkBox refId="Setting_DoubleClick" defaultChecked="true">Double-click time</checkBox>
+        <checkBox refId="Setting_KeyRepeatSpeed" defaultChecked="true">Key repeat speed</checkBox>
+        <checkBox refId="Setting_KeyRepeatDelay" defaultChecked="true">Key repeat delay</checkBox>
+        <checkBox refId="Setting_ScreenTimeout" defaultChecked="true">Screen off after</checkBox>
+        <checkBox refId="Setting_SleepTimeout" defaultChecked="true">Sleep after</checkBox>
+        <checkBox refId="Setting_PowerMode" defaultChecked="true">Power mode</checkBox>
+      </presentation>
+    </presentationTable>
+  </resources>
+</policyDefinitionResources>

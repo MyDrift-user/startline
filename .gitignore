@@ -1,0 +1,6 @@
+/target/
+/dist/
+# Test pictures and scripts from building the app, which show the PC they ran on.
+/shots/
+# Points at this PC's dlltool. See Build from source in README.md.
+/.cargo/
