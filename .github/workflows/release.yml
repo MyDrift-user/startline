@@ -81,6 +81,8 @@ jobs:
           $p = Start-Process "dist\$base-setup.exe" -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/ALLUSERS' -Wait -PassThru
           if ($p.ExitCode -or -not (Test-Path $exe)) { throw "setup.exe did not install" }
           Assert-Runs $exe
+          # Installers replace a program by its version, so it has to carry one.
+          if ((Get-Item $exe).VersionInfo.FileVersion -ne $env:VERSION) { throw "The program's file version is '$((Get-Item $exe).VersionInfo.FileVersion)'" }
           if (-not (Test-Path "$env:ProgramFiles\Startline\LICENSE.txt")) { throw "setup.exe did not install the licence" }
           if (-not (Task)) { throw "setup.exe didn't add the update task" }
           Assert-Locked "$env:ProgramFiles\Startline"
@@ -149,6 +151,8 @@ jobs:
               if ($p.ExitCode) { throw "MSI did not upgrade: $($p.ExitCode)" }
               if ((Listed).Count -ne 1) { throw "After upgrading ($scope), Windows lists Startline $((Listed).Count) times" }
               if ((Listed)[0].DisplayVersion -ne $env:VERSION) { throw "After upgrading ($scope), Windows lists version $((Listed)[0].DisplayVersion)" }
+              # Windows Installer may keep an old file it can't compare: the program itself has to be the new one.
+              if ((Version $installed) -ne "Startline $env:VERSION") { throw "After upgrading ($scope), the program is '$(Version $installed)'" }
               $p = Start-Process msiexec -ArgumentList (@('/x', "`"$msi`"", '/qn', '/norestart') + $scope) -Wait -PassThru
               if ($p.ExitCode -or (Test-Path $installed)) { throw "MSI did not uninstall after upgrading ($scope): $($p.ExitCode)" }
             }

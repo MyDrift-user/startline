@@ -10,6 +10,9 @@ repository = "https://github.com/MyDrift-user/startline"
 # Only for the release workflow's update test: trusts a published test key instead of the real one. Never released.
 update-test = []
 
+[build-dependencies]
+winresource = "0.1"
+
 [dependencies]
 ed25519-dalek = { version = "2", default-features = false, features = ["std"] }
 sha2 = "0.10"

@@ -112,7 +112,7 @@ You need [Rust](https://rustup.rs).
 cargo build --release
 ```
 
-The program ends up in `target/release/startline.exe`. With the `x86_64-pc-windows-gnu` toolchain, the `windows` crate needs a working `dlltool`, for example MSYS2's, set with `-C dlltool=...` in `.cargo/config.toml`. The MSVC toolchain needs nothing extra.
+The program ends up in `target/release/startline.exe`. Its icon and version need a resource compiler: `rc.exe` from the Windows SDK with MSVC, or `windres` (in MSYS2) on the PATH with the GNU toolchain. With the `x86_64-pc-windows-gnu` toolchain, the `windows` crate needs a working `dlltool`, for example MSYS2's, set with `-C dlltool=...` in `.cargo/config.toml`. The MSVC toolchain needs nothing extra.
 
 `assets/make-assets.ps1` draws the logo, the icon and the installer's pictures from the same shape as the app's icon.
 
