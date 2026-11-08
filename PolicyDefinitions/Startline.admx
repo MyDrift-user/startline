@@ -11,6 +11,9 @@
   </supportedOn>
   <categories>
     <category name="Startline" displayName="$(string.Cat_Startline)"/>
+    <category name="Search" displayName="$(string.Cat_Search)">
+      <parentCategory ref="Startline"/>
+    </category>
     <category name="Appearance" displayName="$(string.Cat_Appearance)">
       <parentCategory ref="Startline"/>
     </category>
@@ -20,8 +23,14 @@
     <category name="Pins" displayName="$(string.Cat_Pins)">
       <parentCategory ref="Startline"/>
     </category>
-    <category name="Search" displayName="$(string.Cat_Search)">
-      <parentCategory ref="Startline"/>
+    <category name="SearchPlaces" displayName="$(string.Cat_SearchPlaces)">
+      <parentCategory ref="Search"/>
+    </category>
+    <category name="SearchSkip" displayName="$(string.Cat_SearchSkip)">
+      <parentCategory ref="Search"/>
+    </category>
+    <category name="SearchResults" displayName="$(string.Cat_SearchResults)">
+      <parentCategory ref="Search"/>
     </category>
     <category name="General" displayName="$(string.Cat_General)">
       <parentCategory ref="Startline"/>
@@ -354,7 +363,7 @@
       </elements>
     </policy>
     <policy name="SearchFolders" class="Both" displayName="$(string.P_SearchFolders)" explainText="$(string.E_SearchFolders)" presentation="$(presentation.P_SearchFolders)" key="Software\Policies\Startline" valueName="SearchFolders">
-      <parentCategory ref="Search"/>
+      <parentCategory ref="SearchPlaces"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -366,47 +375,8 @@
         <list id="Value" key="Software\Policies\Startline\SearchFolders" valuePrefix="" expandable="true"/>
       </elements>
     </policy>
-    <policy name="ExcludedFolders" class="Both" displayName="$(string.P_ExcludedFolders)" explainText="$(string.E_ExcludedFolders)" presentation="$(presentation.P_ExcludedFolders)" key="Software\Policies\Startline" valueName="ExcludedFolders">
-      <parentCategory ref="Search"/>
-      <supportedOn ref="SUPPORTED_Startline"/>
-      <enabledValue>
-        <decimal value="1"/>
-      </enabledValue>
-      <disabledValue>
-        <delete/>
-      </disabledValue>
-      <elements>
-        <list id="Value" key="Software\Policies\Startline\ExcludedFolders" valuePrefix="" expandable="true"/>
-      </elements>
-    </policy>
-    <policy name="ExcludedFolderNames" class="Both" displayName="$(string.P_ExcludedFolderNames)" explainText="$(string.E_ExcludedFolderNames)" presentation="$(presentation.P_ExcludedFolderNames)" key="Software\Policies\Startline" valueName="ExcludedFolderNames">
-      <parentCategory ref="Search"/>
-      <supportedOn ref="SUPPORTED_Startline"/>
-      <enabledValue>
-        <decimal value="1"/>
-      </enabledValue>
-      <disabledValue>
-        <delete/>
-      </disabledValue>
-      <elements>
-        <list id="Value" key="Software\Policies\Startline\ExcludedFolderNames" valuePrefix="" expandable="true"/>
-      </elements>
-    </policy>
-    <policy name="ExcludedFileTypes" class="Both" displayName="$(string.P_ExcludedFileTypes)" explainText="$(string.E_ExcludedFileTypes)" presentation="$(presentation.P_ExcludedFileTypes)" key="Software\Policies\Startline" valueName="ExcludedFileTypes">
-      <parentCategory ref="Search"/>
-      <supportedOn ref="SUPPORTED_Startline"/>
-      <enabledValue>
-        <decimal value="1"/>
-      </enabledValue>
-      <disabledValue>
-        <delete/>
-      </disabledValue>
-      <elements>
-        <list id="Value" key="Software\Policies\Startline\ExcludedFileTypes" valuePrefix="" expandable="true"/>
-      </elements>
-    </policy>
     <policy name="SearchNetworkDrives" class="Both" displayName="$(string.P_SearchNetworkDrives)" explainText="$(string.E_SearchNetworkDrives)" key="Software\Policies\Startline" valueName="SearchNetworkDrives">
-      <parentCategory ref="Search"/>
+      <parentCategory ref="SearchPlaces"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -416,7 +386,7 @@
       </disabledValue>
     </policy>
     <policy name="SearchUsbDrives" class="Both" displayName="$(string.P_SearchUsbDrives)" explainText="$(string.E_SearchUsbDrives)" key="Software\Policies\Startline" valueName="SearchUsbDrives">
-      <parentCategory ref="Search"/>
+      <parentCategory ref="SearchPlaces"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -425,18 +395,8 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
-    <policy name="IncludeHiddenFiles" class="Both" displayName="$(string.P_IncludeHiddenFiles)" explainText="$(string.E_IncludeHiddenFiles)" key="Software\Policies\Startline" valueName="IncludeHiddenFiles">
-      <parentCategory ref="Search"/>
-      <supportedOn ref="SUPPORTED_Startline"/>
-      <enabledValue>
-        <decimal value="1"/>
-      </enabledValue>
-      <disabledValue>
-        <decimal value="0"/>
-      </disabledValue>
-    </policy>
-    <policy name="ResultOrder" class="Both" displayName="$(string.P_ResultOrder)" explainText="$(string.E_ResultOrder)" presentation="$(presentation.P_ResultOrder)" key="Software\Policies\Startline" valueName="ResultOrder">
-      <parentCategory ref="Search"/>
+    <policy name="SearchSkipFolders" class="Both" displayName="$(string.P_SearchSkipFolders)" explainText="$(string.E_SearchSkipFolders)" presentation="$(presentation.P_SearchSkipFolders)" key="Software\Policies\Startline" valueName="SearchSkipFolders">
+      <parentCategory ref="SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -445,18 +405,50 @@
         <delete/>
       </disabledValue>
       <elements>
-        <list id="Value" key="Software\Policies\Startline\ResultOrder" valuePrefix="" expandable="true"/>
+        <list id="Value" key="Software\Policies\Startline\SearchSkipFolders" valuePrefix="" expandable="true"/>
       </elements>
     </policy>
-    <policy name="MaxFiles" class="Both" displayName="$(string.P_MaxFiles)" explainText="$(string.E_MaxFiles)" presentation="$(presentation.P_MaxFiles)" key="Software\Policies\Startline">
-      <parentCategory ref="Search"/>
+    <policy name="SearchSkipFolderNames" class="Both" displayName="$(string.P_SearchSkipFolderNames)" explainText="$(string.E_SearchSkipFolderNames)" presentation="$(presentation.P_SearchSkipFolderNames)" key="Software\Policies\Startline" valueName="SearchSkipFolderNames">
+      <parentCategory ref="SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
       <elements>
-        <decimal id="Value" valueName="MaxFiles" required="true" minValue="5" maxValue="200"/>
+        <list id="Value" key="Software\Policies\Startline\SearchSkipFolderNames" valuePrefix="" expandable="true"/>
       </elements>
     </policy>
-    <policy name="ShowFolderUnderFile" class="Both" displayName="$(string.P_ShowFolderUnderFile)" explainText="$(string.E_ShowFolderUnderFile)" key="Software\Policies\Startline" valueName="ShowFolderUnderFile">
-      <parentCategory ref="Search"/>
+    <policy name="SearchSkipFileTypes" class="Both" displayName="$(string.P_SearchSkipFileTypes)" explainText="$(string.E_SearchSkipFileTypes)" presentation="$(presentation.P_SearchSkipFileTypes)" key="Software\Policies\Startline" valueName="SearchSkipFileTypes">
+      <parentCategory ref="SearchSkip"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\SearchSkipFileTypes" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
+    <policy name="SearchSkipPatterns" class="Both" displayName="$(string.P_SearchSkipPatterns)" explainText="$(string.E_SearchSkipPatterns)" presentation="$(presentation.P_SearchSkipPatterns)" key="Software\Policies\Startline" valueName="SearchSkipPatterns">
+      <parentCategory ref="SearchSkip"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\SearchSkipPatterns" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
+    <policy name="SearchSkipHidden" class="Both" displayName="$(string.P_SearchSkipHidden)" explainText="$(string.E_SearchSkipHidden)" key="Software\Policies\Startline" valueName="SearchSkipHidden">
+      <parentCategory ref="SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -465,8 +457,8 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
-    <policy name="ShowSearchTime" class="Both" displayName="$(string.P_ShowSearchTime)" explainText="$(string.E_ShowSearchTime)" key="Software\Policies\Startline" valueName="ShowSearchTime">
-      <parentCategory ref="Search"/>
+    <policy name="SearchSkipSystem" class="Both" displayName="$(string.P_SearchSkipSystem)" explainText="$(string.E_SearchSkipSystem)" key="Software\Policies\Startline" valueName="SearchSkipSystem">
+      <parentCategory ref="SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -475,8 +467,28 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
-    <policy name="OfferWebSearch" class="Both" displayName="$(string.P_OfferWebSearch)" explainText="$(string.E_OfferWebSearch)" key="Software\Policies\Startline" valueName="OfferWebSearch">
-      <parentCategory ref="Search"/>
+    <policy name="SearchResults" class="Both" displayName="$(string.P_SearchResults)" explainText="$(string.E_SearchResults)" presentation="$(presentation.P_SearchResults)" key="Software\Policies\Startline" valueName="SearchResults">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\SearchResults" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
+    <policy name="SearchMaxFiles" class="Both" displayName="$(string.P_SearchMaxFiles)" explainText="$(string.E_SearchMaxFiles)" presentation="$(presentation.P_SearchMaxFiles)" key="Software\Policies\Startline">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="SearchMaxFiles" required="true" minValue="5" maxValue="200"/>
+      </elements>
+    </policy>
+    <policy name="SearchShowFolders" class="Both" displayName="$(string.P_SearchShowFolders)" explainText="$(string.E_SearchShowFolders)" key="Software\Policies\Startline" valueName="SearchShowFolders">
+      <parentCategory ref="SearchResults"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -485,19 +497,59 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
-    <policy name="WebSearchName" class="Both" displayName="$(string.P_WebSearchName)" explainText="$(string.E_WebSearchName)" presentation="$(presentation.P_WebSearchName)" key="Software\Policies\Startline">
-      <parentCategory ref="Search"/>
+    <policy name="SearchShowTime" class="Both" displayName="$(string.P_SearchShowTime)" explainText="$(string.E_SearchShowTime)" key="Software\Policies\Startline" valueName="SearchShowTime">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="SearchFileTypeButtons" class="Both" displayName="$(string.P_SearchFileTypeButtons)" explainText="$(string.E_SearchFileTypeButtons)" key="Software\Policies\Startline" valueName="SearchFileTypeButtons">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="SearchWebName" class="Both" displayName="$(string.P_SearchWebName)" explainText="$(string.E_SearchWebName)" presentation="$(presentation.P_SearchWebName)" key="Software\Policies\Startline">
+      <parentCategory ref="SearchResults"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <elements>
-        <text id="Value" valueName="WebSearchName" required="true"/>
+        <text id="Value" valueName="SearchWebName" required="true"/>
       </elements>
     </policy>
-    <policy name="WebSearchAddress" class="Both" displayName="$(string.P_WebSearchAddress)" explainText="$(string.E_WebSearchAddress)" presentation="$(presentation.P_WebSearchAddress)" key="Software\Policies\Startline">
-      <parentCategory ref="Search"/>
+    <policy name="SearchWebAddress" class="Both" displayName="$(string.P_SearchWebAddress)" explainText="$(string.E_SearchWebAddress)" presentation="$(presentation.P_SearchWebAddress)" key="Software\Policies\Startline">
+      <parentCategory ref="SearchResults"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <elements>
-        <text id="Value" valueName="WebSearchAddress" required="true"/>
+        <text id="Value" valueName="SearchWebAddress" required="true"/>
       </elements>
+    </policy>
+    <policy name="SearchChangeWindowsSettings" class="Both" displayName="$(string.P_SearchChangeWindowsSettings)" explainText="$(string.E_SearchChangeWindowsSettings)" key="Software\Policies\Startline" valueName="SearchChangeWindowsSettings">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="SearchWindowsSettingsPages" class="Both" displayName="$(string.P_SearchWindowsSettingsPages)" explainText="$(string.E_SearchWindowsSettingsPages)" key="Software\Policies\Startline" valueName="SearchWindowsSettingsPages">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
     </policy>
     <policy name="StartWithWindows" class="Both" displayName="$(string.P_StartWithWindows)" explainText="$(string.E_StartWithWindows)" key="Software\Policies\Startline" valueName="StartWithWindows">
       <parentCategory ref="General"/>
@@ -559,8 +611,8 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
-    <policy name="ChangeWindowsSettings" class="Both" displayName="$(string.P_ChangeWindowsSettings)" explainText="$(string.E_ChangeWindowsSettings)" key="Software\Policies\Startline" valueName="ChangeWindowsSettings">
-      <parentCategory ref="Limits"/>
+    <policy name="SearchSkipAppData" class="Both" displayName="$(string.P_SearchSkipAppData)" explainText="$(string.E_SearchSkipAppData)" key="Software\Policies\Startline" valueName="SearchSkipAppData">
+      <parentCategory ref="SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -569,8 +621,8 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
-    <policy name="WindowsSettingsPages" class="Both" displayName="$(string.P_WindowsSettingsPages)" explainText="$(string.E_WindowsSettingsPages)" key="Software\Policies\Startline" valueName="WindowsSettingsPages">
-      <parentCategory ref="Limits"/>
+    <policy name="SearchSkipWindows" class="Both" displayName="$(string.P_SearchSkipWindows)" explainText="$(string.E_SearchSkipWindows)" key="Software\Policies\Startline" valueName="SearchSkipWindows">
+      <parentCategory ref="SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -579,8 +631,8 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
-    <policy name="FileTypeButtons" class="Both" displayName="$(string.P_FileTypeButtons)" explainText="$(string.E_FileTypeButtons)" key="Software\Policies\Startline" valueName="FileTypeButtons">
-      <parentCategory ref="Limits"/>
+    <policy name="SearchSkipDeveloperFiles" class="Both" displayName="$(string.P_SearchSkipDeveloperFiles)" explainText="$(string.E_SearchSkipDeveloperFiles)" key="Software\Policies\Startline" valueName="SearchSkipDeveloperFiles">
+      <parentCategory ref="SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -589,8 +641,8 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
-    <policy name="Skip_Appdata" class="Both" displayName="$(string.P_Skip_Appdata)" explainText="$(string.E_Skip_Appdata)" key="Software\Policies\Startline" valueName="Skip_Appdata">
-      <parentCategory ref="Search"/>
+    <policy name="SearchSkipCloudFolders" class="Both" displayName="$(string.P_SearchSkipCloudFolders)" explainText="$(string.E_SearchSkipCloudFolders)" key="Software\Policies\Startline" valueName="SearchSkipCloudFolders">
+      <parentCategory ref="SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -599,8 +651,8 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
-    <policy name="Skip_Windowsandinstalledprograms" class="Both" displayName="$(string.P_Skip_Windowsandinstalledprograms)" explainText="$(string.E_Skip_Windowsandinstalledprograms)" key="Software\Policies\Startline" valueName="Skip_Windowsandinstalledprograms">
-      <parentCategory ref="Search"/>
+    <policy name="SearchSkipTempFiles" class="Both" displayName="$(string.P_SearchSkipTempFiles)" explainText="$(string.E_SearchSkipTempFiles)" key="Software\Policies\Startline" valueName="SearchSkipTempFiles">
+      <parentCategory ref="SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -609,8 +661,8 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
-    <policy name="Skip_Developerclutter" class="Both" displayName="$(string.P_Skip_Developerclutter)" explainText="$(string.E_Skip_Developerclutter)" key="Software\Policies\Startline" valueName="Skip_Developerclutter">
-      <parentCategory ref="Search"/>
+    <policy name="SearchSkipProgramParts" class="Both" displayName="$(string.P_SearchSkipProgramParts)" explainText="$(string.E_SearchSkipProgramParts)" key="Software\Policies\Startline" valueName="SearchSkipProgramParts">
+      <parentCategory ref="SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -619,218 +671,8 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
-    <policy name="Skip_Cloudfolders" class="Both" displayName="$(string.P_Skip_Cloudfolders)" explainText="$(string.E_Skip_Cloudfolders)" key="Software\Policies\Startline" valueName="Skip_Cloudfolders">
-      <parentCategory ref="Search"/>
-      <supportedOn ref="SUPPORTED_Startline"/>
-      <enabledValue>
-        <decimal value="1"/>
-      </enabledValue>
-      <disabledValue>
-        <decimal value="0"/>
-      </disabledValue>
-    </policy>
-    <policy name="Skip_Temporaryandlogfiles" class="Both" displayName="$(string.P_Skip_Temporaryandlogfiles)" explainText="$(string.E_Skip_Temporaryandlogfiles)" key="Software\Policies\Startline" valueName="Skip_Temporaryandlogfiles">
-      <parentCategory ref="Search"/>
-      <supportedOn ref="SUPPORTED_Startline"/>
-      <enabledValue>
-        <decimal value="1"/>
-      </enabledValue>
-      <disabledValue>
-        <decimal value="0"/>
-      </disabledValue>
-    </policy>
-    <policy name="Skip_Programparts" class="Both" displayName="$(string.P_Skip_Programparts)" explainText="$(string.E_Skip_Programparts)" key="Software\Policies\Startline" valueName="Skip_Programparts">
-      <parentCategory ref="Search"/>
-      <supportedOn ref="SUPPORTED_Startline"/>
-      <enabledValue>
-        <decimal value="1"/>
-      </enabledValue>
-      <disabledValue>
-        <decimal value="0"/>
-      </disabledValue>
-    </policy>
-    <policy name="Commands" class="Both" displayName="$(string.P_Commands)" explainText="$(string.E_Commands)" presentation="$(presentation.P_Commands)" key="Software\Policies\Startline">
-      <parentCategory ref="Limits"/>
-      <supportedOn ref="SUPPORTED_Startline"/>
-      <elements>
-        <boolean id="Command_Lock" valueName="Allow_Command_Lock">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Command_Sleep" valueName="Allow_Command_Sleep">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Command_SignOut" valueName="Allow_Command_SignOut">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Command_SwitchUser" valueName="Allow_Command_SwitchUser">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Command_Restart" valueName="Allow_Command_Restart">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Command_ShutDown" valueName="Allow_Command_ShutDown">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Command_EmptyRecycleBin" valueName="Allow_Command_EmptyRecycleBin">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Command_Customize" valueName="Allow_Command_Customize">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Command_PinPage" valueName="Allow_Command_PinPage">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Command_RealStart" valueName="Allow_Command_RealStart">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Command_Quit" valueName="Allow_Command_Quit">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Command_SettingsFolder" valueName="Allow_Command_SettingsFolder">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Command_ResetSettings" valueName="Allow_Command_ResetSettings">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-      </elements>
-    </policy>
-    <policy name="RightClickOptions" class="Both" displayName="$(string.P_RightClickOptions)" explainText="$(string.E_RightClickOptions)" presentation="$(presentation.P_RightClickOptions)" key="Software\Policies\Startline">
-      <parentCategory ref="Limits"/>
-      <supportedOn ref="SUPPORTED_Startline"/>
-      <elements>
-        <boolean id="Menu_RunAsAdmin" valueName="Allow_Menu_RunAsAdmin">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Menu_OpenWith" valueName="Allow_Menu_OpenWith">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Menu_OpenLocation" valueName="Allow_Menu_OpenLocation">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Menu_Copy" valueName="Allow_Menu_Copy">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Menu_Uninstall" valueName="Allow_Menu_Uninstall">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Menu_Recycle" valueName="Allow_Menu_Recycle">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Menu_Properties" valueName="Allow_Menu_Properties">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-        <boolean id="Menu_ShellMenu" valueName="Allow_Menu_ShellMenu">
-          <trueValue>
-            <decimal value="1"/>
-          </trueValue>
-          <falseValue>
-            <decimal value="0"/>
-          </falseValue>
-        </boolean>
-      </elements>
-    </policy>
-    <policy name="WindowsSettingsInSearch" class="Both" displayName="$(string.P_WindowsSettingsInSearch)" explainText="$(string.E_WindowsSettingsInSearch)" presentation="$(presentation.P_WindowsSettingsInSearch)" key="Software\Policies\Startline">
-      <parentCategory ref="Limits"/>
+    <policy name="SearchWindowsSettings" class="Both" displayName="$(string.P_SearchWindowsSettings)" explainText="$(string.E_SearchWindowsSettings)" presentation="$(presentation.P_SearchWindowsSettings)" key="Software\Policies\Startline">
+      <parentCategory ref="SearchResults"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <elements>
         <boolean id="Setting_Wifi" valueName="Allow_Setting_Wifi">
@@ -1170,6 +1012,186 @@
           </falseValue>
         </boolean>
         <boolean id="Setting_PowerMode" valueName="Allow_Setting_PowerMode">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+      </elements>
+    </policy>
+    <policy name="Commands" class="Both" displayName="$(string.P_Commands)" explainText="$(string.E_Commands)" presentation="$(presentation.P_Commands)" key="Software\Policies\Startline">
+      <parentCategory ref="Limits"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <boolean id="Command_Lock" valueName="Allow_Command_Lock">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Command_Sleep" valueName="Allow_Command_Sleep">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Command_SignOut" valueName="Allow_Command_SignOut">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Command_SwitchUser" valueName="Allow_Command_SwitchUser">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Command_Restart" valueName="Allow_Command_Restart">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Command_ShutDown" valueName="Allow_Command_ShutDown">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Command_EmptyRecycleBin" valueName="Allow_Command_EmptyRecycleBin">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Command_Customize" valueName="Allow_Command_Customize">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Command_PinPage" valueName="Allow_Command_PinPage">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Command_RealStart" valueName="Allow_Command_RealStart">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Command_Quit" valueName="Allow_Command_Quit">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Command_SettingsFolder" valueName="Allow_Command_SettingsFolder">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Command_ResetSettings" valueName="Allow_Command_ResetSettings">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+      </elements>
+    </policy>
+    <policy name="RightClickOptions" class="Both" displayName="$(string.P_RightClickOptions)" explainText="$(string.E_RightClickOptions)" presentation="$(presentation.P_RightClickOptions)" key="Software\Policies\Startline">
+      <parentCategory ref="Limits"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <boolean id="Menu_RunAsAdmin" valueName="Allow_Menu_RunAsAdmin">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Menu_OpenWith" valueName="Allow_Menu_OpenWith">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Menu_OpenLocation" valueName="Allow_Menu_OpenLocation">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Menu_Copy" valueName="Allow_Menu_Copy">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Menu_Uninstall" valueName="Allow_Menu_Uninstall">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Menu_Recycle" valueName="Allow_Menu_Recycle">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Menu_Properties" valueName="Allow_Menu_Properties">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Menu_ShellMenu" valueName="Allow_Menu_ShellMenu">
           <trueValue>
             <decimal value="1"/>
           </trueValue>

@@ -1,7 +1,7 @@
 //! The Search settings page: tick the places to search in a folder tree, flip simple skip
 //! rules, and see the result at once. Changes re-read the folders by themselves.
 
-use crate::config::Category;
+use crate::config::ResultKind;
 use crate::customize::{card, heading};
 use crate::platform::{self, Drive, DriveKind};
 use crate::scope::{self, SKIP_PRESETS, Scope, Tick};
@@ -18,8 +18,9 @@ use std::time::{Duration, Instant};
 pub struct ScopeUi {
     expanded: HashSet<String>,
     requested: HashSet<String>,
-    children: Arc<Mutex<HashMap<String, Vec<(String, bool)>>>>,
-    hidden: Arc<Mutex<HashSet<String>>>,
+    children: Arc<Mutex<HashMap<String, Vec<(String, u32)>>>>,
+    /// Folders seen with the hidden or system attribute, by lower-case path.
+    hidden: Arc<Mutex<HashMap<String, u32>>>,
     drives: Arc<Mutex<Vec<Drive>>>,
     drives_read: Option<Instant>,
     counts: Vec<(String, usize)>,
@@ -27,6 +28,7 @@ pub struct ScopeUi {
     toggle: Option<String>,
     new_name: String,
     new_ext: String,
+    new_pattern: String,
     new_place: String,
 }
 
@@ -48,9 +50,9 @@ impl ScopeUi {
         std::thread::spawn(move || {
             let found = platform::child_folders(&path);
             let mut known = hidden.lock().unwrap();
-            for (name, is_hidden) in &found {
-                if *is_hidden {
-                    known.insert(crate::matching::lower(&format!("{}\\{name}", path.trim_end_matches('\\'))));
+            for (name, attrs) in &found {
+                if *attrs != 0 {
+                    known.insert(crate::matching::lower(&format!("{}\\{name}", path.trim_end_matches('\\'))), *attrs);
                 }
             }
             drop(known);
@@ -96,20 +98,20 @@ struct View {
     all_roots: Vec<String>,
     excluded_paths: Vec<String>,
     excluded_names: Vec<String>,
-    include_hidden: bool,
-    hidden: HashSet<String>,
-    children: HashMap<String, Vec<(String, bool)>>,
+    skip_attrs: u32,
+    hidden: HashMap<String, u32>,
+    children: HashMap<String, Vec<(String, u32)>>,
     counts: Vec<(String, usize)>,
 }
 
 impl View {
     fn with_scope<R>(&self, read: impl FnOnce(&Scope) -> R) -> R {
-        let is_hidden = |path: &str| self.hidden.contains(&crate::matching::lower(path.trim_end_matches('\\')));
+        let is_hidden = |path: &str| self.hidden.get(&crate::matching::lower(path.trim_end_matches('\\'))).is_some_and(|a| a & self.skip_attrs != 0);
         read(&Scope {
             roots: &self.all_roots,
             excluded_paths: &self.excluded_paths,
             excluded_names: &self.excluded_names,
-            include_hidden: self.include_hidden,
+            include_hidden: self.skip_attrs == 0,
             is_hidden: &is_hidden,
         })
     }
@@ -220,19 +222,40 @@ fn drive_title(drive: &Drive) -> String {
     if drive.label.is_empty() { format!("{kind} ({letter})") } else { format!("{} ({letter})", drive.label) }
 }
 
-fn tag_list(ui: &mut Ui, list: &mut Vec<String>, pal: Pal) {
+/// The rules in a list as chips: the person's own can be clicked away, the organization's can't. Items a switch
+/// above stands for are left to that switch. `problem` says what's wrong with an item, if anything.
+fn tag_list(ui: &mut Ui, list: &mut Vec<String>, locked: &[String], problem: impl Fn(&str) -> Option<String>, pal: Pal) {
+    let shown = |item: &str| !scope::in_a_preset(item) || locked.iter().any(|l| l.eq_ignore_ascii_case(item));
     // An empty row would leave a gap between the label and its box.
-    if list.iter().all(|item| scope::in_a_preset(item)) {
+    if !list.iter().any(|item| shown(item)) {
         return;
     }
     let mut remove = None;
     ui.horizontal_wrapped(|ui| {
         ui.spacing_mut().item_spacing = vec2(6.0, 6.0);
         for (index, item) in list.iter().enumerate() {
-            if scope::in_a_preset(item) {
+            if !shown(item) {
                 continue;
             }
-            if chip(ui, &format!("{item}   ×"), None, false, pal).on_hover_text("Click to remove this rule").clicked() {
+            let theirs = locked.iter().any(|l| l.eq_ignore_ascii_case(item));
+            let trouble = problem(item);
+            // Room for a lock or a warning, drawn below in the icon font.
+            let text = match (theirs, &trouble) {
+                (true, _) => format!("      {item}"),
+                (false, Some(_)) => format!("      {item}   ×"),
+                (false, None) => format!("{item}   ×"),
+            };
+            let response = chip(ui, &text, None, false, pal);
+            let mark = if theirs { Some(('\u{E72E}', pal.sub)) } else { trouble.as_ref().map(|_| ('\u{E7BA}', Color32::from_rgb(222, 120, 96))) };
+            if let Some((glyph, color)) = mark {
+                ui.painter().text(pos2(response.rect.left() + 16.0, response.rect.center().y), Align2::CENTER_CENTER, glyph, icon_font(11.0), color);
+            }
+            let response = match (theirs, trouble) {
+                (true, _) => response.on_hover_text("Set by your organization"),
+                (false, Some(why)) => response.on_hover_text(format!("{why}\nIgnored until it's fixed. Click to remove it.")),
+                (false, None) => response.on_hover_text("Click to remove this rule"),
+            };
+            if !theirs && response.clicked() {
                 remove = Some(index);
             }
         }
@@ -278,7 +301,7 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         all_roots: scope::all_roots(&menu.cfg, &autos),
         excluded_paths: menu.cfg.excluded_paths.clone(),
         excluded_names: menu.cfg.exclude.clone(),
-        include_hidden: menu.cfg.index_hidden,
+        skip_attrs: menu.cfg.skip_attrs(),
         hidden: menu.scope_ui.hidden.lock().unwrap().clone(),
         children: menu.scope_ui.children.lock().unwrap().clone(),
         counts: menu.scope_ui.counts.clone(),
@@ -347,60 +370,74 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         }
     });
     }, |menu, ui| {
-    heading(ui, "What to skip", pal);
+    heading(ui, "Never found", pal);
     card(ui, pal, |ui| {
         for preset in SKIP_PRESETS {
             let mut on = preset.is_on(&menu.cfg);
             let before = on;
-            policy.lock(ui, &[crate::policy::skip_key(preset.title).as_str(), "ExcludedFolderNames", "ExcludedFileTypes"], |ui| switch_line(ui, preset.title, preset.about, &mut on, pal));
+            policy.lock(ui, &[preset.key], |ui| switch_line(ui, preset.title, preset.about, &mut on, pal));
             if on != before {
                 preset.set(&mut menu.cfg, on);
             }
         }
-        let mut skip_hidden = !menu.cfg.index_hidden;
-        policy.lock(ui, &["IncludeHiddenFiles"], |ui| switch_line(ui, "Hidden files and folders", "Things Windows keeps out of sight.", &mut skip_hidden, pal));
-        menu.cfg.index_hidden = !skip_hidden;
+        policy.lock(ui, &["SearchSkipHidden"], |ui| switch_line(ui, "Hidden files and folders", "Things Windows keeps out of sight.", &mut menu.cfg.skip_hidden, pal));
+        policy.lock(ui, &["SearchSkipSystem"], |ui| switch_line(ui, "System files", "What Windows marks as part of the system, such as desktop.ini.", &mut menu.cfg.skip_system, pal));
     });
+    let no_problem = |_: &str| None;
     card(ui, pal, |ui| {
-        policy.lock(ui, &["ExcludedFolderNames"], |ui| {
-            ui.label(RichText::new("Also skip folders named").size(13.5).color(pal.text));
-            tag_list(ui, &mut menu.cfg.exclude, pal);
-            let mut text = std::mem::take(&mut menu.scope_ui.new_name);
-            if add_rule_field(ui, &mut text, "A folder name, wherever it appears", pal) {
-                menu.cfg.exclude.push(text.trim().to_string());
-                text.clear();
-            }
-            menu.scope_ui.new_name = text;
-        });
+        if menu.cfg.excluded_paths.iter().any(|p| !p.is_empty()) {
+            ui.label(RichText::new("Folders").size(13.5).color(pal.text));
+            tag_list(ui, &mut menu.cfg.excluded_paths, policy.added("/excluded_paths"), no_problem, pal);
+            ui.add_space(6.0);
+        }
+        ui.label(RichText::new("Folders named").size(13.5).color(pal.text));
+        tag_list(ui, &mut menu.cfg.exclude, policy.added("/exclude"), no_problem, pal);
+        let mut text = std::mem::take(&mut menu.scope_ui.new_name);
+        if add_rule_field(ui, &mut text, "A folder name, wherever it appears", pal) {
+            menu.cfg.exclude.push(text.trim().to_string());
+            text.clear();
+        }
+        menu.scope_ui.new_name = text;
         ui.add_space(6.0);
-        policy.lock(ui, &["ExcludedFileTypes"], |ui| {
-            ui.label(RichText::new("Also skip file types").size(13.5).color(pal.text));
-            tag_list(ui, &mut menu.cfg.excluded_exts, pal);
-            let mut text = std::mem::take(&mut menu.scope_ui.new_ext);
-            if add_rule_field(ui, &mut text, ".iso", pal) {
-                let ext = format!(".{}", text.trim().trim_start_matches("*.").trim_start_matches('.').to_lowercase());
-                if ext.len() > 1 && !menu.cfg.excluded_exts.contains(&ext) {
-                    menu.cfg.excluded_exts.push(ext);
-                }
-                text.clear();
+        ui.label(RichText::new("File types").size(13.5).color(pal.text));
+        tag_list(ui, &mut menu.cfg.excluded_exts, policy.added("/excluded_exts"), no_problem, pal);
+        let mut text = std::mem::take(&mut menu.scope_ui.new_ext);
+        if add_rule_field(ui, &mut text, ".iso", pal) {
+            let ext = crate::policy::file_type(&text);
+            if ext.len() > 1 && !menu.cfg.excluded_exts.contains(&ext) {
+                menu.cfg.excluded_exts.push(ext);
             }
-            menu.scope_ui.new_ext = text;
-        });
+            text.clear();
+        }
+        menu.scope_ui.new_ext = text;
+        ui.add_space(6.0);
+        ui.label(RichText::new("Paths matching").size(13.5).color(pal.text));
+        ui.label(RichText::new("Regular expressions, checked against the whole path in any case.").size(12.0).color(pal.sub));
+        let problem = |p: &str| crate::index::pattern(p).err().map(|e| e.to_string().lines().last().unwrap_or("Not a valid pattern").trim().to_string());
+        tag_list(ui, &mut menu.cfg.skip_patterns, policy.added("/skip_patterns"), problem, pal);
+        let mut text = std::mem::take(&mut menu.scope_ui.new_pattern);
+        if add_rule_field(ui, &mut text, r"\\Payroll(\\|$)", pal) {
+            if !menu.cfg.skip_patterns.contains(&text) {
+                menu.cfg.skip_patterns.push(text.trim().to_string());
+            }
+            text.clear();
+        }
+        menu.scope_ui.new_pattern = text;
     });
 
     heading(ui, "Results", pal);
     card(ui, pal, |ui| {
-        policy.lock(ui, &["ResultOrder"], |ui| {
+        policy.lock(ui, &["SearchResults"], |ui| {
             ui.label(RichText::new("Drag to choose what comes first").size(13.5).color(pal.text));
-            drag_rows(ui, Id::unique("result-order"), &mut menu.cfg.category_order, 30.0, pal, |ui, category: &mut Category| {
-                ui.label(RichText::new(category.label()).size(13.5).color(pal.text));
+            drag_rows(ui, Id::unique("result-order"), &mut menu.cfg.results, 34.0, pal, |ui, result: &mut ResultKind| {
+                ui.label(RichText::new(result.kind.label()).size(13.5).color(if result.on { pal.text } else { pal.sub }));
+                ui.with_layout(Layout::right_to_left(Align::Center), |ui| switch(ui, &mut result.on, pal));
             });
         });
         ui.add_space(4.0);
         ui.separator();
-        policy.lock(ui, &["ShowFolderUnderFile"], |ui| switch_line(ui, "Show the folder under each file", "", &mut menu.cfg.show_paths, pal));
-        policy.lock(ui, &["OfferWebSearch"], |ui| switch_line(ui, "Offer a web search", "A last line under the results.", &mut menu.cfg.web_search, pal));
-        policy.lock(ui, &["WebSearchAddress"], |ui| ui.horizontal(|ui| {
+        policy.lock(ui, &["SearchShowFolders"], |ui| switch_line(ui, "Show the folder under each file", "", &mut menu.cfg.show_paths, pal));
+        policy.lock(ui, &["SearchWebAddress"], |ui| ui.horizontal(|ui| {
             ui.label(RichText::new("Web search with").size(13.5).color(pal.text));
             ui.add(TextEdit::singleline(&mut menu.cfg.web_url).desired_width(ui.available_width()));
         }));
@@ -408,8 +445,8 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
     });
 
     if let Some(path) = menu.scope_ui.toggle.take() {
-        let hidden = view.hidden.clone();
-        let is_hidden = move |p: &str| hidden.contains(&crate::matching::lower(p.trim_end_matches('\\')));
+        let (hidden, mask) = (view.hidden.clone(), view.skip_attrs);
+        let is_hidden = move |p: &str| hidden.get(&crate::matching::lower(p.trim_end_matches('\\'))).is_some_and(|a| a & mask != 0);
         scope::toggle(&mut menu.cfg, &autos, &path, &is_hidden);
     }
 }

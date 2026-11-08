@@ -36,7 +36,14 @@ fn long_path(path: &str) -> String {
 }
 
 /// Calls `visit(name, is_dir, is_link, modified)` for each item in a folder.
-pub fn list_dir(path: &str, hidden: bool, mut visit: impl FnMut(&str, bool, bool, u32)) {
+/// Attributes that can leave an item out of a listing.
+pub const HIDDEN: u32 = FILE_ATTRIBUTE_HIDDEN.0;
+pub const SYSTEM: u32 = FILE_ATTRIBUTE_SYSTEM.0;
+pub const HIDDEN_OR_SYSTEM: u32 = HIDDEN | SYSTEM;
+
+/// Calls `visit` with each item's name, whether it's a folder, whether it's a link, and when it last changed.
+/// Items with any of the `skip_attrs` attributes are left out.
+pub fn list_dir(path: &str, skip_attrs: u32, mut visit: impl FnMut(&str, bool, bool, u32)) {
     let pattern = wide(&format!("{}\\*", long_path(path.trim_end_matches('\\'))));
     let mut data = WIN32_FIND_DATAW::default();
     let handle = unsafe {
@@ -57,7 +64,7 @@ pub fn list_dir(path: &str, hidden: bool, mut visit: impl FnMut(&str, bool, bool
         let name = &raw[..len];
         let is_nav = name == [b'.' as u16] || name == [b'.' as u16, b'.' as u16];
         let attrs = data.dwFileAttributes;
-        let skip = !hidden && attrs & (FILE_ATTRIBUTE_HIDDEN.0 | FILE_ATTRIBUTE_SYSTEM.0) != 0;
+        let skip = attrs & skip_attrs != 0;
         if !is_nav && !skip {
             name_buf.clear();
             name_buf.extend(std::char::decode_utf16(name.iter().copied()).map(|c| c.unwrap_or('\u{FFFD}')));
@@ -89,8 +96,9 @@ pub fn stat(path: &str) -> Option<(bool, u32)> {
     Some((data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY.0 != 0, filetime_to_unix(data.ftLastWriteTime)))
 }
 
-pub fn is_hidden(path: &str) -> bool {
-    attributes(path).is_some_and(|d| d.dwFileAttributes & (FILE_ATTRIBUTE_HIDDEN.0 | FILE_ATTRIBUTE_SYSTEM.0) != 0)
+/// Whether the item has any of these attributes, such as [`HIDDEN`] or [`SYSTEM`].
+pub fn has_attributes(path: &str, mask: u32) -> bool {
+    attributes(path).is_some_and(|d| d.dwFileAttributes & mask != 0)
 }
 
 pub fn lower_thread_priority() {
@@ -171,21 +179,27 @@ pub fn describe_drives() -> Vec<Drive> {
         .collect()
 }
 
-/// The folders directly inside a folder, as (name, hidden), visible ones first.
-pub fn child_folders(path: &str) -> Vec<(String, bool)> {
-    let mut visible = Vec::new();
-    list_dir(path, false, |name, is_dir, is_link, _| {
-        if is_dir && !is_link {
-            visible.push(name.to_string());
-        }
-    });
-    let mut all: Vec<(String, bool)> = Vec::new();
-    list_dir(path, true, |name, is_dir, is_link, _| {
-        if is_dir && !is_link {
-            all.push((name.to_string(), !visible.iter().any(|v| v == name)));
-        }
-    });
-    all.sort_by_key(|(name, hidden)| (*hidden, name.to_lowercase()));
+/// The folders directly inside a folder, as (name, its HIDDEN and SYSTEM attributes), plain ones first.
+pub fn child_folders(path: &str) -> Vec<(String, u32)> {
+    let folders = |skip: u32| {
+        let mut names = Vec::new();
+        list_dir(path, skip, |name, is_dir, is_link, _| {
+            if is_dir && !is_link {
+                names.push(name.to_string());
+            }
+        });
+        names
+    };
+    let (not_hidden, not_system) = (folders(HIDDEN), folders(SYSTEM));
+    let mut all: Vec<(String, u32)> = folders(0)
+        .into_iter()
+        .map(|name| {
+            let hidden = if not_hidden.contains(&name) { 0 } else { HIDDEN };
+            let system = if not_system.contains(&name) { 0 } else { SYSTEM };
+            (name, hidden | system)
+        })
+        .collect();
+    all.sort_by_key(|(name, attrs)| (*attrs != 0, name.to_lowercase()));
     all
 }
 
@@ -352,7 +366,7 @@ pub fn recent_files(limit: usize) -> Vec<(String, String, u32)> {
     let Some(appdata) = std::env::var_os("APPDATA") else { return Vec::new() };
     let folder = std::path::PathBuf::from(appdata).join("Microsoft\\Windows\\Recent");
     let mut links: Vec<(String, u32)> = Vec::new();
-    list_dir(&folder.to_string_lossy(), false, |name, is_dir, _, mtime| {
+    list_dir(&folder.to_string_lossy(), HIDDEN_OR_SYSTEM, |name, is_dir, _, mtime| {
         if !is_dir && name.to_ascii_lowercase().ends_with(".lnk") {
             links.push((name.to_string(), mtime));
         }

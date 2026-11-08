@@ -5,6 +5,8 @@ use crate::config::Config;
 
 /// A ready-made skip rule shown as one switch.
 pub struct SkipPreset {
+    /// The policy that turns it on or off for everyone.
+    pub key: &'static str,
     pub title: &'static str,
     pub about: &'static str,
     pub names: &'static [&'static str],
@@ -13,36 +15,42 @@ pub struct SkipPreset {
 
 pub const SKIP_PRESETS: &[SkipPreset] = &[
     SkipPreset {
+        key: "SearchSkipAppData",
         title: "App data",
         about: "Settings and caches programs keep in AppData.",
         names: &["AppData"],
         exts: &[],
     },
     SkipPreset {
+        key: "SearchSkipWindows",
         title: "Windows and installed programs",
         about: "Windows, Program Files and other system folders.",
         names: &["Windows", "Program Files", "Program Files (x86)", "ProgramData", "$Recycle.Bin", "System Volume Information", "$WinREAgent", "Recovery"],
         exts: &[],
     },
     SkipPreset {
+        key: "SearchSkipDeveloperFiles",
         title: "Developer clutter",
         about: "node_modules, .git, build output and similar.",
         names: &["node_modules", ".git", ".svn", "target", "__pycache__", ".cache", ".cargo", ".rustup", ".npm", ".gradle", ".venv", "venv"],
         exts: &[],
     },
     SkipPreset {
+        key: "SearchSkipCloudFolders",
         title: "Cloud folders",
         about: "OneDrive, Dropbox and Google Drive folders.",
         names: &["OneDrive", "Dropbox", "Google Drive", "iCloudDrive"],
         exts: &[],
     },
     SkipPreset {
+        key: "SearchSkipTempFiles",
         title: "Temporary and log files",
         about: "Leftovers such as .tmp, .log and .bak.",
         names: &[],
         exts: &[".tmp", ".temp", ".log", ".bak", ".dmp"],
     },
     SkipPreset {
+        key: "SearchSkipProgramParts",
         title: "Program parts",
         about: "Files you never open yourself, such as .dll and .sys.",
         names: &[],
@@ -186,7 +194,7 @@ impl Scope<'_> {
 pub fn toggle(cfg: &mut Config, auto_roots: &[String], path: &str, is_hidden: &dyn Fn(&str) -> bool) {
     let was_on = {
         let all = all_roots(cfg, auto_roots);
-        let scope = Scope { roots: &all, excluded_paths: &cfg.excluded_paths, excluded_names: &cfg.exclude, include_hidden: cfg.index_hidden, is_hidden };
+        let scope = Scope { roots: &all, excluded_paths: &cfg.excluded_paths, excluded_names: &cfg.exclude, include_hidden: cfg.skip_attrs() == 0, is_hidden };
         scope.is_searched(path)
     };
     if was_on {
@@ -197,7 +205,7 @@ pub fn toggle(cfg: &mut Config, auto_roots: &[String], path: &str, is_hidden: &d
         cfg.excluded_paths.retain(|p| !same_path(p, path));
     }
     let all = all_roots(cfg, auto_roots);
-    let scope = Scope { roots: &all, excluded_paths: &cfg.excluded_paths, excluded_names: &cfg.exclude, include_hidden: cfg.index_hidden, is_hidden };
+    let scope = Scope { roots: &all, excluded_paths: &cfg.excluded_paths, excluded_names: &cfg.exclude, include_hidden: cfg.skip_attrs() == 0, is_hidden };
     let now_on = scope.is_searched(path);
     if was_on && now_on {
         cfg.excluded_paths.push(path.to_string());
@@ -223,7 +231,7 @@ mod tests {
     }
 
     fn scope_of<'a>(cfg: &'a Config, all: &'a [String]) -> Scope<'a> {
-        Scope { roots: all, excluded_paths: &cfg.excluded_paths, excluded_names: &cfg.exclude, include_hidden: cfg.index_hidden, is_hidden: &|_| false }
+        Scope { roots: all, excluded_paths: &cfg.excluded_paths, excluded_names: &cfg.exclude, include_hidden: cfg.skip_attrs() == 0, is_hidden: &|_| false }
     }
 
     fn searched(cfg: &Config, path: &str) -> bool {
@@ -275,7 +283,8 @@ mod tests {
         let all = all_roots(&cfg, &[]);
         let scope = Scope { roots: &all, excluded_paths: &[], excluded_names: &[], include_hidden: false, is_hidden: &hidden };
         assert!(!scope.is_searched("C:\\Users\\me\\Vault"));
-        cfg.index_hidden = true;
+        cfg.skip_hidden = false;
+        cfg.skip_system = false;
         let scope = Scope { roots: &all, excluded_paths: &[], excluded_names: &[], include_hidden: true, is_hidden: &hidden };
         assert!(scope.is_searched("C:\\Users\\me\\Vault"));
     }

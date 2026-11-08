@@ -4,7 +4,7 @@
 //! choice without replacing it: remove the policy and their choice comes back.
 
 use crate::actions::{ACTIONS, Do};
-use crate::config::{Category, Config, PRESETS, Pin, PinGroup, Section, SectionKind, Target};
+use crate::config::{Category, Config, PRESETS, Pin, PinGroup, ResultKind, Section, SectionKind, Target};
 use crate::customize::Tab;
 use crate::platform;
 use crate::scope::SKIP_PRESETS;
@@ -24,9 +24,9 @@ const KEY: &str = "Software\\Policies\\Startline";
 pub const THEME_KEYS: [&str; 6] = ["ColorTheme", "Color_Background", "Color_Panels", "Color_Text", "Color_QuietText", "Color_Accent"];
 const AUTOSTART: &str = "StartWithWindows";
 const PINS: &str = "PinnedApps";
-const PAGES: &str = "WindowsSettingsPages";
-const WINDOWS_SETTINGS: &str = "ChangeWindowsSettings";
-const FILE_BUTTONS: &str = "FileTypeButtons";
+const PAGES: &str = "SearchWindowsSettingsPages";
+const WINDOWS_SETTINGS: &str = "SearchChangeWindowsSettings";
+const FILE_BUTTONS: &str = "SearchFileTypeButtons";
 pub const CHECK_FOR_UPDATES: &str = "CheckForUpdates";
 
 /// Saved in the settings file, but only ever remembered for the person, never chosen by them.
@@ -38,21 +38,26 @@ pub enum Group {
     Appearance,
     StartMenu,
     Pins,
-    Search,
+    SearchPlaces,
+    SearchSkip,
+    SearchResults,
     General,
     Updates,
     Limits,
 }
 
 impl Group {
-    const ALL: [(Group, &'static str, &'static str); 7] = [
-        (Group::Appearance, "Appearance", "Appearance"),
-        (Group::StartMenu, "StartMenu", "Start menu"),
-        (Group::Pins, "Pins", "Pinned apps"),
-        (Group::Search, "Search", "Search"),
-        (Group::General, "General", "General"),
-        (Group::Updates, "Updates", "Updates"),
-        (Group::Limits, "Limits", "What people can do"),
+    /// The category in the templates, its name, and the category it's in.
+    const ALL: [(Group, &'static str, &'static str, &'static str); 9] = [
+        (Group::Appearance, "Appearance", "Appearance", "Startline"),
+        (Group::StartMenu, "StartMenu", "Start menu", "Startline"),
+        (Group::Pins, "Pins", "Pinned apps", "Startline"),
+        (Group::SearchPlaces, "SearchPlaces", "Where to search", "Search"),
+        (Group::SearchSkip, "SearchSkip", "Never found", "Search"),
+        (Group::SearchResults, "SearchResults", "Results", "Search"),
+        (Group::General, "General", "General", "Startline"),
+        (Group::Updates, "Updates", "Updates", "Startline"),
+        (Group::Limits, "Limits", "What people can do", "Startline"),
     ];
 
     fn tab(self) -> Tab {
@@ -60,7 +65,7 @@ impl Group {
             Group::Appearance => Tab::Appearance,
             Group::StartMenu => Tab::StartMenu,
             Group::Pins => Tab::Pins,
-            Group::Search => Tab::Search,
+            Group::SearchPlaces | Group::SearchSkip | Group::SearchResults => Tab::Search,
             Group::General | Group::Limits => Tab::General,
             Group::Updates => Tab::About,
         }
@@ -75,6 +80,8 @@ pub enum Kind {
     Text(&'static str),
     Color(&'static str),
     List,
+    /// A list whose items are added to the person's own, which they can't remove.
+    AddList,
     /// One tick box per item, all ticked to begin with.
     Checks(Vec<(String, String)>),
 }
@@ -110,10 +117,8 @@ fn list(key: &str, field: &'static str, group: Group, title: &str, about: &str) 
     entry(key, field, group, title, about, Kind::List)
 }
 
-/// The name of the policy for one of the "What to skip" switches.
-pub fn skip_key(title: &str) -> String {
-    let word: String = title.chars().filter(char::is_ascii_alphanumeric).collect();
-    format!("Skip_{word}")
+fn add_list(key: &str, field: &'static str, group: Group, title: &str, about: &str) -> Policy {
+    entry(key, field, group, title, about, Kind::AddList)
 }
 
 fn command_id(what: Do) -> Option<&'static str> {
@@ -171,21 +176,27 @@ fn build() -> Vec<Policy> {
         number("Height", "/height", StartMenu, "Menu height", STARTLINE_ONLY, 420, 1100, 720),
         // Pinned apps
         list(PINS, "/groups", Pins, "Pinned apps", "One per line: Section|Name|Target or Section|Name|Target|Arguments. Target is a file, folder, program or web address, or app:ID for an installed app. Environment variables such as %USERPROFILE% work. This replaces the person's pins and stops them changing pins."),
-        // Search
-        list("SearchFolders", "/roots", Search, "Folders to search", "One folder or drive per line. Environment variables such as %USERPROFILE% work."),
-        list("ExcludedFolders", "/excluded_paths", Search, "Exact folders to leave out", "One folder per line, such as %USERPROFILE%\\AppData. Everything inside is left out too."),
-        list("ExcludedFolderNames", "/exclude", Search, "Folder names to leave out", "One name per line. A folder with this name is left out wherever it appears."),
-        list("ExcludedFileTypes", "/excluded_exts", Search, "File types to leave out", "One per line, such as .iso."),
-        switch("SearchNetworkDrives", "/auto_network", Search, "Search network drives", "Includes any network drive as it gets attached. Big shares can take a while to read."),
-        switch("SearchUsbDrives", "/auto_removable", Search, "Search USB drives", "Includes USB sticks and disks as they get plugged in."),
-        switch("IncludeHiddenFiles", "/index_hidden", Search, "Search hidden files and folders", "Includes things Windows keeps out of sight."),
-        list("ResultOrder", "/category_order", Search, "Order of the results", "One per line, first to last: Apps, Settings, Files, Web."),
-        number("MaxFiles", "/max_files", Search, "Most files shown in the results", "", 5, 200, 30),
-        switch("ShowFolderUnderFile", "/show_paths", Search, "Show the folder under each file", ""),
-        switch("ShowSearchTime", "/show_timing", Search, "Show how long a search took", ""),
-        switch("OfferWebSearch", "/web_search", Search, "Offer a web search", "A last line under the results."),
-        entry("WebSearchName", "/web_name", Search, "Name of the web search", "Shown as: Search <name> for ...", Kind::Text("the web")),
-        entry("WebSearchAddress", "/web_url", Search, "Web search address", "Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.", Kind::Text("https://duckduckgo.com/?q={}")),
+        // Search: where to search
+        list("SearchFolders", "/roots", SearchPlaces, "Folders to search", "One folder or drive per line. Environment variables such as %USERPROFILE% work. This replaces the person's own places."),
+        switch("SearchNetworkDrives", "/auto_network", SearchPlaces, "Search network drives", "Includes any network drive as it gets attached. Big shares can take a while to read."),
+        switch("SearchUsbDrives", "/auto_removable", SearchPlaces, "Search USB drives", "Includes USB sticks and disks as they get plugged in."),
+        // Search: never found
+        add_list("SearchSkipFolders", "/excluded_paths", SearchSkip, "Folders never found", "One folder per line, such as %USERPROFILE%\\AppData. Everything inside is never found either."),
+        add_list("SearchSkipFolderNames", "/exclude", SearchSkip, "Folder names never found", "One name per line. A folder with this name is never found, nor anything in it, wherever it is."),
+        add_list("SearchSkipFileTypes", "/excluded_exts", SearchSkip, "File types never found", "One per line, such as .iso."),
+        add_list("SearchSkipPatterns", "/skip_patterns", SearchSkip, "Paths never found (regular expressions)", "One regular expression per line, matched against the whole path whatever the case. A file or folder that matches is never found, nor anything in a folder that matches. For example \\\\Payroll(\\\\|$) or \\.(key|pem|pfx)$. A pattern that isn't valid is ignored."),
+        switch("SearchSkipHidden", "/skip_hidden", SearchSkip, "Hidden files and folders are never found", "Things Windows keeps out of sight. Disabled finds them."),
+        switch("SearchSkipSystem", "/skip_system", SearchSkip, "System files are never found", "Files and folders Windows marks as part of the system, such as desktop.ini. Disabled finds them."),
+        // Search: results
+        list("SearchResults", "/results", SearchResults, "Kinds of results", "One per line, first to last: Apps, Settings, Files, Web. A kind left out is never shown."),
+        number("SearchMaxFiles", "/max_files", SearchResults, "Most files shown in the results", "", 5, 200, 30),
+        switch("SearchShowFolders", "/show_paths", SearchResults, "Show the folder under each file", ""),
+        switch("SearchShowTime", "/show_timing", SearchResults, "Show how long a search took", ""),
+        switch(FILE_BUTTONS, "", SearchResults, "File type buttons under search", "Disabled removes the buttons that narrow results to one kind of file."),
+        entry("SearchWebName", "/web_name", SearchResults, "Name of the web search", "Shown as: Search <name> for ...", Kind::Text("the web")),
+        entry("SearchWebAddress", "/web_url", SearchResults, "Web search address", "Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.", Kind::Text("https://duckduckgo.com/?q={}")),
+        switch(WINDOWS_SETTINGS, "", SearchResults, "Change Windows settings from search", "Disabled removes every Windows setting search can change."),
+        switch(PAGES, "", SearchResults, "Shortcuts to Windows settings and tools", "Disabled removes search's shortcuts to Windows settings pages and tools, and the Control Panel, printer and default program links."),
         // General
         switch(AUTOSTART, "", General, "Start with Windows", "Keeps the Start menu working after a restart."),
         switch("TakeOverStartKey", "/take_over_start", General, "Start key and button open this menu", "Shift + Start still opens the Windows menu."),
@@ -194,14 +205,12 @@ fn build() -> Vec<Policy> {
         // Updates
         switch("AutomaticUpdates", "/auto_update", Updates, "Install updates automatically", "Startline installs new versions by itself, restarting while its menu is closed. On an install for the whole PC, the Startline Updater task installs them as SYSTEM within the hour. Disabled leaves updates to the person, or on an install for the whole PC, to the administrator."),
         switch(CHECK_FOR_UPDATES, "", Updates, "Look for updates", "Disabled stops Startline looking for new versions at all, for organizations that deploy them their own way."),
-        // What people can do
-        switch(WINDOWS_SETTINGS, "", Limits, "Change Windows settings from search", "Disabled removes every Windows setting from search."),
-        switch(PAGES, "", Limits, "Shortcuts to Windows settings and tools", "Disabled removes search's shortcuts to Windows settings pages and tools, and the Control Panel, printer and default program links."),
-        switch(FILE_BUTTONS, "", Limits, "File type buttons under search", "Disabled removes the buttons that narrow results to one kind of file."),
     ];
     for preset in SKIP_PRESETS {
-        list.push(switch(&skip_key(preset.title), "", Search, &format!("Skip: {}", preset.title), preset.about));
+        list.push(switch(preset.key, "", SearchSkip, &format!("Never found: {}", preset.title.to_lowercase()), &format!("{} Enabled never finds them, disabled always finds them.", preset.about)));
     }
+    let windows = QuickId::ALL.iter().map(|id| (format!("Setting_{id:?}"), id.info().label.to_string())).collect();
+    list.push(entry("SearchWindowsSettings", "", SearchResults, "Windows settings search can change", "Unticked settings are removed from search.", Kind::Checks(windows)));
 
     let mut commands: Vec<(String, String)> = ACTIONS.iter().filter_map(|action| command_id(action.what).map(|id| (id.to_string(), action.name.to_string()))).collect();
     commands.push(("Command_SettingsFolder".to_string(), "Open my settings folder".to_string()));
@@ -221,8 +230,6 @@ fn build() -> Vec<Policy> {
     let menu = menu.iter().map(|(id, label)| (id.to_string(), label.to_string())).collect();
     list.push(entry("RightClickOptions", "", Limits, "Right-click options", "Unticked options are removed. Their keyboard shortcuts stop working too.", Kind::Checks(menu)));
 
-    let windows = QuickId::ALL.iter().map(|id| (format!("Setting_{id:?}"), id.info().label.to_string())).collect();
-    list.push(entry("WindowsSettingsInSearch", "", Limits, "Windows settings search can change", "Unticked settings are removed from search.", Kind::Checks(windows)));
     list
 }
 
@@ -300,7 +307,7 @@ fn read_into(raw: &mut Raw, root: HKEY, path: &str) {
 
 fn merge_values(raw: &mut Raw, values: Vec<(String, Stored)>, read_list: impl Fn(&str) -> Vec<(String, Stored)>) {
     // A list says it's in force with a value of its own, so an empty list can be meant.
-    for policy in all().iter().filter(|p| matches!(p.kind, Kind::List)) {
+    for policy in all().iter().filter(|p| matches!(p.kind, Kind::List | Kind::AddList)) {
         let here = values.iter().any(|(name, value)| *name == policy.key && matches!(value, Stored::Number(1)));
         if here {
             let mut items: Vec<(u32, String)> = read_list(&policy.key)
@@ -332,6 +339,8 @@ fn merge_values(raw: &mut Raw, values: Vec<(String, Stored)>, read_list: impl Fn
 #[derive(Clone, Default, PartialEq, Debug)]
 pub struct Policies {
     fields: Vec<(&'static str, Value)>,
+    /// Items added to the person's own list in these settings, which they can't remove.
+    added: Vec<(&'static str, Vec<String>)>,
     skips: Vec<(usize, bool)>,
     autostart: Option<bool>,
     set: HashSet<String>,
@@ -387,23 +396,36 @@ fn sections_of(items: &[String]) -> Vec<Section> {
     sections
 }
 
-fn categories_of(items: &[String]) -> Vec<Category> {
-    let known = [("apps", Category::Apps), ("settings", Category::Settings), ("files", Category::Files), ("web", Category::Web)];
-    let mut order: Vec<Category> = Vec::new();
-    for item in items {
-        let wanted = item.trim().to_lowercase();
-        if let Some((_, category)) = known.iter().find(|(name, _)| *name == wanted) {
-            if !order.contains(category) {
-                order.push(*category);
-            }
+/// The kinds named, in that order and shown; the rest after them and never shown.
+fn results_of(items: &[String]) -> Vec<ResultKind> {
+    let mut results: Vec<ResultKind> = Vec::new();
+    for kind in items.iter().filter_map(|item| Category::from_name(item)) {
+        if !results.iter().any(|r| r.kind == kind) {
+            results.push(ResultKind { kind, on: true });
         }
     }
-    for (_, category) in known {
-        if !order.contains(&category) {
-            order.push(category);
+    for kind in Category::ALL {
+        if !results.iter().any(|r| r.kind == kind) {
+            results.push(ResultKind { kind, on: false });
         }
     }
-    order
+    results
+}
+
+/// A file type as the settings keep it: lower case, with the dot.
+pub fn file_type(text: &str) -> String {
+    format!(".{}", text.trim().trim_start_matches("*.").trim_start_matches('.').to_lowercase())
+}
+
+/// The person's list for a setting an AddList policy adds to.
+fn list_mut<'a>(cfg: &'a mut Config, field: &str) -> Option<&'a mut Vec<String>> {
+    match field {
+        "/excluded_paths" => Some(&mut cfg.excluded_paths),
+        "/exclude" => Some(&mut cfg.exclude),
+        "/excluded_exts" => Some(&mut cfg.excluded_exts),
+        "/skip_patterns" => Some(&mut cfg.skip_patterns),
+        _ => None,
+    }
 }
 
 /// "Section|Name|Target" or "Section|Name|Target|Arguments". Lines that aren't either are skipped.
@@ -466,7 +488,7 @@ impl Policies {
                     let on = *number != 0;
                     if policy.key == AUTOSTART {
                         out.autostart = Some(on);
-                    } else if let Some(at) = SKIP_PRESETS.iter().position(|p| skip_key(p.title) == policy.key) {
+                    } else if let Some(at) = SKIP_PRESETS.iter().position(|p| p.key == policy.key) {
                         out.skips.push((at, on));
                     } else if !policy.field.is_empty() {
                         out.fields.push((policy.field, json!(on)));
@@ -512,13 +534,28 @@ impl Policies {
                     let Some(items) = raw.lists.get(&policy.key) else { continue };
                     let value = match policy.field {
                         "/sections" => serde_json::to_value(sections_of(items)),
-                        "/category_order" => serde_json::to_value(categories_of(items)),
+                        "/results" => serde_json::to_value(results_of(items)),
                         "/groups" => serde_json::to_value(pins_of(items)),
-                        "/excluded_exts" => Ok(json!(items.iter().map(|e| format!(".{}", e.trim().trim_start_matches("*.").trim_start_matches('.').to_lowercase())).collect::<Vec<_>>())),
                         _ => Ok(json!(items.iter().map(|i| expand(i.trim())).collect::<Vec<_>>())),
                     };
                     let Ok(value) = value else { continue };
                     out.fields.push((policy.field, value));
+                    out.set.insert(policy.key.clone());
+                }
+                Kind::AddList => {
+                    let Some(items) = raw.lists.get(&policy.key) else { continue };
+                    let items = items
+                        .iter()
+                        .map(|i| i.trim())
+                        .filter(|i| !i.is_empty())
+                        .map(|i| match policy.field {
+                            "/excluded_exts" => file_type(i),
+                            // a regular expression's own % and \ mean something
+                            "/skip_patterns" => i.to_string(),
+                            _ => expand(i),
+                        })
+                        .collect();
+                    out.added.push((policy.field, items));
                     out.set.insert(policy.key.clone());
                 }
                 Kind::Checks(items) => {
@@ -604,6 +641,19 @@ impl Policies {
                 SKIP_PRESETS[*at].set(cfg, *on);
             }
         }
+        for (field, items) in &self.added {
+            let Some(list) = list_mut(cfg, field) else { continue };
+            for item in items {
+                if !list.iter().any(|have| have.eq_ignore_ascii_case(item)) {
+                    list.push(item.clone());
+                }
+            }
+        }
+    }
+
+    /// What a policy adds to this list, such as "/exclude", which the person can't take out.
+    pub fn added(&self, field: &str) -> &[String] {
+        self.added.iter().find(|(f, _)| *f == field).map_or(&[], |(_, items)| items.as_slice())
     }
 
     /// What to save: the settings with the person's own choice wherever a policy is in force.
@@ -623,6 +673,14 @@ impl Policies {
         }
         for (at, _) in &self.skips {
             SKIP_PRESETS[*at].set(&mut out, SKIP_PRESETS[*at].is_on(own));
+        }
+        // The administrator's items aren't the person's, unless they had them too.
+        let mut own = own.clone();
+        for (field, items) in &self.added {
+            let mine = list_mut(&mut own, field).map(|l| l.clone()).unwrap_or_default();
+            if let Some(list) = list_mut(&mut out, field) {
+                list.retain(|item| mine.iter().any(|m| m.eq_ignore_ascii_case(item)) || !items.iter().any(|a| a.eq_ignore_ascii_case(item)));
+            }
         }
         out
     }
@@ -680,6 +738,7 @@ fn explain(policy: &Policy) -> String {
     let what = match policy.kind {
         Kind::Bool => "Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.",
         Kind::Checks(_) => "Enabled applies the ticks below. Disabled or Not configured allows everything.",
+        Kind::AddList => "Enabled adds the items below to people's own, and they can't remove them. They can still add more. Disabled or Not configured leaves it to them.",
         _ => "Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.",
     };
     if policy.about.is_empty() { what.to_string() } else { format!("{}\n\n{what}", policy.about) }
@@ -699,15 +758,18 @@ pub fn templates() -> (String, String) {
     admx.push_str("  <resources minRequiredRevision=\"1.0\" fallbackCulture=\"en-us\"/>\n");
     admx.push_str("  <supportedOn>\n    <definitions>\n      <definition name=\"SUPPORTED_Startline\" displayName=\"$(string.Supported)\"/>\n    </definitions>\n  </supportedOn>\n");
     admx.push_str("  <categories>\n    <category name=\"Startline\" displayName=\"$(string.Cat_Startline)\"/>\n");
-    for (_, id, label) in Group::ALL {
+    // Search's settings come in three parts, in a category of their own.
+    say("Cat_Search", "Search");
+    admx.push_str("    <category name=\"Search\" displayName=\"$(string.Cat_Search)\">\n      <parentCategory ref=\"Startline\"/>\n    </category>\n");
+    for (_, id, label, parent) in Group::ALL {
         say(&format!("Cat_{id}"), label);
-        admx.push_str(&format!("    <category name=\"{id}\" displayName=\"$(string.Cat_{id})\">\n      <parentCategory ref=\"Startline\"/>\n    </category>\n"));
+        admx.push_str(&format!("    <category name=\"{id}\" displayName=\"$(string.Cat_{id})\">\n      <parentCategory ref=\"{parent}\"/>\n    </category>\n"));
     }
     admx.push_str("  </categories>\n  <policies>\n");
 
     for policy in all() {
         let key = &policy.key;
-        let group = Group::ALL.iter().find(|(g, _, _)| *g == policy.group).map_or("", |(_, id, _)| id);
+        let group = Group::ALL.iter().find(|(g, _, _, _)| *g == policy.group).map_or("", |(_, id, _, _)| id);
         say(&format!("P_{key}"), &policy.title);
         say(&format!("E_{key}"), &explain(policy));
         let label = xml(&format!("{}:", policy.title));
@@ -739,7 +801,7 @@ pub fn templates() -> (String, String) {
                 elements = format!("        <text id=\"Value\" valueName=\"{key}\" required=\"true\"/>\n");
                 presentation = format!("        <textBox refId=\"Value\">\n          <label>{label}</label>\n          <defaultValue>{}</defaultValue>\n        </textBox>\n", xml(default));
             }
-            Kind::List => {
+            Kind::List | Kind::AddList => {
                 own_value = format!(" valueName=\"{key}\"");
                 values = "      <enabledValue>\n        <decimal value=\"1\"/>\n      </enabledValue>\n      <disabledValue>\n        <delete/>\n      </disabledValue>\n".to_string();
                 elements = format!("        <list id=\"Value\" key=\"{KEY}\\{key}\" valuePrefix=\"\" expandable=\"true\"/>\n");
@@ -805,9 +867,9 @@ mod tests {
             Kind::Choice(items) => Some(json!(items.last().unwrap().0)),
             Kind::Text(_) => Some(json!("https://example.com/?q={}")),
             Kind::Color(_) => Some(json!("#010203")),
-            Kind::List => Some(json!(match policy.field {
+            Kind::List | Kind::AddList => Some(json!(match policy.field {
                 "/sections" => vec!["Recent"],
-                "/category_order" => vec!["Web", "Files"],
+                "/results" => vec!["Web", "Files"],
                 "/groups" => vec!["Work|Notes|C:\\notes.txt"],
                 _ => vec![".test"],
             })),
@@ -832,7 +894,7 @@ mod tests {
     fn every_option_has_a_policy() {
         let keys: HashSet<&str> = all().iter().map(|p| p.key.as_str()).collect();
         for preset in SKIP_PRESETS {
-            assert!(keys.contains(skip_key(preset.title).as_str()), "{}", preset.title);
+            assert!(keys.contains(preset.key), "{}", preset.title);
         }
         let checks: HashSet<&str> = all().iter().filter_map(|p| if let Kind::Checks(items) = &p.kind { Some(items) } else { None }).flatten().map(|(id, _)| id.as_str()).collect();
         for id in QuickId::ALL {
@@ -855,7 +917,8 @@ mod tests {
             let raw = raw(json!({ policy.key.clone(): value }));
             let policies = Policies::from_raw(&raw);
             assert!(policies.is_set(&policy.key), "{}", policy.key);
-            if policy.field.is_empty() {
+            // An AddList adds to a list rather than setting it: see a_policy_adds_rules_the_person_keeps_their_own_under.
+            if policy.field.is_empty() || matches!(policy.kind, Kind::AddList) {
                 continue;
             }
             let mut cfg = Config::default();
@@ -886,7 +949,7 @@ mod tests {
         let mut own = Config::default();
         own.columns = 9;
         own.width = 500.0;
-        let policies = Policies::from_raw(&raw(json!({ "Columns": 4, "Skip_Developerclutter": 1 })));
+        let policies = Policies::from_raw(&raw(json!({ "Columns": 4, "SearchSkipDeveloperFiles": 1 })));
         let mut cfg = own.clone();
         policies.enforce(&mut cfg);
         assert_eq!(cfg.columns, 4);
@@ -930,20 +993,48 @@ mod tests {
     fn lists_keep_their_meaning() {
         let policies = Policies::from_raw(&raw(json!({
             "Sections": ["Recent", "Pinned"],
-            "ResultOrder": ["Files"],
+            "SearchResults": ["Files"],
             "PinnedApps": ["Work|Notes|C:\\notes.txt", "Work|Calc|app:Calc.App", "not a pin"],
-            "ExcludedFileTypes": ["ISO", "*.tmp", ".log"],
+            "SearchSkipFileTypes": ["ISO", "*.tmp", ".log"],
         })));
         let mut cfg = Config::default();
         policies.enforce(&mut cfg);
         assert_eq!((cfg.sections[0].kind, cfg.sections[0].visible), (SectionKind::Recent, true));
         assert_eq!((cfg.sections[2].kind, cfg.sections[2].visible), (SectionKind::Frequent, false));
-        assert_eq!(cfg.category_order[0], Category::Files);
-        assert_eq!(cfg.category_order.len(), 4);
+        assert_eq!(cfg.results[0], ResultKind { kind: Category::Files, on: true });
+        assert_eq!(cfg.results.len(), 4);
+        assert!(!cfg.shows(Category::Web), "a kind left out is never shown");
         assert_eq!(cfg.groups.len(), 1);
         assert_eq!(cfg.groups[0].pins.len(), 2);
         assert_eq!(cfg.groups[0].pins[1].target, Target::App("Calc.App".to_string()));
         assert_eq!(cfg.excluded_exts, vec![".iso", ".tmp", ".log"]);
+    }
+
+    #[test]
+    fn a_policy_adds_rules_the_person_keeps_their_own_under() {
+        let policies = Policies::from_raw(&raw(json!({
+            "SearchSkipFolderNames": ["Secret", "Archive"],
+            "SearchSkipPatterns": [r"\\Payroll(\\|$)"],
+        })));
+        let mut own = Config::default();
+        own.exclude = vec!["archive".into(), "Mine".into()];
+        let mut cfg = own.clone();
+        policies.enforce(&mut cfg);
+        assert_eq!(cfg.exclude, ["archive", "Mine", "Secret"], "added once, whatever the case");
+        assert_eq!(cfg.skip_patterns, [r"\\Payroll(\\|$)"], "a pattern is kept as written");
+        cfg.exclude.push("Later".into());
+        let saved = policies.without_forced(&cfg, &own);
+        assert_eq!(saved.exclude, ["archive", "Mine", "Later"], "the organization's rules aren't saved as the person's");
+        assert!(saved.skip_patterns.is_empty());
+        assert_eq!(policies.added("/exclude"), ["Secret", "Archive"]);
+    }
+
+    #[test]
+    fn an_older_settings_file_keeps_its_meaning() {
+        let cfg = Config::parse(br#"{"index_hidden": true, "web_search": false, "category_order": ["Files", "Apps", "Settings", "Web"]}"#).unwrap();
+        assert!(!cfg.skip_hidden, "hidden files were included");
+        assert_eq!(cfg.results[0].kind, Category::Files);
+        assert!(cfg.shows(Category::Apps) && !cfg.shows(Category::Web), "the web search was off");
     }
 
     #[test]
@@ -953,7 +1044,7 @@ mod tests {
             "Allow_Command_Lock": 1,
             "Allow_Menu_RunAsAdmin": 0,
             "Allow_Setting_Wifi": 0,
-            "WindowsSettingsPages": 0,
+            "SearchWindowsSettingsPages": 0,
             "StartWithWindows": 0,
         })));
         assert!(!policies.allows_do(Do::Quit));
@@ -994,7 +1085,7 @@ mod tests {
             ("Corners".to_string(), Stored::Text("Square".to_string())),
             ("FrostedGlass".to_string(), Stored::Number(0)),
             ("SearchFolders".to_string(), Stored::Number(1)),
-            ("ExcludedFolders".to_string(), Stored::Number(1)),
+            ("SearchSkipFolders".to_string(), Stored::Number(1)),
             ("Sections".to_string(), Stored::Number(0)),
         ];
         let mut raw = Raw::default();
@@ -1009,7 +1100,7 @@ mod tests {
         assert_eq!(cfg.corners, crate::config::CornerKind::Square);
         assert!(!cfg.blur);
         assert_eq!(cfg.roots, vec!["C:\\first", "D:\\second"], "in order");
-        assert!(policies.is_set("ExcludedFolders"), "an empty list can be meant");
+        assert!(policies.is_set("SearchSkipFolders"), "an empty list can be meant");
         assert!(!policies.is_set("Sections"));
     }
 

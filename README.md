@@ -29,7 +29,7 @@ While Startline runs, the Start key and the Start button open it instead of the 
 - Apps and settings are answered in the same frame as the key press
 - Files come from an index that keeps every name in one block of memory, so a million files is one fast scan. It's saved to disk, so search works from the first moment, and kept fresh by watching for changes
 - Filter chips for folders, documents, pictures and each file type in the results, with the time the search took
-- Choose where to search and what to skip, including network and USB drives as they're attached
+- Choose where to search, including network and USB drives as they're attached, and what's never found: ready-made groups, hidden and system files, folders, file types and regular expressions
 - A web search for what you typed
 
 ### 🎚️ Settings right in the search

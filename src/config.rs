@@ -110,7 +110,20 @@ pub struct PinGroup {
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Debug)]
 pub enum Category { Apps, Settings, Files, Web }
 
+/// One kind of search result, and whether it's shown.
+#[derive(Clone, Copy, PartialEq, Serialize, Deserialize, Debug)]
+pub struct ResultKind {
+    pub kind: Category,
+    pub on: bool,
+}
+
 impl Category {
+    pub const ALL: [Category; 4] = [Category::Apps, Category::Settings, Category::Files, Category::Web];
+
+    pub fn from_name(name: &str) -> Option<Category> {
+        Category::ALL.into_iter().find(|c| format!("{c:?}").eq_ignore_ascii_case(name.trim()))
+    }
+
     pub fn label(self) -> &'static str {
         match self {
             Category::Apps => "Apps",
@@ -177,12 +190,16 @@ pub struct Config {
     /// Search network drives and USB drives as they get attached.
     pub auto_network: bool,
     pub auto_removable: bool,
-    pub index_hidden: bool,
-    pub category_order: Vec<Category>,
+    /// Never find what Windows keeps out of sight, or marks as part of the system.
+    pub skip_hidden: bool,
+    pub skip_system: bool,
+    /// Regular expressions: anything whose whole path matches is never found.
+    pub skip_patterns: Vec<String>,
+    /// The kinds of results, in the order they're shown, each on or off.
+    pub results: Vec<ResultKind>,
     pub max_files: usize,
     pub show_paths: bool,
     pub show_timing: bool,
-    pub web_search: bool,
     pub web_name: String,
     pub web_url: String,
 
@@ -257,12 +274,13 @@ impl Default for Config {
             excluded_exts: Vec::new(),
             auto_network: false,
             auto_removable: false,
-            index_hidden: false,
-            category_order: vec![Category::Apps, Category::Settings, Category::Files, Category::Web],
+            skip_hidden: true,
+            skip_system: true,
+            skip_patterns: Vec::new(),
+            results: Category::ALL.iter().map(|&kind| ResultKind { kind, on: true }).collect(),
             max_files: 30,
             show_paths: true,
             show_timing: true,
-            web_search: true,
             web_name: "the web".into(),
             web_url: "https://duckduckgo.com/?q={}".into(),
             take_over_start: true,
@@ -288,12 +306,33 @@ impl Config {
 
     /// Reads a saved file. The home screen used to have a quick settings section: it is
     /// dropped here so that a file from then keeps its pins and everything else.
-    fn parse(bytes: &[u8]) -> Option<Config> {
+    pub(crate) fn parse(bytes: &[u8]) -> Option<Config> {
         let mut saved: serde_json::Value = serde_json::from_slice(bytes).ok()?;
         if let Some(sections) = saved.get_mut("sections").and_then(|s| s.as_array_mut()) {
             sections.retain(|s| s.get("kind").and_then(|k| k.as_str()) != Some("Quick"));
         }
+        // Hidden files were once something to include, and the results an order with a separate web switch.
+        if let Some(object) = saved.as_object_mut() {
+            if let Some(include) = object.remove("index_hidden").and_then(|v| v.as_bool()) {
+                object.entry("skip_hidden").or_insert(serde_json::json!(!include));
+            }
+            let web = object.remove("web_search").and_then(|v| v.as_bool()).unwrap_or(true);
+            if let Some(order) = object.remove("category_order").and_then(|v| v.as_array().cloned()) {
+                let results: Vec<serde_json::Value> = order.into_iter().map(|kind| serde_json::json!({ "on": web || kind != "Web", "kind": kind })).collect();
+                object.entry("results").or_insert(serde_json::json!(results));
+            }
+        }
         serde_json::from_value(saved).ok()
+    }
+
+    /// Whether search shows this kind of result.
+    pub fn shows(&self, kind: Category) -> bool {
+        self.results.iter().any(|r| r.kind == kind && r.on)
+    }
+
+    /// The attributes that leave a file or folder out of search.
+    pub fn skip_attrs(&self) -> u32 {
+        (if self.skip_hidden { crate::platform::HIDDEN } else { 0 }) | (if self.skip_system { crate::platform::SYSTEM } else { 0 })
     }
 
     /// Bring lists up to date after an update added a new section, setting or category.
@@ -314,9 +353,9 @@ impl Config {
                 self.sections.push(section);
             }
         }
-        for category in defaults.category_order {
-            if !self.category_order.contains(&category) {
-                self.category_order.push(category);
+        for result in defaults.results {
+            if !self.results.iter().any(|r| r.kind == result.kind) {
+                self.results.push(result);
             }
         }
         if self.groups.is_empty() {

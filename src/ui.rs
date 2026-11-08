@@ -62,14 +62,16 @@ fn index_params_of(cfg: &Config) -> IndexParams {
     let autos = search_page::auto_roots(cfg.auto_network, cfg.auto_removable);
     let all = scope::all_roots(cfg, &autos);
     // The top of a drive needs no check, and asking a dead network drive could stall.
-    let is_hidden = |path: &str| scope::parent_of(path).is_some() && platform::is_hidden(path);
-    let scope = Scope { roots: &all, excluded_paths: &cfg.excluded_paths, excluded_names: &cfg.exclude, include_hidden: cfg.index_hidden, is_hidden: &is_hidden };
+    let skip_attrs = cfg.skip_attrs();
+    let is_hidden = |path: &str| scope::parent_of(path).is_some() && platform::has_attributes(path, skip_attrs);
+    let scope = Scope { roots: &all, excluded_paths: &cfg.excluded_paths, excluded_names: &cfg.exclude, include_hidden: skip_attrs == 0, is_hidden: &is_hidden };
     IndexParams {
         roots: scope.places_to_read(),
         exclude: cfg.exclude.clone(),
         exclude_paths: cfg.excluded_paths.clone(),
         exclude_exts: cfg.excluded_exts.clone(),
-        hidden: cfg.index_hidden,
+        patterns: cfg.skip_patterns.clone(),
+        skip_attrs,
     }
 }
 
@@ -410,7 +412,7 @@ impl Menu {
         let already = {
             let autos = search_page::auto_roots(self.cfg.auto_network, self.cfg.auto_removable);
             let all = scope::all_roots(&self.cfg, &autos);
-            let scope = Scope { roots: &all, excluded_paths: &self.cfg.excluded_paths, excluded_names: &self.cfg.exclude, include_hidden: self.cfg.index_hidden, is_hidden: &|_| false };
+            let scope = Scope { roots: &all, excluded_paths: &self.cfg.excluded_paths, excluded_names: &self.cfg.exclude, include_hidden: self.cfg.skip_attrs() == 0, is_hidden: &|_| false };
             scope.is_searched(&place)
         };
         self.cfg.excluded_paths.retain(|p| !scope::same_path(p, &place));
@@ -443,14 +445,16 @@ impl Menu {
         rows.extend(direct);
         // A file type filter means the person is after files: nothing else belongs in the list.
         if self.filtering() {
-            rows.extend(file_rows);
+            if self.cfg.shows(Category::Files) {
+                rows.extend(file_rows);
+            }
             self.rows = rows;
             return;
         }
-        if self.settings_lead {
+        if self.settings_lead && self.cfg.shows(Category::Settings) {
             rows.extend(self.fast_rows.iter().filter(|r| r.category == Category::Settings).cloned());
         }
-        for &category in &self.cfg.category_order {
+        for category in self.cfg.results.iter().filter(|r| r.on).map(|r| r.kind) {
             match category {
                 Category::Settings if self.settings_lead => {}
                 Category::Apps | Category::Settings => {
@@ -1142,3 +1146,4 @@ fn window_handle(cc: &eframe::CreationContext<'_>) -> Option<isize> {
         _ => None,
     }
 }
+

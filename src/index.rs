@@ -563,7 +563,10 @@ pub struct IndexParams {
     pub exclude_paths: Vec<String>,
     /// File types to skip, with the dot.
     pub exclude_exts: Vec<String>,
-    pub hidden: bool,
+    /// Regular expressions: an item whose whole path matches is left out, and a folder with all it holds.
+    pub patterns: Vec<String>,
+    /// Attributes that leave an item out, see platform::HIDDEN and platform::SYSTEM.
+    pub skip_attrs: u32,
 }
 
 impl IndexParams {
@@ -574,7 +577,8 @@ impl IndexParams {
         self.exclude.hash(&mut h);
         self.exclude_paths.hash(&mut h);
         self.exclude_exts.hash(&mut h);
-        self.hidden.hash(&mut h);
+        self.patterns.hash(&mut h);
+        self.skip_attrs.hash(&mut h);
         h.finish()
     }
 
@@ -583,9 +587,15 @@ impl IndexParams {
             names: self.exclude.iter().map(|e| matching::lower(e)).collect(),
             paths: self.exclude_paths.iter().map(|p| matching::lower(p.trim_end_matches('\\'))).collect(),
             exts: self.exclude_exts.iter().map(|e| matching::lower(e)).collect(),
-            hidden: self.hidden,
+            patterns: self.patterns.iter().filter_map(|p| pattern(p).ok()).collect(),
+            skip_attrs: self.skip_attrs,
         }
     }
+}
+
+/// A pattern as search uses it: matched against the whole path, whatever the case.
+pub fn pattern(text: &str) -> Result<regex::Regex, regex::Error> {
+    regex::RegexBuilder::new(text).case_insensitive(true).build()
 }
 
 /// What to leave out while reading folders.
@@ -594,25 +604,49 @@ struct Rules {
     names: Vec<String>,
     paths: Vec<String>,
     exts: Vec<String>,
-    hidden: bool,
+    patterns: Vec<regex::Regex>,
+    skip_attrs: u32,
 }
 
 impl Rules {
     fn skips_folder(&self, parent: &str, name: &str) -> bool {
-        self.names.iter().any(|e| e.eq_ignore_ascii_case(name)) || (!self.paths.is_empty() && self.paths.contains(&matching::lower(&join(parent, name))))
+        self.names.iter().any(|e| e.eq_ignore_ascii_case(name))
+            || (!self.paths.is_empty() && self.paths.contains(&matching::lower(&join(parent, name))))
+            || self.matches(parent, name)
     }
 
-    fn skips_file(&self, name: &str) -> bool {
-        !self.exts.is_empty() && {
+    fn skips_file(&self, parent: &str, name: &str) -> bool {
+        let by_type = !self.exts.is_empty() && {
             let lowered = matching::lower(name);
             self.exts.iter().any(|ext| lowered.ends_with(ext.as_str()))
+        };
+        by_type || self.matches(parent, name)
+    }
+
+    fn matches(&self, parent: &str, name: &str) -> bool {
+        !self.patterns.is_empty() && {
+            let path = join(parent, name);
+            self.patterns.iter().any(|p| p.is_match(&path))
         }
     }
 
     /// For a change Windows reports: `rel` is the path below the searched place.
     fn skips_change(&self, full: &str, rel: &str) -> bool {
-        if path_is_excluded(rel, &self.names) || self.skips_file(rel) {
+        let by_type = !self.exts.is_empty() && {
+            let lowered = matching::lower(rel);
+            self.exts.iter().any(|ext| lowered.ends_with(ext.as_str()))
+        };
+        if path_is_excluded(rel, &self.names) || by_type {
             return true;
+        }
+        // A pattern that matches the item or any folder it's in below the searched place.
+        let top = full.len() - rel.len();
+        let mut end = full.len();
+        while !self.patterns.is_empty() && end > top {
+            if self.patterns.iter().any(|p| p.is_match(&full[..end])) {
+                return true;
+            }
+            end = full[..end].rfind('\\').unwrap_or(0);
         }
         let lowered = matching::lower(full);
         self.paths.iter().any(|p| lowered == *p || lowered.strip_prefix(p.as_str()).is_some_and(|rest| rest.starts_with('\\')))
@@ -622,7 +656,7 @@ impl Rules {
 fn walk(path: &str, name: String, mtime: u32, rules: &Rules, counter: &AtomicUsize) -> Listing {
     let mut listing = Listing { name, mtime, ..Default::default() };
     let mut subdirs = Vec::new();
-    platform::list_dir(path, rules.hidden, |entry_name, is_dir, is_link, entry_mtime| {
+    platform::list_dir(path, rules.skip_attrs, |entry_name, is_dir, is_link, entry_mtime| {
         if is_dir {
             if rules.skips_folder(path, entry_name) {
                 return;
@@ -633,7 +667,7 @@ fn walk(path: &str, name: String, mtime: u32, rules: &Rules, counter: &AtomicUsi
             } else {
                 subdirs.push((entry_name.to_string(), entry_mtime));
             }
-        } else if !rules.skips_file(entry_name) {
+        } else if !rules.skips_file(path, entry_name) {
             listing.files.push((entry_name.into(), entry_mtime));
         }
     });
@@ -679,7 +713,7 @@ fn walk_all(params: &IndexParams, counter: &AtomicUsize, store: &mut dyn FnMut(&
         // Read the top level first, then finish one top-level folder at a time.
         let mut top = Listing::default();
         let mut subdirs = Vec::new();
-        platform::list_dir(root, params.hidden, |name, is_dir, is_link, mtime| {
+        platform::list_dir(root, params.skip_attrs, |name, is_dir, is_link, mtime| {
             if is_dir {
                 if rules.skips_folder(root, name) {
                     return;
@@ -689,7 +723,7 @@ fn walk_all(params: &IndexParams, counter: &AtomicUsize, store: &mut dyn FnMut(&
                 } else {
                     subdirs.push((name.to_string(), mtime));
                 }
-            } else if !rules.skips_file(name) {
+            } else if !rules.skips_file(root, name) {
                 top.files.push((name.into(), mtime));
             }
         });
@@ -734,7 +768,7 @@ impl Index {
                 let Some((parent_path, name)) = path.rsplit_once('\\') else { return };
                 let Some(parent) = self.find_path(parent_path) else { return };
                 let Some((is_dir, mtime)) = platform::stat(path) else { return };
-                if !params.hidden && platform::is_hidden(path) {
+                if platform::has_attributes(path, params.skip_attrs) {
                     return;
                 }
                 let depth = self.entries[parent].depth.saturating_add(1);
@@ -1099,10 +1133,24 @@ mod tests {
         assert!(rules.skips_folder("C:\\Users\\me", "SECRET"));
         assert!(!rules.skips_folder("C:\\Users\\me", "Secrets"));
         assert!(!rules.skips_folder("C:\\Users\\other", "Secret"));
-        assert!(rules.skips_file("Cache.TMP"));
-        assert!(!rules.skips_file("notes.txt"));
+        assert!(rules.skips_file("C:\\x", "Cache.TMP"));
+        assert!(!rules.skips_file("C:\\x", "notes.txt"));
         assert!(rules.skips_change("C:\\Users\\me\\Secret\\a.txt", "Secret\\a.txt"));
         assert!(!rules.skips_change("C:\\Users\\me\\Secrets\\a.txt", "Secrets\\a.txt"));
+    }
+
+    #[test]
+    fn patterns_match_the_whole_path_and_leave_out_what_a_folder_holds() {
+        let rules = IndexParams { patterns: vec![r"\\payroll\\".into(), r"\.(key|pem)$".into(), "(unclosed".into()], ..Default::default() }.rules();
+        assert_eq!(rules.patterns.len(), 2, "a pattern that isn't valid is left out");
+        assert!(rules.skips_file("C:\\Work", "server.KEY"), "whatever the case");
+        assert!(!rules.skips_file("C:\\Work", "keys.txt"));
+        assert!(!rules.skips_folder("C:\\Work", "Payroll"), "the folder's own path doesn't end in a backslash");
+        assert!(rules.skips_change("C:\\Work\\Payroll\\2026\\june.xlsx", "Payroll\\2026\\june.xlsx"), "what it holds is left out");
+        assert!(!rules.skips_change("C:\\Work\\Pay\\june.xlsx", "Pay\\june.xlsx"));
+        let folder = IndexParams { patterns: vec![r"\\payroll$".into()], ..Default::default() }.rules();
+        assert!(folder.skips_folder("C:\\Work", "Payroll"));
+        assert!(folder.skips_change("C:\\Work\\Payroll\\june.xlsx", "Payroll\\june.xlsx"));
     }
 
     #[test]

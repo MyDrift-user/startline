@@ -6,10 +6,13 @@
     <stringTable>
       <string id="Supported">Startline 0.1 and later</string>
       <string id="Cat_Startline">Startline</string>
+      <string id="Cat_Search">Search</string>
       <string id="Cat_Appearance">Appearance</string>
       <string id="Cat_StartMenu">Start menu</string>
       <string id="Cat_Pins">Pinned apps</string>
-      <string id="Cat_Search">Search</string>
+      <string id="Cat_SearchPlaces">Where to search</string>
+      <string id="Cat_SearchSkip">Never found</string>
+      <string id="Cat_SearchResults">Results</string>
       <string id="Cat_General">General</string>
       <string id="Cat_Updates">Updates</string>
       <string id="Cat_Limits">What people can do</string>
@@ -133,19 +136,7 @@ Enabled sets it to the value below, and people can't change it. Disabled or Not 
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
       <string id="P_SearchFolders">Folders to search</string>
-      <string id="E_SearchFolders">One folder or drive per line. Environment variables such as %USERPROFILE% work.
-
-Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
-      <string id="P_ExcludedFolders">Exact folders to leave out</string>
-      <string id="E_ExcludedFolders">One folder per line, such as %USERPROFILE%\AppData. Everything inside is left out too.
-
-Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
-      <string id="P_ExcludedFolderNames">Folder names to leave out</string>
-      <string id="E_ExcludedFolderNames">One name per line. A folder with this name is left out wherever it appears.
-
-Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
-      <string id="P_ExcludedFileTypes">File types to leave out</string>
-      <string id="E_ExcludedFileTypes">One per line, such as .iso.
+      <string id="E_SearchFolders">One folder or drive per line. Environment variables such as %USERPROFILE% work. This replaces the person's own places.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
       <string id="P_SearchNetworkDrives">Search network drives</string>
@@ -156,32 +147,60 @@ Enabled turns this on and Disabled turns it off, and people can't change it. Not
       <string id="E_SearchUsbDrives">Includes USB sticks and disks as they get plugged in.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_IncludeHiddenFiles">Search hidden files and folders</string>
-      <string id="E_IncludeHiddenFiles">Includes things Windows keeps out of sight.
+      <string id="P_SearchSkipFolders">Folders never found</string>
+      <string id="E_SearchSkipFolders">One folder per line, such as %USERPROFILE%\AppData. Everything inside is never found either.
+
+Enabled adds the items below to people's own, and they can't remove them. They can still add more. Disabled or Not configured leaves it to them.</string>
+      <string id="P_SearchSkipFolderNames">Folder names never found</string>
+      <string id="E_SearchSkipFolderNames">One name per line. A folder with this name is never found, nor anything in it, wherever it is.
+
+Enabled adds the items below to people's own, and they can't remove them. They can still add more. Disabled or Not configured leaves it to them.</string>
+      <string id="P_SearchSkipFileTypes">File types never found</string>
+      <string id="E_SearchSkipFileTypes">One per line, such as .iso.
+
+Enabled adds the items below to people's own, and they can't remove them. They can still add more. Disabled or Not configured leaves it to them.</string>
+      <string id="P_SearchSkipPatterns">Paths never found (regular expressions)</string>
+      <string id="E_SearchSkipPatterns">One regular expression per line, matched against the whole path whatever the case. A file or folder that matches is never found, nor anything in a folder that matches. For example \\Payroll(\\|$) or \.(key|pem|pfx)$. A pattern that isn't valid is ignored.
+
+Enabled adds the items below to people's own, and they can't remove them. They can still add more. Disabled or Not configured leaves it to them.</string>
+      <string id="P_SearchSkipHidden">Hidden files and folders are never found</string>
+      <string id="E_SearchSkipHidden">Things Windows keeps out of sight. Disabled finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_ResultOrder">Order of the results</string>
-      <string id="E_ResultOrder">One per line, first to last: Apps, Settings, Files, Web.
-
-Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
-      <string id="P_MaxFiles">Most files shown in the results</string>
-      <string id="E_MaxFiles">Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
-      <string id="P_ShowFolderUnderFile">Show the folder under each file</string>
-      <string id="E_ShowFolderUnderFile">Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_ShowSearchTime">Show how long a search took</string>
-      <string id="E_ShowSearchTime">Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_OfferWebSearch">Offer a web search</string>
-      <string id="E_OfferWebSearch">A last line under the results.
+      <string id="P_SearchSkipSystem">System files are never found</string>
+      <string id="E_SearchSkipSystem">Files and folders Windows marks as part of the system, such as desktop.ini. Disabled finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_WebSearchName">Name of the web search</string>
-      <string id="E_WebSearchName">Shown as: Search &lt;name&gt; for ...
+      <string id="P_SearchResults">Kinds of results</string>
+      <string id="E_SearchResults">One per line, first to last: Apps, Settings, Files, Web. A kind left out is never shown.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
-      <string id="P_WebSearchAddress">Web search address</string>
-      <string id="E_WebSearchAddress">Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.
+      <string id="P_SearchMaxFiles">Most files shown in the results</string>
+      <string id="E_SearchMaxFiles">Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_SearchShowFolders">Show the folder under each file</string>
+      <string id="E_SearchShowFolders">Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_SearchShowTime">Show how long a search took</string>
+      <string id="E_SearchShowTime">Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_SearchFileTypeButtons">File type buttons under search</string>
+      <string id="E_SearchFileTypeButtons">Disabled removes the buttons that narrow results to one kind of file.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_SearchWebName">Name of the web search</string>
+      <string id="E_SearchWebName">Shown as: Search &lt;name&gt; for ...
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_SearchWebAddress">Web search address</string>
+      <string id="E_SearchWebAddress">Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="P_SearchChangeWindowsSettings">Change Windows settings from search</string>
+      <string id="E_SearchChangeWindowsSettings">Disabled removes every Windows setting search can change.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_SearchWindowsSettingsPages">Shortcuts to Windows settings and tools</string>
+      <string id="E_SearchWindowsSettingsPages">Disabled removes search's shortcuts to Windows settings pages and tools, and the Control Panel, printer and default program links.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
       <string id="P_StartWithWindows">Start with Windows</string>
       <string id="E_StartWithWindows">Keeps the Start menu working after a restart.
 
@@ -206,52 +225,40 @@ Enabled turns this on and Disabled turns it off, and people can't change it. Not
       <string id="E_CheckForUpdates">Disabled stops Startline looking for new versions at all, for organizations that deploy them their own way.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_ChangeWindowsSettings">Change Windows settings from search</string>
-      <string id="E_ChangeWindowsSettings">Disabled removes every Windows setting from search.
+      <string id="P_SearchSkipAppData">Never found: app data</string>
+      <string id="E_SearchSkipAppData">Settings and caches programs keep in AppData. Enabled never finds them, disabled always finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_WindowsSettingsPages">Shortcuts to Windows settings and tools</string>
-      <string id="E_WindowsSettingsPages">Disabled removes search's shortcuts to Windows settings pages and tools, and the Control Panel, printer and default program links.
+      <string id="P_SearchSkipWindows">Never found: windows and installed programs</string>
+      <string id="E_SearchSkipWindows">Windows, Program Files and other system folders. Enabled never finds them, disabled always finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_FileTypeButtons">File type buttons under search</string>
-      <string id="E_FileTypeButtons">Disabled removes the buttons that narrow results to one kind of file.
+      <string id="P_SearchSkipDeveloperFiles">Never found: developer clutter</string>
+      <string id="E_SearchSkipDeveloperFiles">node_modules, .git, build output and similar. Enabled never finds them, disabled always finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_Skip_Appdata">Skip: App data</string>
-      <string id="E_Skip_Appdata">Settings and caches programs keep in AppData.
+      <string id="P_SearchSkipCloudFolders">Never found: cloud folders</string>
+      <string id="E_SearchSkipCloudFolders">OneDrive, Dropbox and Google Drive folders. Enabled never finds them, disabled always finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_Skip_Windowsandinstalledprograms">Skip: Windows and installed programs</string>
-      <string id="E_Skip_Windowsandinstalledprograms">Windows, Program Files and other system folders.
+      <string id="P_SearchSkipTempFiles">Never found: temporary and log files</string>
+      <string id="E_SearchSkipTempFiles">Leftovers such as .tmp, .log and .bak. Enabled never finds them, disabled always finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_Skip_Developerclutter">Skip: Developer clutter</string>
-      <string id="E_Skip_Developerclutter">node_modules, .git, build output and similar.
+      <string id="P_SearchSkipProgramParts">Never found: program parts</string>
+      <string id="E_SearchSkipProgramParts">Files you never open yourself, such as .dll and .sys. Enabled never finds them, disabled always finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_Skip_Cloudfolders">Skip: Cloud folders</string>
-      <string id="E_Skip_Cloudfolders">OneDrive, Dropbox and Google Drive folders.
+      <string id="P_SearchWindowsSettings">Windows settings search can change</string>
+      <string id="E_SearchWindowsSettings">Unticked settings are removed from search.
 
-Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_Skip_Temporaryandlogfiles">Skip: Temporary and log files</string>
-      <string id="E_Skip_Temporaryandlogfiles">Leftovers such as .tmp, .log and .bak.
-
-Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_Skip_Programparts">Skip: Program parts</string>
-      <string id="E_Skip_Programparts">Files you never open yourself, such as .dll and .sys.
-
-Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+Enabled applies the ticks below. Disabled or Not configured allows everything.</string>
       <string id="P_Commands">Commands people can use</string>
       <string id="E_Commands">Unticked commands are removed everywhere they appear. Removing Customize Startline also closes off the settings window.
 
 Enabled applies the ticks below. Disabled or Not configured allows everything.</string>
       <string id="P_RightClickOptions">Right-click options</string>
       <string id="E_RightClickOptions">Unticked options are removed. Their keyboard shortcuts stop working too.
-
-Enabled applies the ticks below. Disabled or Not configured allows everything.</string>
-      <string id="P_WindowsSettingsInSearch">Windows settings search can change</string>
-      <string id="E_WindowsSettingsInSearch">Unticked settings are removed from search.
 
 Enabled applies the ticks below. Disabled or Not configured allows everything.</string>
     </stringTable>
@@ -337,59 +344,37 @@ Enabled applies the ticks below. Disabled or Not configured allows everything.</
       <presentation id="P_SearchFolders">
         <listBox refId="Value">Folders to search:</listBox>
       </presentation>
-      <presentation id="P_ExcludedFolders">
-        <listBox refId="Value">Exact folders to leave out:</listBox>
+      <presentation id="P_SearchSkipFolders">
+        <listBox refId="Value">Folders never found:</listBox>
       </presentation>
-      <presentation id="P_ExcludedFolderNames">
-        <listBox refId="Value">Folder names to leave out:</listBox>
+      <presentation id="P_SearchSkipFolderNames">
+        <listBox refId="Value">Folder names never found:</listBox>
       </presentation>
-      <presentation id="P_ExcludedFileTypes">
-        <listBox refId="Value">File types to leave out:</listBox>
+      <presentation id="P_SearchSkipFileTypes">
+        <listBox refId="Value">File types never found:</listBox>
       </presentation>
-      <presentation id="P_ResultOrder">
-        <listBox refId="Value">Order of the results:</listBox>
+      <presentation id="P_SearchSkipPatterns">
+        <listBox refId="Value">Paths never found (regular expressions):</listBox>
       </presentation>
-      <presentation id="P_MaxFiles">
+      <presentation id="P_SearchResults">
+        <listBox refId="Value">Kinds of results:</listBox>
+      </presentation>
+      <presentation id="P_SearchMaxFiles">
         <decimalTextBox refId="Value" defaultValue="30">Most files shown in the results:</decimalTextBox>
       </presentation>
-      <presentation id="P_WebSearchName">
+      <presentation id="P_SearchWebName">
         <textBox refId="Value">
           <label>Name of the web search:</label>
           <defaultValue>the web</defaultValue>
         </textBox>
       </presentation>
-      <presentation id="P_WebSearchAddress">
+      <presentation id="P_SearchWebAddress">
         <textBox refId="Value">
           <label>Web search address:</label>
           <defaultValue>https://duckduckgo.com/?q={}</defaultValue>
         </textBox>
       </presentation>
-      <presentation id="P_Commands">
-        <checkBox refId="Command_Lock" defaultChecked="true">Lock screen</checkBox>
-        <checkBox refId="Command_Sleep" defaultChecked="true">Sleep</checkBox>
-        <checkBox refId="Command_SignOut" defaultChecked="true">Sign out</checkBox>
-        <checkBox refId="Command_SwitchUser" defaultChecked="true">Switch user</checkBox>
-        <checkBox refId="Command_Restart" defaultChecked="true">Restart</checkBox>
-        <checkBox refId="Command_ShutDown" defaultChecked="true">Shut down</checkBox>
-        <checkBox refId="Command_EmptyRecycleBin" defaultChecked="true">Empty Recycle Bin</checkBox>
-        <checkBox refId="Command_Customize" defaultChecked="true">Customize Startline</checkBox>
-        <checkBox refId="Command_PinPage" defaultChecked="true">Pin something to Start</checkBox>
-        <checkBox refId="Command_RealStart" defaultChecked="true">Open the Windows Start menu</checkBox>
-        <checkBox refId="Command_Quit" defaultChecked="true">Quit Startline</checkBox>
-        <checkBox refId="Command_SettingsFolder" defaultChecked="true">Open my settings folder</checkBox>
-        <checkBox refId="Command_ResetSettings" defaultChecked="true">Reset all settings</checkBox>
-      </presentation>
-      <presentation id="P_RightClickOptions">
-        <checkBox refId="Menu_RunAsAdmin" defaultChecked="true">Run as administrator</checkBox>
-        <checkBox refId="Menu_OpenWith" defaultChecked="true">Open with</checkBox>
-        <checkBox refId="Menu_OpenLocation" defaultChecked="true">Open file location</checkBox>
-        <checkBox refId="Menu_Copy" defaultChecked="true">Copy path, name or address</checkBox>
-        <checkBox refId="Menu_Uninstall" defaultChecked="true">Uninstall</checkBox>
-        <checkBox refId="Menu_Recycle" defaultChecked="true">Move to Recycle Bin</checkBox>
-        <checkBox refId="Menu_Properties" defaultChecked="true">Properties</checkBox>
-        <checkBox refId="Menu_ShellMenu" defaultChecked="true">More options (the Windows menu)</checkBox>
-      </presentation>
-      <presentation id="P_WindowsSettingsInSearch">
+      <presentation id="P_SearchWindowsSettings">
         <checkBox refId="Setting_Wifi" defaultChecked="true">Wi-Fi</checkBox>
         <checkBox refId="Setting_Bluetooth" defaultChecked="true">Bluetooth</checkBox>
         <checkBox refId="Setting_DarkMode" defaultChecked="true">Dark mode</checkBox>
@@ -433,6 +418,31 @@ Enabled applies the ticks below. Disabled or Not configured allows everything.</
         <checkBox refId="Setting_ScreenTimeout" defaultChecked="true">Screen off after</checkBox>
         <checkBox refId="Setting_SleepTimeout" defaultChecked="true">Sleep after</checkBox>
         <checkBox refId="Setting_PowerMode" defaultChecked="true">Power mode</checkBox>
+      </presentation>
+      <presentation id="P_Commands">
+        <checkBox refId="Command_Lock" defaultChecked="true">Lock screen</checkBox>
+        <checkBox refId="Command_Sleep" defaultChecked="true">Sleep</checkBox>
+        <checkBox refId="Command_SignOut" defaultChecked="true">Sign out</checkBox>
+        <checkBox refId="Command_SwitchUser" defaultChecked="true">Switch user</checkBox>
+        <checkBox refId="Command_Restart" defaultChecked="true">Restart</checkBox>
+        <checkBox refId="Command_ShutDown" defaultChecked="true">Shut down</checkBox>
+        <checkBox refId="Command_EmptyRecycleBin" defaultChecked="true">Empty Recycle Bin</checkBox>
+        <checkBox refId="Command_Customize" defaultChecked="true">Customize Startline</checkBox>
+        <checkBox refId="Command_PinPage" defaultChecked="true">Pin something to Start</checkBox>
+        <checkBox refId="Command_RealStart" defaultChecked="true">Open the Windows Start menu</checkBox>
+        <checkBox refId="Command_Quit" defaultChecked="true">Quit Startline</checkBox>
+        <checkBox refId="Command_SettingsFolder" defaultChecked="true">Open my settings folder</checkBox>
+        <checkBox refId="Command_ResetSettings" defaultChecked="true">Reset all settings</checkBox>
+      </presentation>
+      <presentation id="P_RightClickOptions">
+        <checkBox refId="Menu_RunAsAdmin" defaultChecked="true">Run as administrator</checkBox>
+        <checkBox refId="Menu_OpenWith" defaultChecked="true">Open with</checkBox>
+        <checkBox refId="Menu_OpenLocation" defaultChecked="true">Open file location</checkBox>
+        <checkBox refId="Menu_Copy" defaultChecked="true">Copy path, name or address</checkBox>
+        <checkBox refId="Menu_Uninstall" defaultChecked="true">Uninstall</checkBox>
+        <checkBox refId="Menu_Recycle" defaultChecked="true">Move to Recycle Bin</checkBox>
+        <checkBox refId="Menu_Properties" defaultChecked="true">Properties</checkBox>
+        <checkBox refId="Menu_ShellMenu" defaultChecked="true">More options (the Windows menu)</checkBox>
       </presentation>
     </presentationTable>
   </resources>

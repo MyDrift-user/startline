@@ -235,7 +235,7 @@ pub fn file_rows(hits: &[Hit], cfg: &Config) -> Vec<Row> {
 }
 
 pub fn web_row(query: &str, cfg: &Config) -> Option<Row> {
-    if !cfg.web_search || query.trim().is_empty() {
+    if !cfg.shows(Category::Web) || query.trim().is_empty() {
         return None;
     }
     Some(Row {
