@@ -49,7 +49,17 @@ function Wait-Updated($exe) {
     Start-Sleep 5
     if ((Installer-Running)) { continue }
     try { if ((Version $exe) -eq "Startline $new") { break } } catch {}
-    if ($i -eq 72) { Show-Logs; throw "$exe didn't update" }
+    if ($i -eq 72) {
+      Show-Logs
+      # what's there instead, and what the installer decided about it
+      try { Write-Host "--- it says: '$(Version $exe)'" } catch { Write-Host "--- it doesn't run: $_" }
+      Get-Item $exe -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "--- $($_.FullName) $($_.Length) bytes, written $($_.LastWriteTime), version $($_.VersionInfo.FileVersion)" }
+      Get-ChildItem (Split-Path $exe) -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "    $($_.FullName)" }
+      if ($script:installerLog -and (Test-Path $script:installerLog)) {
+        Select-String -Path $script:installerLog -Pattern 'startline\.exe|APPLICATIONFOLDER|RemoveExistingProducts|Won.t|Disallow' | Select-Object -First 60 | ForEach-Object { Write-Host $_.Line }
+      }
+      throw "$exe didn't update"
+    }
   }
   Assert-Version $exe $new
   if ($script:installerLog -notlike '*.log' -or -not (Test-Path $script:installerLog)) { throw "The installer left no log at $script:installerLog" }
