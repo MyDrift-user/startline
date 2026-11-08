@@ -143,9 +143,10 @@ src/
   config.rs               what's saved
   policy.rs               Group Policy
   update.rs               signed updates from GitHub releases
+build.rs                  puts the icon and version into startline.exe
 PolicyDefinitions/        ADMX / ADML templates
 assets/                   logo, icon, screenshots and the script that draws them
-installer/windows/        setup.exe (Inno Setup) and MSI (WiX) definitions, and the packaging script
+installer/windows/        setup.exe (Inno Setup) and MSI (WiX) definitions, packaging, and the installer and update tests
 ```
 
 ## 📄 License

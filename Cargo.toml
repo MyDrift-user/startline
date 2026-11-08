@@ -2,6 +2,7 @@
 name = "startline"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.95"
 description = "A customizable Start menu and instant local search for Windows"
 license = "GPL-3.0-only"
 repository = "https://github.com/MyDrift-user/startline"
