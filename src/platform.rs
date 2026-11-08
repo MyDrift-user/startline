@@ -301,7 +301,52 @@ pub fn com_init() {
     let _ = unsafe { CoInitializeEx(None, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE) };
 }
 
+/// Whether this copy of Startline runs with administrator rights, as when it was started from an elevated prompt.
+pub fn is_elevated() -> bool {
+    use windows::Win32::Security::{GetTokenInformation, TOKEN_ELEVATION, TOKEN_QUERY, TokenElevation};
+    use windows::Win32::System::Threading::{GetCurrentProcess, OpenProcessToken};
+    unsafe {
+        let mut token = HANDLE::default();
+        if OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &mut token).is_err() {
+            return false;
+        }
+        let mut elevation = TOKEN_ELEVATION::default();
+        let mut size = 0;
+        let ok = GetTokenInformation(token, TokenElevation, Some(&mut elevation as *mut _ as *mut c_void), size_of::<TOKEN_ELEVATION>() as u32, &mut size).is_ok();
+        let _ = CloseHandle(token);
+        ok && elevation.TokenIsElevated != 0
+    }
+}
+
+/// Opens through the desktop's own Explorer, so what opens runs with the person's normal rights even when Startline
+/// has administrator rights. False if there's no desktop Explorer to ask.
+fn shell_open_as_user(file: &str, args: &str) -> bool {
+    use windows::Win32::System::Com::{CLSCTX_LOCAL_SERVER, CoCreateInstance, IDispatch, IServiceProvider};
+    use windows::Win32::System::Variant::VARIANT;
+    use windows::Win32::UI::Shell::*;
+    use windows::core::{BSTR, Interface};
+    unsafe {
+        let run = || -> windows::core::Result<()> {
+            let windows: IShellWindows = CoCreateInstance(&ShellWindows, None, CLSCTX_LOCAL_SERVER)?;
+            let desktop = VARIANT::from(CSIDL_DESKTOP as i32);
+            let mut hwnd = 0;
+            let found: IDispatch = windows.FindWindowSW(&desktop, &VARIANT::default(), SWC_DESKTOP, &mut hwnd, SWFO_NEEDDISPATCH)?;
+            let browser: IShellBrowser = found.cast::<IServiceProvider>()?.QueryService(&SID_STopLevelBrowser)?;
+            let view = browser.QueryActiveShellView()?;
+            let background: IDispatch = view.GetItemObject(SVGIO_BACKGROUND)?;
+            let shell: IShellDispatch2 = background.cast::<IShellFolderViewDual>()?.Application()?.cast()?;
+            let show = VARIANT::from(SW_SHOWNORMAL.0);
+            shell.ShellExecute(&BSTR::from(file), &VARIANT::from(BSTR::from(args)), &VARIANT::from(BSTR::new()), &VARIANT::from(BSTR::new()), &show)
+        };
+        run().is_ok()
+    }
+}
+
 pub fn shell_open(verb: &str, file: &str, args: &str) -> bool {
+    // An elevated Start menu mustn't make everything it opens elevated too; only Run as administrator should.
+    if verb != "runas" && is_elevated() && shell_open_as_user(file, args) {
+        return true;
+    }
     let (verb_w, file_w, args_w) = (wide(verb), wide(file), wide(args));
     let result = unsafe {
         ShellExecuteW(
@@ -572,5 +617,33 @@ pub fn message_box_error(text: &str) {
     let (text_w, title) = (wide(text), wide("Startline"));
     unsafe {
         MessageBoxW(None, PCWSTR(text_w.as_ptr()), PCWSTR(title.as_ptr()), MB_OK | MB_ICONERROR);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Run from an elevated prompt: cargo test --release -- --ignored opens_with_normal_rights
+    #[test]
+    #[ignore = "needs an elevated prompt and a desktop"]
+    fn opens_with_normal_rights_even_when_elevated() {
+        assert!(is_elevated(), "start this test from an elevated prompt");
+        com_init();
+        let out = std::env::temp_dir().join(format!("startline-rights-{}.txt", std::process::id()));
+        let _ = std::fs::remove_file(&out);
+        assert!(shell_open("", "cmd.exe", &format!("/c whoami /groups > \"{}\"", out.display())));
+        let mut groups = String::new();
+        for _ in 0..50 {
+            std::thread::sleep(std::time::Duration::from_millis(200));
+            // whoami writes in the console's code page, not UTF-8
+            groups = String::from_utf8_lossy(&std::fs::read(&out).unwrap_or_default()).into_owned();
+            if groups.contains("S-1-16-") {
+                break;
+            }
+        }
+        let _ = std::fs::remove_file(&out);
+        assert!(groups.contains("S-1-16-8192"), "it should run at the normal (medium) level");
+        assert!(!groups.contains("S-1-16-12288"), "not with administrator rights");
     }
 }
