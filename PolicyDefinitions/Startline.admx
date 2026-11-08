@@ -26,6 +26,9 @@
     <category name="General" displayName="$(string.Cat_General)">
       <parentCategory ref="Startline"/>
     </category>
+    <category name="Updates" displayName="$(string.Cat_Updates)">
+      <parentCategory ref="Startline"/>
+    </category>
     <category name="Limits" displayName="$(string.Cat_Limits)">
       <parentCategory ref="Startline"/>
     </category>
@@ -528,6 +531,26 @@
     </policy>
     <policy name="SkipWelcome" class="Both" displayName="$(string.P_SkipWelcome)" explainText="$(string.E_SkipWelcome)" key="Software\Policies\Startline" valueName="SkipWelcome">
       <parentCategory ref="General"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="AutomaticUpdates" class="Both" displayName="$(string.P_AutomaticUpdates)" explainText="$(string.E_AutomaticUpdates)" key="Software\Policies\Startline" valueName="AutomaticUpdates">
+      <parentCategory ref="Updates"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="CheckForUpdates" class="Both" displayName="$(string.P_CheckForUpdates)" explainText="$(string.E_CheckForUpdates)" key="Software\Policies\Startline" valueName="CheckForUpdates">
+      <parentCategory ref="Updates"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>

@@ -68,6 +68,8 @@ jobs:
         run: |
           $base = "startline-v$env:VERSION-windows-x64"
           $exe = "$env:ProgramFiles\Startline\startline.exe"
+          . installer\windows\test-lib.ps1
+          function Task { schtasks /Query /TN 'Startline Updater' 2>$null; $LASTEXITCODE -eq 0 }
           # The installed program has to run. Writing the policy templates is the one thing it does and then exits.
           function Assert-Runs($program) {
             $p = Start-Process $program -ArgumentList '--write-policy-templates', "`"$env:RUNNER_TEMP\runs`"" -Wait -PassThru
@@ -80,9 +82,13 @@ jobs:
           if ($p.ExitCode -or -not (Test-Path $exe)) { throw "setup.exe did not install" }
           Assert-Runs $exe
           if (-not (Test-Path "$env:ProgramFiles\Startline\LICENSE.txt")) { throw "setup.exe did not install the licence" }
+          if (-not (Task)) { throw "setup.exe didn't add the update task" }
+          Assert-Locked "$env:ProgramFiles\Startline"
+          if (-not (Test-Path "$env:ProgramFiles\Startline\machine-install.txt")) { throw "setup.exe didn't mark a PC-wide install" }
           $p = Start-Process "$env:ProgramFiles\Startline\unins000.exe" -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait -PassThru
           Start-Sleep -Seconds 5
           if ($p.ExitCode -or (Test-Path $exe)) { throw "setup.exe did not uninstall" }
+          if (Task) { throw "Uninstalling setup.exe left the update task" }
 
           $msi = (Resolve-Path "dist\$base.msi").Path
           $p = Start-Process msiexec -ArgumentList '/i',"`"$msi`"",'/qn','/norestart','ALLUSERS=1' -Wait -PassThru
@@ -93,14 +99,20 @@ jobs:
           $target = (New-Object -ComObject WScript.Shell).CreateShortcut("$menu\Startline.lnk").TargetPath
           if ($target -ne $exe) { throw "The shortcut points to '$target'" }
           if ((Listed).Count -ne 1) { throw "Windows lists Startline $((Listed).Count) times" }
+          # A PC-wide install gets the task that installs updates silently, and loses it again.
+          if (-not (Task)) { throw "The MSI didn't add the update task" }
+          Assert-Locked "$env:ProgramFiles\Startline"
           $p = Start-Process msiexec -ArgumentList '/x',"`"$msi`"",'/qn','/norestart' -Wait -PassThru
           if ($p.ExitCode -or (Test-Path $exe) -or (Test-Path "$menu\Startline.lnk")) { throw "MSI did not uninstall: $($p.ExitCode)" }
+          if (Task) { throw "Uninstalling the MSI left the update task" }
 
           # For one account: in their own folder, without admin rights.
           $own = "$env:LOCALAPPDATA\Programs\Startline\startline.exe"
           $p = Start-Process msiexec -ArgumentList '/i',"`"$msi`"",'/qn','/norestart','ALLUSERS=2','MSIINSTALLPERUSER=1' -Wait -PassThru
           if ($p.ExitCode -or -not (Test-Path $own)) { throw "MSI did not install for one account: $($p.ExitCode)" }
           Assert-Runs $own
+          if (Task) { throw "A per-user MSI added the update task" }
+          if (Test-Path "$env:LOCALAPPDATA\Programs\Startline\machine-install.txt") { throw "A per-user MSI was marked as PC-wide" }
           $p = Start-Process msiexec -ArgumentList '/x',"`"$msi`"",'/qn','/norestart','ALLUSERS=2','MSIINSTALLPERUSER=1' -Wait -PassThru
           if ($p.ExitCode -or (Test-Path $own)) { throw "MSI did not uninstall for one account: $($p.ExitCode)" }
 
@@ -108,6 +120,8 @@ jobs:
           $dir = 'C:\Apps\Startline Test'
           $p = Start-Process msiexec -ArgumentList '/i',"`"$msi`"",'/qn','/norestart','ALLUSERS=1',"APPLICATIONFOLDER=`"$dir`"" -Wait -PassThru
           if ($p.ExitCode -or -not (Test-Path "$dir\startline.exe")) { throw "MSI did not install into a chosen folder: $($p.ExitCode)" }
+          Assert-Locked $dir
+          if (-not (Test-Path "$dir\machine-install.txt")) { throw "The MSI didn't mark a PC-wide install in a chosen folder" }
           $p = Start-Process msiexec -ArgumentList '/x',"`"$msi`"",'/qn','/norestart' -Wait -PassThru
           if ($p.ExitCode -or (Test-Path "$dir\startline.exe")) { throw "MSI did not uninstall from a chosen folder: $($p.ExitCode)" }
 
@@ -141,32 +155,82 @@ jobs:
           }
           $global:LASTEXITCODE = 0
 
-      - name: Checksums
-        shell: pwsh
-        run: |
-          Get-ChildItem dist -File | ForEach-Object { "$((Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower())  $($_.Name)" } | Set-Content dist\SHA256SUMS.txt -Encoding ascii
-          Get-Content dist\SHA256SUMS.txt
-
       - uses: actions/upload-artifact@v7
         with:
           name: release-windows
           path: dist/*
           if-no-files-found: error
 
+  # Every kind of install really updates itself, from this version to a new one, with a throwaway key.
+  update-test:
+    needs: windows
+    runs-on: windows-latest
+    env:
+      VERSION: ${{ needs.windows.outputs.version }}
+      DOTNET_ROLL_FORWARD: Major
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install installer tools
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          dotnet tool install --global wix --version 5.0.2
+          & "$env:USERPROFILE\.dotnet\tools\wix.exe" extension add --global WixToolset.UI.wixext/5.0.2
+          if ($LASTEXITCODE) { throw "wix extension failed" }
+          "$env:USERPROFILE\.dotnet\tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build two versions
+        shell: pwsh
+        run: installer\windows\build-two-versions.ps1
+
+      - name: Update
+        shell: pwsh
+        run: installer\windows\test-update.ps1
+
   release:
     if: inputs.publish
-    needs: windows
-    runs-on: ubuntu-latest
+    needs: [windows, update-test]
+    runs-on: windows-latest
+    # Holds the signing key, and waits for an approval on GitHub before it runs.
+    environment: release
     permissions:
       contents: write
     env:
       VERSION: ${{ needs.windows.outputs.version }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/download-artifact@v8
         with:
           path: dist
           pattern: release-*
           merge-multiple: true
+
+      - name: Sign the update list
+        env:
+          UPDATE_KEY: ${{ secrets.STARTLINE_UPDATE_KEY }}
+        run: |
+          [ -n "$UPDATE_KEY" ] || { echo "The STARTLINE_UPDATE_KEY secret is missing"; exit 1; }
+          cd dist
+          { echo "version $VERSION"; sha256sum -- * | sed -E 's/^([0-9a-f]+) +\*?/file \1 /'; } > latest.json
+          printf '%s\n' "$UPDATE_KEY" > "$RUNNER_TEMP/key.pem"
+          openssl pkeyutl -sign -inkey "$RUNNER_TEMP/key.pem" -rawin -in latest.json -out latest.json.sig
+          rm -f "$RUNNER_TEMP/key.pem"
+          cat latest.json
+          # the program itself has to accept it, with the key built into it
+          program="$RUNNER_TEMP/startline.exe"
+          cp "startline-v$VERSION-windows-x64-portable.exe" "$program"
+          "$program" --verify-manifest latest.json latest.json.sig
+          { echo tampered; cat latest.json; } > "$RUNNER_TEMP/changed.json"
+          if "$program" --verify-manifest "$RUNNER_TEMP/changed.json" latest.json.sig; then
+            echo "A changed list was accepted"
+            exit 1
+          fi
 
       - name: Create release
         env:

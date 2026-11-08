@@ -27,6 +27,7 @@ const PINS: &str = "PinnedApps";
 const PAGES: &str = "WindowsSettingsPages";
 const WINDOWS_SETTINGS: &str = "ChangeWindowsSettings";
 const FILE_BUTTONS: &str = "FileTypeButtons";
+pub const CHECK_FOR_UPDATES: &str = "CheckForUpdates";
 
 /// Saved in the settings file, but only ever remembered for the person, never chosen by them.
 #[cfg(test)]
@@ -39,16 +40,18 @@ pub enum Group {
     Pins,
     Search,
     General,
+    Updates,
     Limits,
 }
 
 impl Group {
-    const ALL: [(Group, &'static str, &'static str); 6] = [
+    const ALL: [(Group, &'static str, &'static str); 7] = [
         (Group::Appearance, "Appearance", "Appearance"),
         (Group::StartMenu, "StartMenu", "Start menu"),
         (Group::Pins, "Pins", "Pinned apps"),
         (Group::Search, "Search", "Search"),
         (Group::General, "General", "General"),
+        (Group::Updates, "Updates", "Updates"),
         (Group::Limits, "Limits", "What people can do"),
     ];
 
@@ -59,6 +62,7 @@ impl Group {
             Group::Pins => Tab::Pins,
             Group::Search => Tab::Search,
             Group::General | Group::Limits => Tab::General,
+            Group::Updates => Tab::About,
         }
     }
 }
@@ -187,6 +191,9 @@ fn build() -> Vec<Policy> {
         switch("TakeOverStartKey", "/take_over_start", General, "Start key and button open this menu", "Shift + Start still opens the Windows menu."),
         switch("TakeOverSearchKey", "/take_over_search", General, "Start + S opens this menu too", "Other Windows shortcuts keep working."),
         switch("SkipWelcome", "/seen_welcome", General, "Skip the welcome note", "Enabled hides the note shown on the first run."),
+        // Updates
+        switch("AutomaticUpdates", "/auto_update", Updates, "Install updates automatically", "Startline installs new versions by itself, restarting while its menu is closed. On an install for the whole PC, the Startline Updater task installs them as SYSTEM within the hour. Disabled leaves updates to the person, or on an install for the whole PC, to the administrator."),
+        switch(CHECK_FOR_UPDATES, "", Updates, "Look for updates", "Disabled stops Startline looking for new versions at all, for organizations that deploy them their own way."),
         // What people can do
         switch(WINDOWS_SETTINGS, "", Limits, "Change Windows settings from search", "Disabled removes every Windows setting from search."),
         switch(PAGES, "", Limits, "Shortcuts to Windows settings and tools", "Disabled removes search's shortcuts to Windows settings pages and tools, and the Control Panel, printer and default program links."),
@@ -549,6 +556,11 @@ impl Policies {
         !self.blocked.contains(id)
     }
 
+    /// The value a policy fixes for a saved setting, such as "/auto_update".
+    pub fn fixed(&self, field: &str) -> Option<&Value> {
+        self.fields.iter().find(|(f, _)| *f == field).map(|(_, value)| value)
+    }
+
     pub fn autostart(&self) -> Option<bool> {
         self.autostart
     }
@@ -767,17 +779,23 @@ pub fn write_templates(folder: &Path) -> std::io::Result<()> {
     std::fs::write(folder.join("en-US").join("Startline.adml"), adml)
 }
 
+/// Policy values for other modules' tests, as the Registry would hold them.
+#[cfg(test)]
+pub fn tests_raw(values: Value) -> Raw {
+    let mut raw = Raw::default();
+    for (name, value) in values.as_object().unwrap() {
+        raw.add_json(name, value);
+    }
+    raw
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::collections::BTreeSet;
 
     fn raw(values: Value) -> Raw {
-        let mut raw = Raw::default();
-        for (name, value) in values.as_object().unwrap() {
-            raw.add_json(name, value);
-        }
-        raw
+        tests_raw(values)
     }
 
     fn forced(policy: &Policy) -> Option<Value> {

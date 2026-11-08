@@ -11,6 +11,7 @@
       <string id="Cat_Pins">Pinned apps</string>
       <string id="Cat_Search">Search</string>
       <string id="Cat_General">General</string>
+      <string id="Cat_Updates">Updates</string>
       <string id="Cat_Limits">What people can do</string>
       <string id="P_Experience">Look</string>
       <string id="E_Experience">Which look the Start menu, search and the settings window use.
@@ -195,6 +196,14 @@ Enabled turns this on and Disabled turns it off, and people can't change it. Not
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
       <string id="P_SkipWelcome">Skip the welcome note</string>
       <string id="E_SkipWelcome">Enabled hides the note shown on the first run.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_AutomaticUpdates">Install updates automatically</string>
+      <string id="E_AutomaticUpdates">Startline installs new versions by itself, restarting while its menu is closed. On an install for the whole PC, the Startline Updater task installs them as SYSTEM within the hour. Disabled leaves updates to the person, or on an install for the whole PC, to the administrator.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="P_CheckForUpdates">Look for updates</string>
+      <string id="E_CheckForUpdates">Disabled stops Startline looking for new versions at all, for organizations that deploy them their own way.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
       <string id="P_ChangeWindowsSettings">Change Windows settings from search</string>

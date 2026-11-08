@@ -6,7 +6,13 @@ description = "A customizable Start menu and instant local search for Windows"
 license = "GPL-3.0-only"
 repository = "https://github.com/MyDrift-user/startline"
 
+[features]
+# Only for the release workflow's update test: trusts a published test key instead of the real one. Never released.
+update-test = []
+
 [dependencies]
+ed25519-dalek = { version = "2", default-features = false, features = ["std"] }
+sha2 = "0.10"
 eframe = { version = "0.37.0", default-features = false, features = ["glow", "default_fonts"] }
 egui = "0.37.0"
 memchr = "2.8.3"
@@ -36,6 +42,7 @@ features = [
     "Win32_System_Com",
     "Win32_System_Com_StructuredStorage",
     "Win32_System_DataExchange",
+    "Win32_System_Environment",
     "Win32_System_IO",
     "Win32_System_Memory",
     "Win32_System_Rpc",

@@ -1,0 +1,1 @@
+Startline was installed for everyone on this PC. Updates come from the "Startline Updater" scheduled task.

@@ -22,6 +22,7 @@ mod settings;
 mod styles;
 mod system;
 mod ui;
+mod update;
 mod widgets;
 
 use std::path::PathBuf;
@@ -76,6 +77,12 @@ fn parse_options() -> (Options, Option<PathBuf>, Option<PathBuf>) {
                 let done = policy::write_templates(&folder);
                 std::process::exit(i32::from(done.is_err()));
             }
+            // Started by the copy it replaces, which is still ending.
+            "--wait-for" => {
+                if let Some(pid) = args.next().and_then(|p| p.parse().ok()) {
+                    update::wait_for(pid);
+                }
+            }
             "--probe" => probe = args.next().map(PathBuf::from),
             "--probe-changes" => probe_changes = args.next().map(PathBuf::from),
             _ => {}
@@ -119,6 +126,9 @@ pub fn app_icon_pixels(size: usize) -> Vec<u8> {
 }
 
 fn main() {
+    if let Some(code) = update::handle_command_line() {
+        std::process::exit(code);
+    }
     let (options, probe, probe_changes) = parse_options();
 
     if let Some(path) = probe {
@@ -138,6 +148,7 @@ fn main() {
     if options.screenshot.is_none() && !options.test_injected_keys && system::signal_running_instance() {
         return;
     }
+    update::clean_after_update();
 
     let cfg = config::Config::load();
     let viewport = egui::ViewportBuilder::default()

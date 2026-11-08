@@ -44,7 +44,7 @@ Type what you want and act on it from the result: "dark mode", "volume 40", "lou
 - Start with Windows, on by default
 
 ### 🏢 Ready for IT departments
-Every setting can be fixed by **Group Policy**, for computers or users, with ADMX/ADML templates included. Open menus pick up changes within a minute. See [`PolicyDefinitions/README.txt`](PolicyDefinitions/README.txt).
+Every setting can be fixed by **Group Policy**, for computers or users, with ADMX/ADML templates included, including whether updates install by themselves and whether Startline looks for them at all. Open menus pick up changes within a minute. See [`PolicyDefinitions/README.txt`](PolicyDefinitions/README.txt).
 
 ## ⌨️ Keyboard
 
@@ -73,7 +73,6 @@ Download what you need from **[Releases](../../releases)**, for Windows 10 or 11
 | `...-windows-x64-portable.exe` | Portable, runs without installing |
 | `...-windows-x64.zip` | The same portable program, zipped |
 | `...-policy-definitions.zip` | Group Policy templates |
-| `SHA256SUMS.txt` | Checksums of all the files |
 
 Both installers can install for this PC or for just your account. To install without any screens:
 
@@ -89,9 +88,21 @@ startline-windows-x64-setup.exe /VERYSILENT /CURRENTUSER
 
 Nothing is signed by a known publisher, so SmartScreen may show a warning. Uninstalling closes Startline and removes its Start with Windows entry.
 
+## 🔄 Updates
+
+Startline looks for a new release 90 seconds after it starts and every 6 hours, and installs it by itself unless you turn that off under **Settings → About & updates**, which also shows the version and lets you check by hand. As Startline is always running, it closes and starts again with the new version, only while neither the menu nor the settings window is open:
+
+| Installed as | How updates land |
+|---|---|
+| For one account (MSI or `setup.exe`) | Installed silently, then Startline starts again |
+| For this PC (MSI or `setup.exe`) | A scheduled task, `Startline Updater`, installs it as SYSTEM within the hour and starts Startline again for everyone who had it running. No admin prompts. The install folder is locked so only administrators can change it |
+| Portable | Replaces its own file and starts the new one |
+
+Every release lists its files' checksums in `latest.json`, signed in `latest.json.sig`. Startline checks that signature against a key built into it, and refuses anything that doesn't match. Administrators can fix automatic updates on or off with the **AutomaticUpdates** policy, or stop Startline looking for updates at all with **CheckForUpdates**. `startline.exe --update-now` does an update check from a script, and what happened is logged to `update.log` in the settings folder.
+
 ## ⚙️ Settings and data
 
-Settings, the app list and the search index are in `%LOCALAPPDATA%\Startline\`. Settings are a JSON file, `config.json`, and survive updates.
+Settings, the app list, the search index and the update log are in `%LOCALAPPDATA%\Startline\`. Settings are a JSON file, `config.json`, and survive updates.
 
 ## 🛠️ Build from source
 
@@ -109,10 +120,12 @@ The program ends up in `target/release/startline.exe`. With the `x86_64-pc-windo
 
 Every push is built and tested by the CI workflow, which also checks that `PolicyDefinitions` matches what the program writes with `startline.exe --write-policy-templates PolicyDefinitions`. Releases only start by hand:
 
-1. Raise `version` in `Cargo.toml` and push. A version can't change once it's released.
+1. Raise `version` in `Cargo.toml` and push. A version can't change once it's released, because updates go by the number.
 2. Go to **Actions → Release → Run workflow**. Turning off **Publish** only builds and tests, leaving the files on the run.
 
-The workflow builds and tests the program, builds every download, checks that both installers install and uninstall (for this PC, for one account and into a chosen folder) and that the MSI upgrades the published release, then tags `v<version>` and publishes a GitHub Release.
+Publishing waits for an approval on GitHub, as the signing key is a secret of the protected `release` environment. If that key is lost or leaks, a release signed with the offline backup key can still reach every copy, and replace it.
+
+The workflow builds and tests the program, builds every download, checks that both installers install and uninstall (for this PC, for one account and into a chosen folder) and that the MSI upgrades the published release. It then updates every kind of install from this version to a newer test build, through the real installers and the real SYSTEM task, signed with a throwaway key, and checks that bad signatures, changed files and the update policies stop it. Last, it signs the update list, checks the program accepts it, tags `v<version>` and publishes a GitHub Release.
 
 ## 🗺️ Project layout
 
@@ -129,6 +142,7 @@ src/
   customize.rs, pins_page.rs, setting_list.rs, widgets.rs, styles.rs   Settings and the looks
   config.rs               what's saved
   policy.rs               Group Policy
+  update.rs               signed updates from GitHub releases
 PolicyDefinitions/        ADMX / ADML templates
 assets/                   logo, icon, screenshots and the script that draws them
 installer/windows/        setup.exe (Inno Setup) and MSI (WiX) definitions, and the packaging script

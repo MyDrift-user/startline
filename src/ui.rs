@@ -21,7 +21,7 @@ use crate::styles::{self, Experience, Look, SystemLook};
 use crate::system::{self, Command, Shape, Shared};
 use crate::widgets::*;
 use egui::*;
-use std::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, RwLock};
 use std::time::{Duration, Instant};
 
@@ -149,6 +149,12 @@ pub struct Menu {
     pub scope_ui: ScopeUi,
     pub reset_armed: Option<Instant>,
 
+    /// Not running for pictures and tests.
+    pub(crate) updater: Option<crate::update::Updater>,
+    auto_update: Arc<AtomicBool>,
+    /// The person chose to update now, rather than when the menu is next out of sight.
+    pub(crate) update_requested: bool,
+
     options: Options,
     frames: u64,
     started: Instant,
@@ -268,6 +274,9 @@ impl Menu {
             pin_ui: PinUi::default(),
             scope_ui: ScopeUi::default(),
             reset_armed: None,
+            updater: None,
+            auto_update: Arc::new(AtomicBool::new(true)),
+            update_requested: false,
             hide_after_frame: options.background,
             options,
             frames: 0,
@@ -277,6 +286,10 @@ impl Menu {
         };
         menu.share_limits();
         menu.refresh_recent();
+        if !screenshot && !menu.options.test_injected_keys {
+            menu.auto_update.store(menu.cfg.auto_update, Ordering::Relaxed);
+            menu.updater = Some(crate::update::Updater::start(ctx.clone(), menu.auto_update.clone()));
+        }
         let (slot, repaint) = (menu.user_picture.clone(), ctx.clone());
         std::thread::spawn(move || {
             platform::com_init();
@@ -594,6 +607,28 @@ impl Menu {
     fn save_settings(&self) {
         if !self.options.test_injected_keys {
             self.policy.without_forced(&self.cfg, &self.own_cfg).save();
+        }
+    }
+
+    /// Installs a downloaded update when the person asked for it, or by itself once nothing of Startline is on screen.
+    /// Startline then ends, and the installer or the new copy starts it again.
+    fn drive_update(&mut self, ctx: &Context) {
+        let Some(updater) = &self.updater else { return };
+        self.auto_update.store(self.cfg.auto_update, Ordering::Relaxed);
+        if !matches!(updater.status(), crate::update::Status::Ready(_)) {
+            return;
+        }
+        let quiet = !self.shared.visible.load(Ordering::SeqCst) && !self.settings_open;
+        if !(self.update_requested || (self.cfg.auto_update && quiet)) {
+            // Nothing else may wake the app once the menu is closed.
+            ctx.request_repaint_after(Duration::from_secs(30));
+            return;
+        }
+        self.update_requested = false;
+        self.save_settings();
+        match updater.finish() {
+            Ok(()) => system::shutdown(),
+            Err(e) => updater.fail(e),
         }
     }
 
@@ -1044,6 +1079,7 @@ impl eframe::App for Menu {
 
         self.handle_keys(ctx);
         self.apply_config_side_effects(ctx);
+        self.drive_update(ctx);
 
         if self.changed_at.is_some_and(|at| at.elapsed() > Duration::from_millis(800)) && !self.is_shot() {
             self.save_settings();

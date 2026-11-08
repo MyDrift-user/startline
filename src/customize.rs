@@ -18,15 +18,17 @@ pub enum Tab {
     Pins,
     Search,
     General,
+    About,
 }
 
 impl Tab {
-    const ALL: [(Tab, &'static str, char); 5] = [
+    const ALL: [(Tab, &'static str, char); 6] = [
         (Tab::Appearance, "Appearance", '\u{E790}'),
         (Tab::StartMenu, "Start menu", '\u{E8FC}'),
         (Tab::Pins, "Pinned apps", '\u{E718}'),
         (Tab::Search, "Search", '\u{E721}'),
         (Tab::General, "General", '\u{E713}'),
+        (Tab::About, "About & updates", '\u{E946}'),
     ];
 
     pub fn from_name(name: &str) -> Option<Tab> {
@@ -137,6 +139,7 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, tab: Tab) {
                     Tab::Pins => crate::pins_page::draw(menu, ui, pal),
                     Tab::Search => crate::search_page::draw(menu, ui, pal),
                     Tab::General => general(menu, ui, pal),
+                    Tab::About => about(menu, ui, pal),
                 }
             });
         });
@@ -492,4 +495,127 @@ fn general(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
             }
         });
     });
+}
+
+fn about(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
+    page_header(ui, "About & updates", "Which version this is, and how it stays up to date.", pal);
+    two_columns(menu, ui, updates_card, |_menu, ui| {
+        heading(ui, "Startline", pal);
+        card(ui, pal, |ui| {
+            ui.horizontal(|ui| {
+                let logo = ui.ctx().data_mut(|d| d.get_temp::<TextureHandle>(Id::unique("startline-logo"))).unwrap_or_else(|| {
+                    let image = ColorImage::from_rgba_unmultiplied([128, 128], &crate::app_icon_pixels(128));
+                    let texture = ui.ctx().load_texture("startline-logo", image, TextureOptions::LINEAR);
+                    ui.ctx().data_mut(|d| d.insert_temp(Id::unique("startline-logo"), texture.clone()));
+                    texture
+                });
+                let shown = ui.add(Image::new(&logo).fit_to_exact_size(vec2(56.0, 56.0))).rect;
+                // The tile is the dark themes' own panel color, so it needs an edge.
+                ui.painter().rect_stroke(shown, 12, Stroke::new(1.0, pal.line), StrokeKind::Inside);
+                ui.add_space(6.0);
+                ui.vertical(|ui| {
+                    ui.spacing_mut().item_spacing.y = 2.0;
+                    ui.label(RichText::new("Startline").font(semibold(18.0)).color(pal.text));
+                    ui.label(RichText::new(format!("Version {}", crate::update::CURRENT)).size(13.0).color(pal.text));
+                    ui.label(RichText::new("A Start menu with search that answers as you type. Free software under the GPL-3.0 licence.").size(12.0).color(pal.sub));
+                });
+            });
+            ui.add_space(4.0);
+            ui.horizontal_wrapped(|ui| {
+                for (label, url) in [
+                    ("Project", crate::update::PROJECT.to_string()),
+                    ("What's new", crate::update::RELEASES.to_string()),
+                    ("Report a problem", format!("{}/issues", crate::update::PROJECT)),
+                    ("Licence", format!("{}/blob/main/LICENSE", crate::update::PROJECT)),
+                ] {
+                    if pill_button(ui, label, pal, false).on_hover_text(&url).clicked() {
+                        platform::open_async("", url, String::new());
+                    }
+                }
+            });
+        });
+    });
+}
+
+/// Whether there's a newer version, and whether to install it without asking.
+fn updates_card(menu: &mut Menu, ui: &mut Ui) {
+    use crate::update::{self, Install, Status};
+    let pal = menu.pal();
+    let policy = menu.policy.clone();
+    heading(ui, "Updates", pal);
+    let Some(updater) = &menu.updater else {
+        card(ui, pal, |ui| note(ui, "This copy doesn't look for updates.", pal));
+        return;
+    };
+    let (status, install) = (updater.status(), updater.install.clone());
+    let machine = matches!(install, Install::Machine { .. });
+    let own_auto = menu.cfg.auto_update;
+    let mut check = false;
+    let mut get = false;
+    let mut switched = None;
+    card(ui, pal, |ui| {
+        if !update::allowed(&policy) {
+            note(ui, "Your organization installs new versions of Startline, so it doesn't look for updates itself.", pal);
+            return;
+        }
+        note(
+            ui,
+            match &install {
+                Install::PerUser { .. } => "Installed for this account. Updates install by themselves while the menu is closed, and Startline starts again straight away.",
+                Install::Machine { .. } => "Installed for this PC. The Startline Updater task installs updates within the hour, and starts Startline again for everyone using it.",
+                Install::Portable(_) => "A single program file. Updates replace it, and Startline starts again with the new one.",
+                Install::Unmanaged => "This copy can't update itself. New versions are on the releases page.",
+            },
+            pal,
+        );
+        // The whole PC shares one switch, which the task reads: show what it's really set to.
+        let mut auto = if machine { policy.fixed("/auto_update").and_then(serde_json::Value::as_bool).or_else(update::machine_switch).unwrap_or(true) } else { own_auto };
+        if policy.lock(ui, &["AutomaticUpdates"], |ui| switch_row(ui, "Install updates automatically", "Looks at start and every 6 hours.", &mut auto, pal)) {
+            switched = Some(auto);
+        }
+        let text = match &status {
+            Status::Idle => "Not checked yet.".to_string(),
+            Status::Checking => "Checking for updates…".to_string(),
+            Status::UpToDate => "Startline is up to date.".to_string(),
+            Status::Available(v) if machine => format!("Version {v} is available. The update task installs it once automatic updates are on."),
+            Status::Available(v) => format!("Version {v} is available."),
+            Status::Downloading(v) => format!("Downloading version {v}…"),
+            Status::Ready(v) if own_auto => format!("Version {v} is ready. It installs the next time the menu and this window are closed."),
+            Status::Ready(v) => format!("Version {v} is downloaded."),
+            Status::InstallsByTask(v) => format!("Version {v} is available. The update task installs it within the hour."),
+            Status::Installing(v) => format!("Installing version {v}. Startline starts again in a moment."),
+            Status::Failed(e) => e.clone(),
+        };
+        let color = if matches!(status, Status::Failed(_)) { Color32::from_rgb(222, 120, 96) } else { pal.text };
+        ui.label(RichText::new(text).size(13.0).color(color));
+        let busy = matches!(status, Status::Checking | Status::Downloading(_) | Status::Installing(_));
+        let can_install = !machine && install != Install::Unmanaged;
+        ui.horizontal_wrapped(|ui| {
+            check = ui.add_enabled_ui(!busy, |ui| pill_button(ui, "Check for updates", pal, false)).inner.clicked();
+            match &status {
+                Status::Available(_) if can_install => get = pill_button(ui, "Install and restart", pal, true).clicked(),
+                Status::Ready(_) => get = pill_button(ui, "Restart now to update", pal, true).clicked(),
+                _ => {}
+            }
+        });
+    });
+    if check {
+        updater.check_now(own_auto);
+    }
+    if get && matches!(status, Status::Available(_)) {
+        updater.download_now();
+    }
+    match switched {
+        Some(on) if machine => {
+            if let Err(e) = update::set_machine_switch(on) {
+                updater.fail(e);
+            }
+        }
+        Some(on) => menu.cfg.auto_update = on,
+        None => {}
+    }
+    // Installs as soon as it's downloaded, as the person asked for it.
+    if get {
+        menu.update_requested = true;
+    }
 }

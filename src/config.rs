@@ -192,6 +192,8 @@ pub struct Config {
     pub seen_welcome: bool,
     /// "Start with Windows" is on from the first run; after that it is the person's choice.
     pub autostart_applied: bool,
+    /// Install new versions without asking. A PC-wide install keeps this in a file of its own, see update.rs.
+    pub auto_update: bool,
 
     pub usage: HashMap<String, Usage>,
 }
@@ -267,6 +269,7 @@ impl Default for Config {
             take_over_search: true,
             seen_welcome: false,
             autostart_applied: false,
+            auto_update: true,
             usage: HashMap::new(),
         }
     }
