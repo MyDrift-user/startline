@@ -9,10 +9,15 @@ if ($LASTEXITCODE) { throw "cargo build failed" }
 Move-Item dist old
 
 $toml = Get-Content Cargo.toml -Raw
-Set-Content Cargo.toml ([regex]::new('(?m)^version = ".*"$').Replace($toml, 'version = "99.0.0"', 1)) -NoNewline
+# Not anchored at the line's end: a checkout on Windows has \r there.
+$changed = [regex]::new('(?m)^version = "[^"]*"').Replace($toml, 'version = "99.0.0"', 1)
+if ($changed -eq $toml) { throw "Couldn't set the version in Cargo.toml" }
+Set-Content Cargo.toml $changed -NoNewline
 try {
   cargo build --release --features update-test
   if ($LASTEXITCODE) { throw "cargo build failed" }
+  $built = (Get-Item target\release\startline.exe).VersionInfo.FileVersion
+  if ($built -ne '99.0.0') { throw "The new build is version '$built', not 99.0.0" }
   $env:VERSION = '99.0.0'
   & "$PSScriptRoot\package.ps1"
 } finally {
