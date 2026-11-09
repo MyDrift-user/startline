@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-const CURRENT_VERSION: u32 = 2;
+const CURRENT_VERSION: u32 = 3;
 
 pub fn data_dir() -> PathBuf {
     let base = std::env::var_os("LOCALAPPDATA")
@@ -193,7 +193,9 @@ pub struct Config {
     pub excluded_paths: Vec<String>,
     /// File types left out, with the dot.
     pub excluded_exts: Vec<String>,
-    /// Search network drives and USB drives as they get attached.
+    /// Which kinds of drive are indexed: local drives, and network and USB drives, including those attached later.
+    /// Places on a kind that's off aren't read or watched at all.
+    pub index_local: bool,
     pub auto_network: bool,
     pub auto_removable: bool,
     /// Never find what Windows keeps out of sight, or marks as part of the system.
@@ -295,6 +297,7 @@ impl Default for Config {
             exclude: default_exclude(),
             excluded_paths: Vec::new(),
             excluded_exts: Vec::new(),
+            index_local: true,
             auto_network: false,
             auto_removable: false,
             skip_hidden: true,
@@ -358,6 +361,16 @@ impl Config {
         serde_json::from_value(saved).ok()
     }
 
+    /// Whether places on this kind of drive are indexed at all.
+    pub fn indexes(&self, kind: crate::platform::PlaceKind) -> bool {
+        use crate::platform::PlaceKind;
+        match kind {
+            PlaceKind::Hdd | PlaceKind::Ssd => self.index_local,
+            PlaceKind::Network => self.auto_network,
+            PlaceKind::Usb => self.auto_removable,
+        }
+    }
+
     /// Whether search shows this kind of result.
     pub fn shows(&self, kind: Category) -> bool {
         self.results.iter().any(|r| r.kind == kind && r.on)
@@ -370,6 +383,11 @@ impl Config {
 
     /// Bring lists up to date after an update added a new section, setting or category.
     fn repair(&mut self) {
+        self.repair_with(&crate::platform::drive_kind_of)
+    }
+
+    /// `kind_of` tells what a place sits on, without touching the disk.
+    fn repair_with(&mut self, kind_of: &dyn Fn(&str) -> crate::platform::PlaceKind) {
         let defaults = Config::default();
         if self.version < 1 {
             // Search used to default to the top; nobody had chosen that on purpose yet.
@@ -379,6 +397,17 @@ impl Config {
             // A color theme that no longer exists moves to the new default.
             self.preset = PRESETS[0].0.into();
             self.theme = PRESETS[0].1;
+        }
+        if self.version < 3 {
+            // Before the switches for each kind of drive, a network share or USB folder someone added was always read:
+            // its switch stays on for them.
+            for root in &self.roots {
+                match kind_of(root) {
+                    crate::platform::PlaceKind::Network => self.auto_network = true,
+                    crate::platform::PlaceKind::Usb => self.auto_removable = true,
+                    _ => {}
+                }
+            }
         }
         self.version = CURRENT_VERSION;
         for section in defaults.sections {
@@ -477,5 +506,51 @@ mod tests {
         let mut own = Config::parse(br#"{"version": 1, "preset": "Custom", "theme": {"bg": [1,2,3], "surface": [1,2,3], "text": [1,2,3], "subtext": [1,2,3], "accent": [1,2,3]}}"#).unwrap();
         own.repair();
         assert_eq!(own.theme.bg, [1, 2, 3], "colors the person picked stay");
+    }
+
+    #[test]
+    fn only_local_drives_are_indexed_at_first() {
+        use crate::platform::PlaceKind;
+        let cfg = Config::default();
+        assert!(cfg.index_local);
+        assert!(!cfg.auto_network);
+        assert!(!cfg.auto_removable);
+        assert!(cfg.indexes(PlaceKind::Hdd) && cfg.indexes(PlaceKind::Ssd));
+        assert!(!cfg.indexes(PlaceKind::Network) && !cfg.indexes(PlaceKind::Usb));
+        let off = Config { index_local: false, auto_network: true, ..Config::default() };
+        assert!(!off.indexes(PlaceKind::Ssd) && off.indexes(PlaceKind::Network) && !off.indexes(PlaceKind::Usb));
+    }
+
+    #[test]
+    fn older_settings_keep_their_network_and_usb_drives() {
+        use crate::platform::PlaceKind;
+        let kind_of = |root: &str| {
+            if root.starts_with(r"\\") {
+                PlaceKind::Network
+            } else if root.starts_with("E:") {
+                PlaceKind::Usb
+            } else {
+                PlaceKind::Ssd
+            }
+        };
+
+        let mut switched_on = Config::parse(br#"{"version": 2, "auto_network": true, "auto_removable": true}"#).unwrap();
+        switched_on.repair_with(&kind_of);
+        assert!(switched_on.auto_network && switched_on.auto_removable, "switches that were on stay on");
+
+        let mut share = Config::parse(br#"{"version": 2, "auto_network": false, "auto_removable": false, "roots": ["C:\\Work", "\\\\nas\\photos"]}"#).unwrap();
+        share.repair_with(&kind_of);
+        assert!(share.auto_network, "a share added by hand was read before, so it still is");
+        assert!(!share.auto_removable);
+        assert!(share.index_local);
+
+        let mut stick = Config::parse(br#"{"version": 2, "auto_network": false, "auto_removable": false, "roots": ["E:\\Music"]}"#).unwrap();
+        stick.repair_with(&kind_of);
+        assert!(stick.auto_removable && !stick.auto_network);
+
+        let mut chosen = Config::parse(br#"{"version": 3, "auto_network": false, "roots": ["\\\\nas\\photos"]}"#).unwrap();
+        chosen.repair_with(&kind_of);
+        assert!(!chosen.auto_network, "a switch turned off after the update stays off");
+        assert_eq!(chosen.version, CURRENT_VERSION);
     }
 }

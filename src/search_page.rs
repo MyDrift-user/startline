@@ -373,10 +373,12 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         menu.scope_ui.new_place.clear();
     }
 
-    heading(ui, tr("Network and USB drives"), pal);
+    heading(ui, tr("What's indexed"), pal);
     card(ui, pal, |ui| {
-        policy.lock(ui, &["SearchNetworkDrives"], |ui| switch_line(ui, tr("Search network drives"), tr("Includes any network drive as it gets attached. Big shares can take a while to read."), &mut menu.cfg.auto_network, pal));
-        policy.lock(ui, &["SearchUsbDrives"], |ui| switch_line(ui, tr("Search USB drives"), tr("Includes USB sticks and disks as they get plugged in."), &mut menu.cfg.auto_removable, pal));
+        policy.lock(ui, &["SearchLocalDrives"], |ui| switch_line(ui, tr("Index local drives"), tr("Names and dates of files and folders on this PC's own drives, read gently and kept up to date as they change."), &mut menu.cfg.index_local, pal));
+        policy.lock(ui, &["SearchNetworkDrives"], |ui| switch_line(ui, tr("Index network drives"), tr("Network drives and shares, including \\\\server\\share places added by hand. Read at most once a day while the PC is idle, one folder at a time, with no watch on the server."), &mut menu.cfg.auto_network, pal));
+        policy.lock(ui, &["SearchUsbDrives"], |ui| switch_line(ui, tr("Index USB drives"), tr("USB sticks, disks and memory cards, as they get plugged in."), &mut menu.cfg.auto_removable, pal));
+        ui.label(RichText::new(tr("Startline reads only the names and dates of files and folders, never what's in them. Apps and settings are found whatever is switched off here.")).size(12.0).color(pal.sub));
         let attached: Vec<&Drive> = drives.iter().filter(|d| d.kind != DriveKind::Fixed).collect();
         if attached.is_empty() {
             ui.label(RichText::new(tr("None attached right now.")).size(12.5).color(pal.sub));

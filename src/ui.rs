@@ -66,7 +66,9 @@ fn index_params_of(cfg: &Config) -> IndexParams {
     let is_hidden = |path: &str| scope::parent_of(path).is_some() && platform::has_attributes(path, skip_attrs);
     let scope = Scope { roots: &all, excluded_paths: &cfg.excluded_paths, excluded_names: &cfg.exclude, include_hidden: skip_attrs == 0, is_hidden: &is_hidden };
     IndexParams {
-        roots: scope.places_to_read(),
+        // Only the kinds of drive that are switched on are read or watched at all: local drives, network drives
+        // (manually added \\server\share places among them) and USB drives.
+        roots: scope.places_to_read().into_iter().filter(|place| cfg.indexes(platform::drive_kind_of(place))).collect(),
         exclude: cfg.exclude.clone(),
         exclude_paths: cfg.excluded_paths.clone(),
         exclude_exts: cfg.excluded_exts.clone(),

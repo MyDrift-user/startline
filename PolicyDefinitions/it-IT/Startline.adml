@@ -240,18 +240,25 @@ Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo.
       <string id="R_SearchFolders">Una cartella o unità per riga. Le variabili di ambiente come %USERPROFILE% funzionano. Sostituisce i percorsi scelti dall'utente.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
-      <string id="P_SearchNetworkDrives">Cerca nelle unità di rete</string>
-      <string id="E_SearchNetworkDrives">Include ogni unità di rete appena viene connessa. La lettura di condivisioni grandi può richiedere un po' di tempo.
+      <string id="P_SearchLocalDrives">Indicizza le unità locali</string>
+      <string id="E_SearchLocalDrives">Nomi e date di file e cartelle sulle unità di questo PC, letti con delicatezza e aggiornati quando cambiano.
 
 Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
-      <string id="R_SearchNetworkDrives">Include ogni unità di rete appena viene connessa. La lettura di condivisioni grandi può richiedere un po' di tempo.
+      <string id="R_SearchLocalDrives">Nomi e date di file e cartelle sulle unità di questo PC, letti con delicatezza e aggiornati quando cambiano.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
-      <string id="P_SearchUsbDrives">Cerca nelle unità USB</string>
-      <string id="E_SearchUsbDrives">Include chiavette e dischi USB appena vengono collegati.
+      <string id="P_SearchNetworkDrives">Indicizza le unità di rete</string>
+      <string id="E_SearchNetworkDrives">Unità di rete e condivisioni, compresi i percorsi come \\server\share aggiunti a mano. Lette al massimo una volta al giorno, solo mentre il PC è inattivo, una cartella alla volta e senza controllo sul server.
 
 Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
-      <string id="R_SearchUsbDrives">Include chiavette e dischi USB appena vengono collegati.
+      <string id="R_SearchNetworkDrives">Unità di rete e condivisioni, compresi i percorsi come \\server\share aggiunti a mano. Lette al massimo una volta al giorno, solo mentre il PC è inattivo, una cartella alla volta e senza controllo sul server.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchUsbDrives">Indicizza le unità USB</string>
+      <string id="E_SearchUsbDrives">Chiavette, dischi USB e schede di memoria, appena vengono collegati.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchUsbDrives">Chiavette, dischi USB e schede di memoria, appena vengono collegati.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_SearchSkipFolders">Cartelle mai trovate</string>

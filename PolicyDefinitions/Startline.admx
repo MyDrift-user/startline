@@ -842,6 +842,26 @@
         <list id="Value" key="Software\Policies\Startline\Recommended\SearchFolders" valuePrefix="" expandable="true"/>
       </elements>
     </policy>
+    <policy name="SearchLocalDrives" class="Both" displayName="$(string.P_SearchLocalDrives)" explainText="$(string.E_SearchLocalDrives)" key="Software\Policies\Startline" valueName="SearchLocalDrives">
+      <parentCategory ref="SearchPlaces"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchLocalDrives" class="Both" displayName="$(string.P_SearchLocalDrives)" explainText="$(string.R_SearchLocalDrives)" key="Software\Policies\Startline\Recommended" valueName="SearchLocalDrives">
+      <parentCategory ref="Rec_SearchPlaces"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="SearchNetworkDrives" class="Both" displayName="$(string.P_SearchNetworkDrives)" explainText="$(string.E_SearchNetworkDrives)" key="Software\Policies\Startline" valueName="SearchNetworkDrives">
       <parentCategory ref="SearchPlaces"/>
       <supportedOn ref="SUPPORTED_Startline"/>

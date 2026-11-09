@@ -148,6 +148,31 @@ fn switches_turn_off_as_well_as_on() {
 }
 
 #[test]
+fn each_kind_of_drive_has_its_own_policy() {
+    use crate::platform::PlaceKind;
+    let fixed = Policies::from_raw(&raw(json!({ "SearchLocalDrives": 0, "SearchNetworkDrives": 1, "SearchUsbDrives": 1 })));
+    let mut cfg = Config::default();
+    fixed.enforce(&mut cfg);
+    assert!(!cfg.indexes(PlaceKind::Ssd) && !cfg.indexes(PlaceKind::Hdd));
+    assert!(cfg.indexes(PlaceKind::Network) && cfg.indexes(PlaceKind::Usb));
+    for key in ["SearchLocalDrives", "SearchNetworkDrives", "SearchUsbDrives"] {
+        assert!(fixed.is_set(key), "{key}");
+    }
+
+    // As a default, the person can still switch network drives off again.
+    let defaults = Policies::from_raws(&Raw::default(), &raw(json!({ "SearchNetworkDrives": 1 })));
+    let mut cfg = Config::default();
+    defaults.enforce(&mut cfg);
+    assert!(cfg.auto_network && cfg.index_local && !cfg.auto_removable);
+    assert!(!defaults.is_set("SearchNetworkDrives"));
+    let before = cfg.clone();
+    cfg.auto_network = false;
+    defaults.note_choices(&mut cfg, &before);
+    defaults.enforce(&mut cfg);
+    assert!(!cfg.auto_network);
+}
+
+#[test]
 fn a_policy_does_not_replace_the_persons_own_choice() {
     let mut own = Config::default();
     own.columns = 9;

@@ -12,6 +12,10 @@ use std::sync::mpsc::{self, RecvTimeoutError, Sender};
 use std::sync::{Arc, RwLock};
 use std::time::{Duration, Instant};
 
+#[path = "index_manager.rs"]
+mod manager;
+pub use manager::*;
+
 const FLAG_DIR: u8 = 1;
 const FLAG_ROOT: u8 = 2;
 const FLAG_DEAD: u8 = 4;
@@ -359,6 +363,42 @@ impl Index {
         Some(score)
     }
 
+    // ---- Places within the index ----
+
+    /// The searched places it holds, as their full paths.
+    pub fn root_names(&self) -> Vec<String> {
+        self.entries.iter().filter(|e| e.flags & FLAG_ROOT != 0 && e.flags & FLAG_DEAD == 0).map(|e| self.orig_name(e).to_string()).collect()
+    }
+
+    /// A copy holding only the places `keep` says yes to, with all they hold. Removed items are left behind.
+    pub fn copy_roots(&self, keep: &dyn Fn(&str) -> bool) -> Index {
+        let mut out = Index::default();
+        out.append_roots(self, keep);
+        out
+    }
+
+    /// Adds the places of `other` that `keep` says yes to, with all they hold.
+    pub fn append_roots(&mut self, other: &Index, keep: &dyn Fn(&str) -> bool) {
+        // Every entry comes after its folder, so one pass in order finds each one's new folder.
+        let mut moved = vec![NO_PARENT; other.entries.len()];
+        for (i, e) in other.entries.iter().enumerate() {
+            if e.flags & FLAG_DEAD != 0 {
+                continue;
+            }
+            let parent = if e.flags & FLAG_ROOT != 0 {
+                if !keep(other.orig_name(e)) {
+                    continue;
+                }
+                NO_PARENT
+            } else if e.parent == NO_PARENT || moved[e.parent as usize] == NO_PARENT {
+                continue;
+            } else {
+                moved[e.parent as usize]
+            };
+            moved[i] = self.push_sized(other.orig_name(e), parent, e.depth, e.mtime, e.size, e.flags);
+        }
+    }
+
     // ---- Saving and loading ----
 
     fn save(&self, fingerprint: u64) -> std::io::Result<()> {
@@ -381,12 +421,14 @@ impl Index {
         std::fs::rename(tmp, path)
     }
 
-    fn load(fingerprint: u64) -> Option<Index> {
+    /// The saved index, and the fingerprint of the rules it was read under.
+    fn load() -> Option<(Index, u64)> {
         let bytes = std::fs::read(cache_path()).ok()?;
         let word = |i: usize| -> Option<u64> { Some(u64::from_le_bytes(bytes.get(i * 8..i * 8 + 8)?.try_into().ok()?)) };
-        if word(0)? != CACHE_MAGIC || word(1)? != fingerprint {
+        if word(0)? != CACHE_MAGIC {
             return None;
         }
+        let fingerprint = word(1)?;
         let (count, lower_len, orig_len) = (word(2)? as usize, word(3)? as usize, word(4)? as usize);
         let entries_len = count.checked_mul(std::mem::size_of::<Entry>())?;
         let lower_at = 40usize.checked_add(entries_len)?;
@@ -407,7 +449,7 @@ impl Index {
                 && (e.orig_off as usize + e.orig_len as usize) <= orig.len()
                 && (e.parent == NO_PARENT || (e.parent as usize) < i)
         });
-        sound.then_some(Index { entries, lower, orig })
+        sound.then_some((Index { entries, lower, orig }, fingerprint))
     }
 }
 
@@ -909,10 +951,11 @@ pub struct IndexParams {
 }
 
 impl IndexParams {
-    fn fingerprint(&self) -> u64 {
+    /// What's left out, as one number: when it changes, every place is read again. The places themselves aren't in
+    /// it: one added or taken away doesn't make the others need reading.
+    fn rules_fingerprint(&self) -> u64 {
         use std::hash::{Hash, Hasher};
         let mut h = std::collections::hash_map::DefaultHasher::new();
-        self.roots.hash(&mut h);
         self.exclude.hash(&mut h);
         self.exclude_paths.hash(&mut h);
         self.exclude_exts.hash(&mut h);
@@ -992,9 +1035,10 @@ impl Rules {
     }
 }
 
-fn walk(path: &str, name: String, mtime: u32, rules: &Rules, counter: &AtomicUsize) -> Listing {
+fn walk(path: &str, name: String, mtime: u32, rules: &Rules, counter: &AtomicUsize, gate: &Gate) -> Listing {
     let mut listing = Listing { name, mtime, ..Default::default() };
     let mut subdirs = Vec::new();
+    gate.before_listing();
     platform::list_dir(path, rules.skip_attrs, |entry_name, is_dir, is_link, entry_mtime, entry_size| {
         if is_dir {
             if rules.skips_folder(path, entry_name) {
@@ -1015,7 +1059,7 @@ fn walk(path: &str, name: String, mtime: u32, rules: &Rules, counter: &AtomicUsi
         .into_par_iter()
         .map(|(dir, dir_mtime)| {
             let child = join(path, &dir);
-            walk(&child, dir, dir_mtime, rules, counter)
+            walk(&child, dir, dir_mtime, rules, counter, gate)
         })
         .collect();
     listing
@@ -1031,50 +1075,6 @@ fn join(base: &str, name: &str) -> String {
     out
 }
 
-/// Reads all folders. `store` receives finished pieces, so a first-time index can
-/// answer searches while it is still growing.
-fn walk_all(params: &IndexParams, counter: &AtomicUsize, store: &mut dyn FnMut(&mut dyn FnMut(&mut Index))) {
-    let rules = params.rules();
-    let threads = std::thread::available_parallelism().map(|n| n.get()).unwrap_or(4).clamp(2, 8);
-    let Ok(pool) = rayon::ThreadPoolBuilder::new()
-        .num_threads(threads)
-        .start_handler(|_| platform::lower_thread_priority())
-        .build()
-    else {
-        return;
-    };
-    for root in &params.roots {
-        if !std::path::Path::new(root).is_dir() {
-            continue;
-        }
-        let mut root_entry = NO_PARENT;
-        store(&mut |index| root_entry = index.push(root, NO_PARENT, 0, 0, FLAG_DIR | FLAG_ROOT));
-        // Read the top level first, then finish one top-level folder at a time.
-        let mut top = Listing::default();
-        let mut subdirs = Vec::new();
-        platform::list_dir(root, params.skip_attrs, |name, is_dir, is_link, mtime, size| {
-            if is_dir {
-                if rules.skips_folder(root, name) {
-                    return;
-                }
-                if is_link {
-                    top.files.push((name.into(), mtime, size));
-                } else {
-                    subdirs.push((name.to_string(), mtime));
-                }
-            } else if !rules.skips_file(root, name) {
-                top.files.push((name.into(), mtime, size));
-            }
-        });
-        counter.fetch_add(top.files.len(), Ordering::Relaxed);
-        store(&mut |index| index.append_children(root_entry, 1, &top));
-        for (dir, mtime) in subdirs {
-            let child = join(root, &dir);
-            let listing = pool.install(|| walk(&child, dir, mtime, &rules, counter));
-            store(&mut |index| index.append_listing(root_entry, 1, &listing));
-        }
-    }
-}
 
 // ---- Keeping it fresh ----
 
@@ -1114,7 +1114,7 @@ impl Index {
                 let depth = self.entries[parent].depth.saturating_add(1);
                 if is_dir {
                     let counter = AtomicUsize::new(0);
-                    let listing = walk(path, name.to_string(), mtime, rules, &counter);
+                    let listing = walk(path, name.to_string(), mtime, rules, &counter, &Gate::none());
                     self.append_listing(parent as u32, depth, &listing);
                 } else {
                     self.push_sized(name, parent as u32, depth, mtime, platform::file_size(path).unwrap_or(0), 0);
@@ -1128,194 +1128,6 @@ fn path_is_excluded(path: &str, excluded: &[String]) -> bool {
     path.split('\\').any(|part| excluded.iter().any(|e| e.eq_ignore_ascii_case(part)))
 }
 
-enum Cmd {
-    Reindex(IndexParams),
-    Change(Change),
-    Overflow,
-    WalkDone(Index, IndexParams),
-}
-
-pub struct IndexStatus {
-    pub walking: AtomicBool,
-    pub walked: AtomicUsize,
-    /// How long the last full read of all folders took, in milliseconds.
-    pub last_walk_ms: AtomicU64,
-}
-
-pub struct IndexManager {
-    pub index: Arc<RwLock<Index>>,
-    pub status: Arc<IndexStatus>,
-    tx: Sender<Cmd>,
-}
-
-impl IndexManager {
-    /// Loads the saved index right away, then refreshes it in the background.
-    pub fn start(params: IndexParams) -> IndexManager {
-        let cached = Index::load(params.fingerprint()).unwrap_or_default();
-        let index = Arc::new(RwLock::new(cached));
-        let status = Arc::new(IndexStatus {
-            walking: AtomicBool::new(false),
-            walked: AtomicUsize::new(0),
-            last_walk_ms: AtomicU64::new(0),
-        });
-        let (tx, rx) = mpsc::channel::<Cmd>();
-        let manager = IndexManager { index: index.clone(), status: status.clone(), tx: tx.clone() };
-        let _ = tx.send(Cmd::Reindex(params));
-
-        std::thread::Builder::new()
-            .name("index".into())
-            .spawn(move || {
-                let mut active: Option<IndexParams> = None;
-                let mut rules = Rules::default();
-                let mut watchers: Vec<platform::DirWatcher> = Vec::new();
-                let mut pending: Vec<Change> = Vec::new();
-                let mut walk_running = false;
-                let mut queued: Option<IndexParams> = None;
-                let mut refresh_at: Option<Instant> = None;
-                let mut dirty = false;
-                let mut last_save = Instant::now();
-
-                let begin_walk = |p: IndexParams, index: &Arc<RwLock<Index>>, status: &Arc<IndexStatus>, tx: &Sender<Cmd>| {
-                    let (index, status, tx) = (index.clone(), status.clone(), tx.clone());
-                    status.walking.store(true, Ordering::Relaxed);
-                    status.walked.store(0, Ordering::Relaxed);
-                    let _ = std::thread::Builder::new().name("index-walk".into()).spawn(move || {
-                        let started = Instant::now();
-                        let first_time = index.read().map(|i| i.len() == 0).unwrap_or(false);
-                        let mut private = Index::default();
-                        walk_all(&p, &status.walked, &mut |edit: &mut dyn FnMut(&mut Index)| {
-                            if first_time {
-                                if let Ok(mut live) = index.write() {
-                                    edit(&mut live);
-                                }
-                            } else {
-                                edit(&mut private);
-                            }
-                        });
-                        status.last_walk_ms.store(started.elapsed().as_millis() as u64, Ordering::Relaxed);
-                        let finished = if first_time {
-                            index.write().map(|mut live| std::mem::take(&mut *live)).unwrap_or_default()
-                        } else {
-                            private
-                        };
-                        let _ = tx.send(Cmd::WalkDone(finished, p));
-                    });
-                };
-
-                loop {
-                    let wait = refresh_at
-                        .map(|at| at.saturating_duration_since(Instant::now()))
-                        .unwrap_or(Duration::from_secs(600));
-                    match rx.recv_timeout(wait) {
-                        Ok(Cmd::Reindex(p)) => {
-                            rules = p.rules();
-                            watchers.clear();
-                            for root in &p.roots {
-                                let tx = tx.clone();
-                                let rules = rules.clone();
-                                let root_path = root.clone();
-                                if let Some(w) = platform::DirWatcher::start(root, move |event| {
-                                    let message = match event {
-                                        platform::DirEvent::Overflow => Cmd::Overflow,
-                                        platform::DirEvent::Added(rel) => {
-                                            let path = join(&root_path, &rel);
-                                            if rules.skips_change(&path, &rel) { return; }
-                                            Cmd::Change(Change::Added(path))
-                                        }
-                                        platform::DirEvent::Removed(rel) => {
-                                            let path = join(&root_path, &rel);
-                                            if rules.skips_change(&path, &rel) { return; }
-                                            Cmd::Change(Change::Removed(path))
-                                        }
-                                        platform::DirEvent::Modified(rel) => {
-                                            let path = join(&root_path, &rel);
-                                            if rules.skips_change(&path, &rel) { return; }
-                                            Cmd::Change(Change::Modified(path))
-                                        }
-                                    };
-                                    let _ = tx.send(message);
-                                }) {
-                                    watchers.push(w);
-                                }
-                            }
-                            active = Some(p.clone());
-                            if walk_running {
-                                queued = Some(p);
-                            } else {
-                                walk_running = true;
-                                pending.clear();
-                                begin_walk(p, &index, &status, &tx);
-                            }
-                        }
-                        Ok(Cmd::Change(change)) => {
-                            let Some(p) = &active else { continue };
-                            if let Ok(mut live) = index.write() {
-                                live.apply(&change, p, &rules);
-                            }
-                            dirty = true;
-                            if walk_running {
-                                pending.push(change);
-                                // A huge burst (an unpacked archive, say): the walk may have seen some of it,
-                                // so read everything again once rather than replaying thousands of events.
-                                if pending.len() > 20_000 {
-                                    pending.clear();
-                                    queued = active.clone();
-                                }
-                            }
-                        }
-                        Ok(Cmd::Overflow) => {
-                            // Too much changed at once for Windows to list. Look again shortly.
-                            refresh_at.get_or_insert_with(|| Instant::now() + Duration::from_secs(60));
-                        }
-                        Ok(Cmd::WalkDone(mut finished, p)) => {
-                            walk_running = false;
-                            status.walking.store(false, Ordering::Relaxed);
-                            if active.as_ref() == Some(&p) {
-                                for change in pending.drain(..) {
-                                    finished.apply(&change, &p, &rules);
-                                }
-                                let _ = finished.save(p.fingerprint());
-                                if let Ok(mut live) = index.write() {
-                                    *live = finished;
-                                }
-                                dirty = false;
-                                last_save = Instant::now();
-                            }
-                            if let Some(next) = queued.take() {
-                                walk_running = true;
-                                pending.clear();
-                                begin_walk(next, &index, &status, &tx);
-                            }
-                        }
-                        Err(RecvTimeoutError::Timeout) => {
-                            if refresh_at.is_some_and(|at| at <= Instant::now()) {
-                                refresh_at = None;
-                                if let (Some(p), false) = (active.clone(), walk_running) {
-                                    walk_running = true;
-                                    pending.clear();
-                                    begin_walk(p, &index, &status, &tx);
-                                }
-                            }
-                            if dirty && !walk_running && last_save.elapsed() > Duration::from_secs(300) {
-                                if let (Some(p), Ok(live)) = (&active, index.read()) {
-                                    let _ = live.save(p.fingerprint());
-                                }
-                                dirty = false;
-                                last_save = Instant::now();
-                            }
-                        }
-                        Err(RecvTimeoutError::Disconnected) => break,
-                    }
-                }
-            })
-            .expect("index thread");
-        manager
-    }
-
-    pub fn reindex(&self, params: IndexParams) {
-        let _ = self.tx.send(Cmd::Reindex(params));
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -1375,6 +1187,26 @@ mod tests {
         assert_eq!(hits.len(), 1);
         assert_eq!(hits[0].name, "keynote.json");
         assert_eq!(index.search("nwnmrk", 10, &|| false)[0].name, "known_marketplaces.json");
+    }
+
+    #[test]
+    fn a_shares_part_is_kept_when_the_local_drives_are_read_again() {
+        let mut old = sample();
+        let share = old.push("\\\\nas\\photos", NO_PARENT, 0, 0, FLAG_DIR | FLAG_ROOT);
+        let trip = old.push("Trip", share, 1, 1, FLAG_DIR);
+        old.push("beach.jpg", trip, 2, 1, 0);
+        assert_eq!(old.root_names(), ["C:\\Users\\me", "\\\\nas\\photos"]);
+
+        // A fresh walk of the local place only, then the share's part from before is added back.
+        let mut fresh = Index::default();
+        let root = fresh.push("C:\\Users\\me", NO_PARENT, 0, 0, FLAG_DIR | FLAG_ROOT);
+        fresh.push("new.txt", root, 1, 1, 0);
+        let mut merged = fresh.copy_roots(&|_| true);
+        merged.append_roots(&old, &|root| root.starts_with("\\\\"));
+        assert_eq!(merged.root_names(), ["C:\\Users\\me", "\\\\nas\\photos"]);
+        assert_eq!(merged.search("beach", 10, &|| false)[0].path, "\\\\nas\\photos\\Trip\\beach.jpg");
+        assert_eq!(merged.search("new.txt", 10, &|| false).len(), 1);
+        assert!(merged.search("holiday", 10, &|| false).is_empty(), "the old local part is replaced, not kept twice");
     }
 
     #[test]

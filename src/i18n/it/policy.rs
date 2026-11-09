@@ -63,9 +63,6 @@ pub const T: &[(&str, &str)] = &[
     // policy.rs: where to search
     ("Folders to search", "Cartelle in cui cercare"),
     ("One folder or drive per line. Environment variables such as %USERPROFILE% work. This replaces the person's own places.", "Una cartella o unità per riga. Le variabili di ambiente come %USERPROFILE% funzionano. Sostituisce i percorsi scelti dall'utente."),
-    ("Search network drives", "Cerca nelle unità di rete"),
-    ("Search USB drives", "Cerca nelle unità USB"),
-    ("Includes USB sticks and disks as they get plugged in.", "Include chiavette e dischi USB appena vengono collegati."),
     // policy.rs: never found
     ("Folders never found", "Cartelle mai trovate"),
     ("One folder per line, such as %USERPROFILE%\\AppData. Everything inside is never found either.", "Una cartella per riga, ad esempio %USERPROFILE%\\AppData. Nemmeno il suo contenuto viene mai trovato."),

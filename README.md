@@ -27,10 +27,10 @@ While Startline runs, the Start key and the Start button open it instead of the 
 
 ### ⚡ Search as you type
 - Apps and settings are answered in the same frame as the key press
-- Files come from an index that keeps every name in one block of memory, so a million files is one fast scan. It's saved to disk, so search works from the first moment, and kept fresh by watching for changes
+- Files come from an index that keeps every name in one block of memory, so a million files is one fast scan. It's saved to disk, so search works from the first moment, and kept fresh by watching for changes instead of reading every drive again at each start
 - Filter chips for folders, documents, pictures and each file type in the results, with the time the search took
 - A search language: `"exact text"`, wildcards (`*.pdf`, `img_??.png`), `-word` to leave out, `ext:pdf,docx`, `kind:picture`, `size:>10mb`, `modified:today` or `date:2025-03`, and regular expressions with `re:` or `/…/`, or a switch that makes the whole search one. The `?` in the search box lists it all
-- Choose where to search, including network and USB drives as they're attached, and what's never found: ready-made groups, hidden and system files, folders, file types and regular expressions
+- Choose where to search, with a switch each for the PC's own drives, network drives and USB drives, and what's never found: ready-made groups, hidden and system files, folders, file types and regular expressions
 - Choose which kinds of results show, in which order and how many of each, and hide the parts of the search box you don't use
 - A web search for what you typed
 
@@ -50,6 +50,8 @@ Type what you want and act on it from the result: "dark mode", "volume 40", "lou
 
 ### 🏢 Ready for IT departments
 Every setting can be fixed, or given as a default people can change, by **Group Policy** or straight in the Registry (`Software\Policies\Startline` and its `Recommended` subkey, under HKLM or HKCU), for computers or users. ADMX templates come with ADML in English, German and Italian. Pins and their sections, the layout and size, what the menu shows, how search behaves and whether updates install by themselves can all be deployed this way, without copying `start2.bin` around. Fixed settings show greyed out with "Managed by your organization", and running copies pick up changes within a minute. [`PolicyDefinitions/README.txt`](PolicyDefinitions/README.txt) lists every value.
+
+**What it reads from disks.** Startline reads only the names, sizes and dates of files and folders, never what's in them. Out of the box it indexes the PC's own drives; network and USB drives are off. Reading runs in Windows's background mode, one folder at a time on hard disks, and waits while the PC is on battery or a full-screen app is in front. After the first run it trusts its saved index and Windows's change notices, and reads a drive again only when the search places change, Windows loses track, or the index is more than a day old. Network shares, when switched on, are read at most once a day while the PC is idle, at most 20 folders a second, with no watch on the server. The policies **SearchLocalDrives**, **SearchNetworkDrives** and **SearchUsbDrives** turn each kind on or off.
 
 ## ⌨️ Keyboard
 

@@ -240,18 +240,25 @@ Enabled sets it to the value below, and people can't change it. Disabled or Not 
       <string id="R_SearchFolders">One folder or drive per line. Environment variables such as %USERPROFILE% work. This replaces the person's own places.
 
 A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
-      <string id="P_SearchNetworkDrives">Search network drives</string>
-      <string id="E_SearchNetworkDrives">Includes any network drive as it gets attached. Big shares can take a while to read.
+      <string id="P_SearchLocalDrives">Index local drives</string>
+      <string id="E_SearchLocalDrives">Names and dates of files and folders on this PC's own drives, read gently and kept up to date as they change.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="R_SearchNetworkDrives">Includes any network drive as it gets attached. Big shares can take a while to read.
+      <string id="R_SearchLocalDrives">Names and dates of files and folders on this PC's own drives, read gently and kept up to date as they change.
 
 A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
-      <string id="P_SearchUsbDrives">Search USB drives</string>
-      <string id="E_SearchUsbDrives">Includes USB sticks and disks as they get plugged in.
+      <string id="P_SearchNetworkDrives">Index network drives</string>
+      <string id="E_SearchNetworkDrives">Network drives and shares, including \\server\share places added by hand. Read at most once a day while the PC is idle, one folder at a time, with no watch on the server.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="R_SearchUsbDrives">Includes USB sticks and disks as they get plugged in.
+      <string id="R_SearchNetworkDrives">Network drives and shares, including \\server\share places added by hand. Read at most once a day while the PC is idle, one folder at a time, with no watch on the server.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchUsbDrives">Index USB drives</string>
+      <string id="E_SearchUsbDrives">USB sticks, disks and memory cards, as they get plugged in.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchUsbDrives">USB sticks, disks and memory cards, as they get plugged in.
 
 A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_SearchSkipFolders">Folders never found</string>

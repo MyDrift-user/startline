@@ -198,8 +198,9 @@ fn build(lang: Lang) -> Vec<Policy> {
         list(PINS, "/groups", Pins, t(tx("Pinned apps")), t(tx("One per line: Section|Name|Target or Section|Name|Target|Arguments. Target is a file, folder, program or web address, or app:ID for an installed app. Environment variables such as %USERPROFILE% work. As a fixed setting this replaces the person's pins and stops them changing pins; as a default it's the pins they start with."))),
         // Search: where to search
         list("SearchFolders", "/roots", SearchPlaces, t(tx("Folders to search")), t(tx("One folder or drive per line. Environment variables such as %USERPROFILE% work. This replaces the person's own places."))),
-        switch("SearchNetworkDrives", "/auto_network", SearchPlaces, t(tx("Search network drives")), t(tx("Includes any network drive as it gets attached. Big shares can take a while to read."))),
-        switch("SearchUsbDrives", "/auto_removable", SearchPlaces, t(tx("Search USB drives")), t(tx("Includes USB sticks and disks as they get plugged in."))),
+        switch("SearchLocalDrives", "/index_local", SearchPlaces, t(tx("Index local drives")), t(tx("Names and dates of files and folders on this PC's own drives, read gently and kept up to date as they change."))),
+        switch("SearchNetworkDrives", "/auto_network", SearchPlaces, t(tx("Index network drives")), t(tx("Network drives and shares, including \\\\server\\share places added by hand. Read at most once a day while the PC is idle, one folder at a time, with no watch on the server."))),
+        switch("SearchUsbDrives", "/auto_removable", SearchPlaces, t(tx("Index USB drives")), t(tx("USB sticks, disks and memory cards, as they get plugged in."))),
         // Search: never found
         add_list("SearchSkipFolders", "/excluded_paths", SearchSkip, t(tx("Folders never found")), t(tx("One folder per line, such as %USERPROFILE%\\AppData. Everything inside is never found either."))),
         add_list("SearchSkipFolderNames", "/exclude", SearchSkip, t(tx("Folder names never found")), t(tx("One name per line. A folder with this name is never found, nor anything in it, wherever it is."))),

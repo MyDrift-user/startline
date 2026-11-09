@@ -170,8 +170,118 @@ pub fn has_attributes(path: &str, mask: u32) -> bool {
     attributes(path).is_some_and(|d| d.dwFileAttributes & mask != 0)
 }
 
-pub fn lower_thread_priority() {
-    let _ = unsafe { SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL) };
+/// Puts this thread in Windows's background mode: low CPU priority, and its disk and network reads go to the back of
+/// the queue too, so reading folders never gets in the way of anything else.
+pub fn background_mode() {
+    let _ = unsafe { SetThreadPriority(GetCurrentThread(), THREAD_MODE_BACKGROUND_BEGIN) };
+}
+
+/// What a searched place sits on, which decides how gently it's read.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum PlaceKind {
+    /// A hard disk: one thread, as heads that jump between folders wear the disk and slow everything down.
+    Hdd,
+    /// A solid-state disk: a few threads.
+    Ssd,
+    /// A network share or a network drive: one slow thread, at most once a day.
+    Network,
+    /// A USB drive, memory card or anything else removable: one thread.
+    Usb,
+}
+
+impl PlaceKind {
+    /// How many threads may read it at once.
+    pub fn threads(self) -> usize {
+        if self == PlaceKind::Ssd { 4 } else { 1 }
+    }
+
+    /// Whether Windows tells Startline about changes there. Not for network shares: a watch on a file server keeps a
+    /// connection and a request open on it the whole time.
+    pub fn watched(self) -> bool {
+        self != PlaceKind::Network
+    }
+}
+
+/// What a folder or drive sits on. Network paths are known by their form; a local drive is asked whether it's
+/// removable, on USB, and whether it has a seek penalty, which only spinning disks have.
+pub fn place_kind(path: &str) -> PlaceKind {
+    let drive = drive_kind_of(path);
+    if drive != PlaceKind::Hdd {
+        return drive;
+    }
+    let letter = path.chars().next().unwrap_or('C').to_ascii_uppercase();
+    match storage_of(letter) {
+        Some((usb, _)) if usb => PlaceKind::Usb,
+        Some((_, false)) => PlaceKind::Ssd,
+        // Unknown counts as a hard disk: the gentler choice.
+        _ => PlaceKind::Hdd,
+    }
+}
+
+/// The quick part of `place_kind`: network, removable or local, without asking the disk itself. Local comes back as
+/// Hdd.
+pub fn drive_kind_of(path: &str) -> PlaceKind {
+    if path.starts_with("\\\\") || path.starts_with("//") {
+        return PlaceKind::Network;
+    }
+    let bytes = path.as_bytes();
+    if bytes.len() < 2 || bytes[1] != b':' {
+        return PlaceKind::Hdd;
+    }
+    let root = wide(&format!("{}:\\", bytes[0] as char));
+    match unsafe { GetDriveTypeW(PCWSTR(root.as_ptr())) } {
+        DRIVE_REMOTE => PlaceKind::Network,
+        DRIVE_FIXED => PlaceKind::Hdd,
+        // Removable, optical, RAM disks and anything Windows can't say: read gently, as removable.
+        _ => PlaceKind::Usb,
+    }
+}
+
+/// (on USB, has a seek penalty) for a drive letter, from the storage driver.
+fn storage_of(letter: char) -> Option<(bool, bool)> {
+    use windows::Win32::System::IO::DeviceIoControl;
+    use windows::Win32::System::Ioctl::*;
+    let volume = wide(&format!("\\\\.\\{letter}:"));
+    // No access rights are needed to ask a device about itself.
+    let handle = unsafe { CreateFileW(PCWSTR(volume.as_ptr()), 0, FILE_SHARE_READ | FILE_SHARE_WRITE, None, OPEN_EXISTING, FILE_FLAGS_AND_ATTRIBUTES(0), None) }.ok()?;
+    let ask = |property: STORAGE_PROPERTY_ID, out: *mut c_void, size: usize| -> bool {
+        let query = STORAGE_PROPERTY_QUERY { PropertyId: property, QueryType: PropertyStandardQuery, ..Default::default() };
+        let mut returned = 0u32;
+        unsafe {
+            DeviceIoControl(handle, IOCTL_STORAGE_QUERY_PROPERTY, Some(&query as *const _ as *const c_void), std::mem::size_of::<STORAGE_PROPERTY_QUERY>() as u32, Some(out), size as u32, Some(&mut returned), None).is_ok()
+        }
+    };
+    let mut device = STORAGE_DEVICE_DESCRIPTOR::default();
+    let usb = ask(StorageDeviceProperty, &mut device as *mut _ as *mut c_void, std::mem::size_of::<STORAGE_DEVICE_DESCRIPTOR>()) && device.BusType == BusTypeUsb;
+    let mut seek = DEVICE_SEEK_PENALTY_DESCRIPTOR::default();
+    let known = ask(StorageDeviceSeekPenaltyProperty, &mut seek as *mut _ as *mut c_void, std::mem::size_of::<DEVICE_SEEK_PENALTY_DESCRIPTOR>());
+    let _ = unsafe { CloseHandle(handle) };
+    known.then_some((usb, seek.IncursSeekPenalty))
+}
+
+/// Whether the PC is running on its battery.
+pub fn on_battery() -> bool {
+    let mut status = windows::Win32::System::Power::SYSTEM_POWER_STATUS::default();
+    unsafe { windows::Win32::System::Power::GetSystemPowerStatus(&mut status) }.is_ok() && status.ACLineStatus == 0
+}
+
+/// Whether a full-screen app, a game or a presentation is in front.
+pub fn full_screen_in_front() -> bool {
+    match unsafe { SHQueryUserNotificationState() } {
+        Ok(state) => state == QUNS_BUSY || state == QUNS_RUNNING_D3D_FULL_SCREEN || state == QUNS_PRESENTATION_MODE,
+        Err(_) => false,
+    }
+}
+
+/// How long since the last key press or mouse move, in seconds.
+pub fn idle_seconds() -> u64 {
+    use windows::Win32::UI::Input::KeyboardAndMouse::{GetLastInputInfo, LASTINPUTINFO};
+    let mut info = LASTINPUTINFO { cbSize: std::mem::size_of::<LASTINPUTINFO>() as u32, dwTime: 0 };
+    if !unsafe { GetLastInputInfo(&mut info) }.as_bool() {
+        return 0;
+    }
+    let now = unsafe { windows::Win32::System::SystemInformation::GetTickCount() };
+    (now.wrapping_sub(info.dwTime) / 1000) as u64
 }
 
 /// Fixed drives other than the Windows one.

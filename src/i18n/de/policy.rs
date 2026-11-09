@@ -65,8 +65,6 @@ pub const T: &[(&str, &str)] = &[
     // policy.rs: where to search
     ("Folders to search", "Zu durchsuchende Ordner"),
     ("One folder or drive per line. Environment variables such as %USERPROFILE% work. This replaces the person's own places.", "Ein Ordner oder Laufwerk pro Zeile. Umgebungsvariablen wie %USERPROFILE% funktionieren. Dies ersetzt die eigenen Orte des Benutzers."),
-    ("Search network drives", "Netzlaufwerke durchsuchen"),
-    ("Search USB drives", "USB-Laufwerke durchsuchen"),
     // policy.rs: never found
     ("Folders never found", "Nie gefundene Ordner"),
     ("One folder per line, such as %USERPROFILE%\\AppData. Everything inside is never found either.", "Ein Ordner pro Zeile, etwa %USERPROFILE%\\AppData. Auch alles darin wird nie gefunden."),

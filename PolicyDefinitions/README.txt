@@ -63,9 +63,26 @@ web address, or app:<ID> for an app installed from the Store or with an Applicat
 variables such as %USERPROFILE% and %ProgramFiles% work in targets and arguments.
 
 
+WHAT STARTLINE READS FROM DISKS
+Startline reads only the names, sizes and dates of files and folders, never what's in them. Out of the box it indexes
+the PC's own drives; network drives and USB drives are off. Its reading runs in Windows's background mode, so its disk
+reads come after everyone else's: one folder at a time on hard disks, a few at once on SSDs, and it waits while the PC
+is on battery or a full-screen app is in front. After the first run it trusts its saved index and Windows's change
+notices, and reads a drive again only when the search places or rules change, Windows reports it lost track, or the
+saved index is more than a day old.
+Network shares, when switched on, are read at most once a day, only after the PC has been idle for five minutes, one
+folder at a time and at most 20 folders a second, with no change watch on the server. \\server\share places people add
+by hand count as network shares.
+Each kind has its own policy, fixed or as a default:
+  SearchLocalDrives     the PC's own drives (on unless set)
+  SearchNetworkDrives   network drives and shares (off unless set)
+  SearchUsbDrives       USB sticks, disks and memory cards (off unless set)
+A kind that is off is never read or watched; search still finds apps and settings.
+
+
 SEARCH
 The search policies are under Startline > Search, in four parts:
-  Where to search   the places, and whether network and USB drives are searched as they attach.
+  Where to search   the places, and whether local, network and USB drives are indexed.
   Never found       what search never shows: six ready-made groups (SearchSkipAppData, SearchSkipWindows,
                     SearchSkipDeveloperFiles, SearchSkipCloudFolders, SearchSkipTempFiles, SearchSkipProgramParts),
                     hidden files, system files, and lists of folders, folder names, file types and regular
@@ -216,14 +233,18 @@ SearchFolders
     Folders to search
     list: REG_DWORD 1, its items in a subkey of the same name
     One folder or drive per line. Environment variables such as %USERPROFILE% work. This replaces the person's own places.
+SearchLocalDrives
+    Index local drives
+    REG_DWORD, 1 on, 0 off
+    Names and dates of files and folders on this PC's own drives, read gently and kept up to date as they change.
 SearchNetworkDrives
-    Search network drives
+    Index network drives
     REG_DWORD, 1 on, 0 off
-    Includes any network drive as it gets attached. Big shares can take a while to read.
+    Network drives and shares, including \\server\share places added by hand. Read at most once a day while the PC is idle, one folder at a time, with no watch on the server.
 SearchUsbDrives
-    Search USB drives
+    Index USB drives
     REG_DWORD, 1 on, 0 off
-    Includes USB sticks and disks as they get plugged in.
+    USB sticks, disks and memory cards, as they get plugged in.
 
 SEARCH: NEVER FOUND
 -------------------

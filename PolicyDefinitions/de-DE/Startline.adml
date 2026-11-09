@@ -240,18 +240,25 @@ Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. De
       <string id="R_SearchFolders">Ein Ordner oder Laufwerk pro Zeile. Umgebungsvariablen wie %USERPROFILE% funktionieren. Dies ersetzt die eigenen Orte des Benutzers.
 
 Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
-      <string id="P_SearchNetworkDrives">Netzlaufwerke durchsuchen</string>
-      <string id="E_SearchNetworkDrives">Bezieht jedes Netzlaufwerk ein, sobald es verbunden wird. Große Freigaben brauchen eine Weile zum Einlesen.
+      <string id="P_SearchLocalDrives">Lokale Laufwerke indizieren</string>
+      <string id="E_SearchLocalDrives">Namen und Datumsangaben von Dateien und Ordnern auf den Laufwerken dieses PCs, schonend gelesen und bei Änderungen aktuell gehalten.
 
 Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
-      <string id="R_SearchNetworkDrives">Bezieht jedes Netzlaufwerk ein, sobald es verbunden wird. Große Freigaben brauchen eine Weile zum Einlesen.
+      <string id="R_SearchLocalDrives">Namen und Datumsangaben von Dateien und Ordnern auf den Laufwerken dieses PCs, schonend gelesen und bei Änderungen aktuell gehalten.
 
 Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
-      <string id="P_SearchUsbDrives">USB-Laufwerke durchsuchen</string>
-      <string id="E_SearchUsbDrives">Bezieht USB-Sticks und -Festplatten ein, sobald sie angeschlossen werden.
+      <string id="P_SearchNetworkDrives">Netzlaufwerke indizieren</string>
+      <string id="E_SearchNetworkDrives">Netzlaufwerke und Freigaben, auch von Hand hinzugefügte Orte wie \\server\share. Höchstens einmal am Tag gelesen, nur während der PC nicht benutzt wird, ein Ordner nach dem anderen und ohne Überwachung auf dem Server.
 
 Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
-      <string id="R_SearchUsbDrives">Bezieht USB-Sticks und -Festplatten ein, sobald sie angeschlossen werden.
+      <string id="R_SearchNetworkDrives">Netzlaufwerke und Freigaben, auch von Hand hinzugefügte Orte wie \\server\share. Höchstens einmal am Tag gelesen, nur während der PC nicht benutzt wird, ein Ordner nach dem anderen und ohne Überwachung auf dem Server.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchUsbDrives">USB-Laufwerke indizieren</string>
+      <string id="E_SearchUsbDrives">USB-Sticks, -Festplatten und Speicherkarten, sobald sie angeschlossen werden.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchUsbDrives">USB-Sticks, -Festplatten und Speicherkarten, sobald sie angeschlossen werden.
 
 Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_SearchSkipFolders">Nie gefundene Ordner</string>
