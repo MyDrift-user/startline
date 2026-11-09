@@ -3,7 +3,7 @@
      Silent, for one account, no admin needed: msiexec /i name.msi /qn ALLUSERS=2 MSIINSTALLPERUSER=1 -->
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
   <Package Name="Startline" Manufacturer="MyDrift" Version="$(var.Version)" UpgradeCode="6F0B6C1E-3A52-4E8D-9C47-2D1E7A94B3C5" Scope="perUserOrMachine">
-    <!-- Same version too: the 0.1.0 test builds have to be replaced by the 0.1.0 release, not sit next to it. -->
+    <!-- Same version too: test builds have to be replaced by the release of the same version, not sit next to it. -->
     <MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of Startline is already installed." />
     <MediaTemplate EmbedCab="yes" />
     <Icon Id="app.ico" SourceFile="assets\icon.ico" />
