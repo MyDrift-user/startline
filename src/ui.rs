@@ -93,12 +93,13 @@ pub struct Menu {
     /// The person's own choices underneath any policy, which is what gets saved.
     own_cfg: Config,
     pub(crate) policy: Arc<Policies>,
-    policy_read_at: Instant,
+    /// Policies the watcher read while Startline runs, waiting to be taken in.
+    policy_slot: Arc<Mutex<Option<Policies>>>,
     applied: Option<Config>,
     system_look: SystemLook,
     pub look: Look,
     look_shown: Option<Look>,
-    glass_shown: Option<(bool, [u8; 3], f32)>,
+    glass_shown: Option<(bool, [u8; 3], f32, bool)>,
     changed_at: Option<Instant>,
     pub shared: Arc<Shared>,
     pub(crate) apps: Arc<RwLock<Vec<App>>>,
@@ -124,6 +125,10 @@ pub struct Menu {
     pub(crate) fast_micros: u64,
     waiting_generation: u64,
     pub(crate) rows: Vec<Row>,
+    /// Why a regular expression in the search couldn't be used.
+    pub(crate) search_error: Option<String>,
+    /// The panel that shows what can be typed in the search box.
+    pub(crate) help_open: bool,
 
     pub(crate) selected: Option<Id>,
     pub(crate) scroll_to_selected: bool,
@@ -177,17 +182,19 @@ impl Menu {
         let own_cfg = cfg.clone();
         let policy = Arc::new(read_policies(&options));
         policy.enforce(&mut cfg);
+        crate::i18n::set(crate::i18n::Lang::from_setting(&cfg.language));
         install_fonts(&ctx, cfg.experience);
         // On from the very first run, and kept pointing at wherever this copy now lives.
         if !screenshot && !options.no_hook && !options.test_injected_keys {
             if policy.autostart().is_some() {
                 policy.apply_autostart();
-            } else if !cfg.autostart_applied || settings::autostart_enabled() {
+            } else if !cfg.autostart_applied {
+                // The first run: on, unless an administrator's default says otherwise.
+                settings::set_autostart(policy.first_autostart().unwrap_or(true));
+                cfg.autostart_applied = true;
+                policy.without_forced(&cfg, &own_cfg).save();
+            } else if settings::autostart_enabled() {
                 settings::set_autostart(true);
-                if !cfg.autostart_applied {
-                    cfg.autostart_applied = true;
-                    policy.without_forced(&cfg, &own_cfg).save();
-                }
             }
         }
         let system_look = SystemLook::read();
@@ -227,7 +234,7 @@ impl Menu {
             cfg,
             own_cfg,
             policy,
-            policy_read_at: Instant::now(),
+            policy_slot: Arc::default(),
             applied: None,
             system_look,
             look,
@@ -256,6 +263,8 @@ impl Menu {
             fast_micros: 0,
             waiting_generation: 0,
             rows: Vec::new(),
+            search_error: None,
+            help_open: false,
             selected: None,
             scroll_to_selected: false,
             nav_by_keys: false,
@@ -287,6 +296,9 @@ impl Menu {
             focus_search: true,
         };
         menu.share_limits();
+        if !screenshot {
+            crate::policy::watch(ctx.clone(), menu.policy_slot.clone(), (*menu.policy).clone());
+        }
         menu.refresh_recent();
         if !screenshot && !menu.options.test_injected_keys {
             menu.auto_update.store(menu.cfg.auto_update, Ordering::Relaxed);
@@ -349,7 +361,8 @@ impl Menu {
             return;
         }
         self.rebuild_fast_rows();
-        self.waiting_generation = self.files.request(&self.query, &self.file_filter, self.cfg.max_files.max(1));
+        let filter = FileFilter { regex: self.regex_on(), ..self.file_filter.clone() };
+        self.waiting_generation = self.files.request(&self.query, &filter, self.cfg.max_files.max(1));
     }
 
     /// File types typed into the search itself: ".pdf", "*.pdf", "ext:pdf".
@@ -357,8 +370,14 @@ impl Menu {
         self.tokens.iter().filter_map(|word| typed_extension(word)).collect()
     }
 
+    /// Whether the search is after files only: a file type button, a typed type, the search language or regex mode.
     pub(crate) fn filtering(&self) -> bool {
-        !self.file_filter.is_empty() || !self.typed_filters().is_empty()
+        !self.file_filter.is_empty() || !self.typed_filters().is_empty() || self.regex_on() || crate::index::uses_file_syntax(&self.query)
+    }
+
+    /// Regex mode, which only counts while its switch is there to turn it off again, unless a policy fixes it on.
+    pub(crate) fn regex_on(&self) -> bool {
+        self.cfg.regex_search && (self.cfg.show_regex_switch || self.policy.is_set("SearchRegex"))
     }
 
     /// A file type button was pressed. A type that was typed gets taken out of the words.
@@ -428,7 +447,16 @@ impl Menu {
             search::app_rows(&apps, &self.cfg, &self.tokens)
         };
         let mut settings = search::setting_rows(&self.tokens);
-        settings.rows.retain(|row| self.policy.allows_row(&row.kind));
+        let (changes, pages) = (self.cfg.search_windows_settings, self.cfg.search_settings_pages);
+        settings.rows.retain(|row| {
+            self.policy.allows_row(&row.kind)
+                && match &row.kind {
+                    RowKind::Quick(..) => changes,
+                    RowKind::Run(actions::Do::Open(_)) => pages,
+                    _ => true,
+                }
+        });
+        settings.rows.truncate(self.cfg.max_settings.max(1));
         rows.extend(settings.rows);
         self.subject = settings.subject;
         self.settings_lead = settings.lead;
@@ -647,9 +675,14 @@ impl Menu {
 
     /// Picks up policy changes, and puts back anything that moved away from a policy's value.
     fn keep_to_policies(&mut self) {
-        if !self.is_shot() && self.policy_read_at.elapsed() >= Duration::from_secs(60) {
-            self.policy_read_at = Instant::now();
-            let fresh = Policies::read();
+        // Settings the person changed since the last frame stop following an administrator's default.
+        if let Some(before) = &self.applied {
+            if *before != self.cfg {
+                self.policy.note_choices(&mut self.cfg, before);
+            }
+        }
+        let read = self.policy_slot.lock().unwrap().take();
+        if let Some(fresh) = read {
             if fresh != *self.policy {
                 self.own_cfg = self.policy.without_forced(&self.cfg, &self.own_cfg);
                 self.cfg = self.own_cfg.clone();
@@ -708,6 +741,10 @@ impl Menu {
 
     fn seed_pins(&mut self) {
         if self.cfg.pins_seeded {
+            return;
+        }
+        if self.policy.sets_pins() {
+            self.cfg.pins_seeded = true;
             return;
         }
         let apps = self.apps.read().unwrap();
@@ -787,9 +824,20 @@ impl Menu {
         let glass_on = self.look.blur && (!in_settings || style == Experience::Startline);
         // Windows 7's window color is its white list; its glass is blue.
         let (tint, strength) = if style == Experience::Windows7 { ([28, 66, 104], 0.5) } else { (self.look.theme.bg, (self.look.opacity - 0.25).max(0.0)) };
-        let glass = (glass_on, tint, strength);
+        // Mica takes the place of the glass, where Windows has it. Only one of the two is ever asked for.
+        let mica = self.look.mica && (!in_settings || style == Experience::Startline);
+        let glass = (glass_on && !mica, tint, strength, mica);
         if self.glass_shown != Some(glass) {
-            self.shared.set_blur(glass_on, tint, strength);
+            let dark = (self.look.theme.bg[0] as u32 + self.look.theme.bg[1] as u32 + self.look.theme.bg[2] as u32) < 384;
+            if mica {
+                self.shared.set_blur(false, tint, strength);
+                self.shared.set_mica(true, dark);
+            } else {
+                if self.glass_shown.is_some_and(|shown| shown.3) {
+                    self.shared.set_mica(false, dark);
+                }
+                self.shared.set_blur(glass.0, tint, strength);
+            }
             self.glass_shown = Some(glass);
         }
         if self.applied.as_ref() == Some(&self.cfg) {
@@ -1033,6 +1081,7 @@ impl eframe::App for Menu {
         self.cfg.take_over_start = self.shared.take_start.load(Ordering::Relaxed);
         self.cfg.take_over_search = self.shared.take_search.load(Ordering::Relaxed);
         self.keep_to_policies();
+        crate::i18n::set(crate::i18n::Lang::from_setting(&self.cfg.language));
 
         for command in self.shared.take_commands() {
             match command {
@@ -1056,6 +1105,7 @@ impl eframe::App for Menu {
                 self.file_hits = answer.hits;
                 self.facets = answer.facets;
                 self.file_micros = Some(answer.micros);
+                self.search_error = answer.error;
                 self.assemble_rows();
             }
         }

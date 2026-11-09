@@ -6,6 +6,7 @@ mod classic;
 mod config;
 mod customize;
 mod home;
+mod i18n;
 mod icons;
 mod index;
 mod intent;
@@ -151,8 +152,10 @@ fn main() {
     update::clean_after_update();
 
     let cfg = config::Config::load();
+    // So a message before the window opens is in the right language too.
+    i18n::set(i18n::Lang::from_setting(&cfg.language));
     let viewport = egui::ViewportBuilder::default()
-        .with_title("Startline")
+        .with_title("Startline") // i18n-ignore: the app's name
         .with_decorations(false)
         .with_transparent(true)
         .with_resizable(false)
@@ -169,11 +172,11 @@ fn main() {
         ..Default::default()
     };
     let result = eframe::run_native(
-        "Startline",
+        "Startline", // i18n-ignore: the app's name
         native,
         Box::new(move |cc| Ok(Box::new(ui::Menu::new(cc, cfg, options)))),
     );
     if let Err(error) = result {
-        platform::message_box_error(&format!("Startline couldn't open its window.\n\n{error}"));
+        platform::message_box_error(&crate::trf!("Startline couldn't open its window.\n\n{error}", error = error));
     }
 }

@@ -2,9 +2,10 @@
      Silent, for this PC, from an admin prompt: msiexec /i name.msi /qn ALLUSERS=1 [APPLICATIONFOLDER="D:\Apps\Startline"]
      Silent, for one account, no admin needed: msiexec /i name.msi /qn ALLUSERS=2 MSIINSTALLPERUSER=1 -->
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
-  <Package Name="Startline" Manufacturer="MyDrift" Version="$(var.Version)" UpgradeCode="6F0B6C1E-3A52-4E8D-9C47-2D1E7A94B3C5" Scope="perUserOrMachine">
+  <!-- One ProductCode for all three languages of a build, as a language transform needs: package.ps1 makes it. -->
+  <Package Name="Startline" Manufacturer="MyDrift" Version="$(var.Version)" Language="!(loc.Language)" ProductCode="$(var.ProductCode)" UpgradeCode="6F0B6C1E-3A52-4E8D-9C47-2D1E7A94B3C5" Scope="perUserOrMachine">
     <!-- Same version too: test builds have to be replaced by the release of the same version, not sit next to it. -->
-    <MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of Startline is already installed." />
+    <MajorUpgrade AllowSameVersionUpgrades="yes" IgnoreLanguage="yes" DowngradeErrorMessage="!(loc.DowngradeError)" />
     <MediaTemplate EmbedCab="yes" />
     <Icon Id="app.ico" SourceFile="assets\icon.ico" />
     <Property Id="ARPPRODUCTICON" Value="app.ico" />

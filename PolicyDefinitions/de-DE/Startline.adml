@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.1" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+  <displayName>Startline</displayName>
+  <description>Einstellungen für das Startmenü und die Suche von Startline.</description>
+  <resources>
+    <stringTable>
+      <string id="Supported">Startline 0.1 und höher</string>
+      <string id="Cat_Startline">Startline</string>
+      <string id="Cat_Rec_Startline">Standards, die Benutzer ändern können</string>
+      <string id="Cat_Search">Suchen</string>
+      <string id="Cat_Appearance">Darstellung</string>
+      <string id="Cat_StartMenu">Startmenü</string>
+      <string id="Cat_Pins">Angeheftete Apps</string>
+      <string id="Cat_SearchPlaces">Wo gesucht wird</string>
+      <string id="Cat_SearchSkip">Nie gefunden</string>
+      <string id="Cat_SearchResults">Ergebnisse</string>
+      <string id="Cat_SearchBox">Suchfeld</string>
+      <string id="Cat_General">Allgemein</string>
+      <string id="Cat_Updates">Updates</string>
+      <string id="Cat_Limits">Was Benutzer tun können</string>
+      <string id="P_Experience">Aussehen</string>
+      <string id="E_Experience">Welches Design das Startmenü, die Suche und das Einstellungsfenster verwenden.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Experience">Welches Design das Startmenü, die Suche und das Einstellungsfenster verwenden.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="I_Experience_0">Windows 11</string>
+      <string id="I_Experience_1">Windows 10</string>
+      <string id="I_Experience_2">Windows 7</string>
+      <string id="I_Experience_3">Windows XP</string>
+      <string id="I_Experience_4">Startline</string>
+      <string id="P_Language">Sprache</string>
+      <string id="E_Language">Die Sprache, in der Startline seine Texte anzeigt: system folgt der Anzeigesprache von Windows, wenn diese Englisch, Deutsch oder Italienisch ist, und verwendet sonst Englisch.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Language">Die Sprache, in der Startline seine Texte anzeigt: system folgt der Anzeigesprache von Windows, wenn diese Englisch, Deutsch oder Italienisch ist, und verwendet sonst Englisch.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="I_Language_0">Die Anzeigesprache von Windows</string>
+      <string id="I_Language_1">English</string>
+      <string id="I_Language_2">Deutsch</string>
+      <string id="I_Language_3">Italiano</string>
+      <string id="P_TextAndIconSize">Text- und Symbolgröße</string>
+      <string id="E_TextAndIconSize">In Prozent. Das Einstellungsfenster bietet 90 (klein), 100 (normal) und 115 (groß).
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_TextAndIconSize">In Prozent. Das Einstellungsfenster bietet 90 (klein), 100 (normal) und 115 (groß).
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_Mica">Mica hinter dem Startmenü</string>
+      <string id="E_Mica">Das Mica-Material von Windows 11 hinter dem Startmenü, vom Desktophintergrund gefärbt, statt Milchglas. Ab Windows 11 Version 22H2; ältere Windows-Versionen ignorieren es. Für das Windows 11- und das Startline-Design.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Mica">Das Mica-Material von Windows 11 hinter dem Startmenü, vom Desktophintergrund gefärbt, statt Milchglas. Ab Windows 11 Version 22H2; ältere Windows-Versionen ignorieren es. Für das Windows 11- und das Startline-Design.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_MicaLight">Helleres Mica durch das Suchfeld und das ausgewählte Element</string>
+      <string id="E_MicaLight">Lässt bei eingeschaltetem Mica einen helleren Ton davon durch das Suchfeld und das ausgewählte Element scheinen, statt sie abzudecken.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_MicaLight">Lässt bei eingeschaltetem Mica einen helleren Ton davon durch das Suchfeld und das ausgewählte Element scheinen, statt sie abzudecken.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_ColorTheme">Farbschema</string>
+      <string id="E_ColorTheme">Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_ColorTheme">Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="I_ColorTheme_0">Stein</string>
+      <string id="I_ColorTheme_1">Graphit</string>
+      <string id="I_ColorTheme_2">Moos</string>
+      <string id="I_ColorTheme_3">Hafen</string>
+      <string id="I_ColorTheme_4">Ton</string>
+      <string id="I_ColorTheme_5">Schwarz</string>
+      <string id="I_ColorTheme_6">Tageslicht</string>
+      <string id="I_ColorTheme_7">Papier</string>
+      <string id="P_Color_Background">Hintergrundfarbe</string>
+      <string id="E_Color_Background">Als #RRGGBB geschrieben. Ersetzt diese Farbe des Farbschemas. Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Color_Background">Als #RRGGBB geschrieben. Ersetzt diese Farbe des Farbschemas. Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_Color_Panels">Flächenfarbe</string>
+      <string id="E_Color_Panels">Als #RRGGBB geschrieben. Ersetzt diese Farbe des Farbschemas. Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Color_Panels">Als #RRGGBB geschrieben. Ersetzt diese Farbe des Farbschemas. Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_Color_Text">Textfarbe</string>
+      <string id="E_Color_Text">Als #RRGGBB geschrieben. Ersetzt diese Farbe des Farbschemas. Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Color_Text">Als #RRGGBB geschrieben. Ersetzt diese Farbe des Farbschemas. Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_Color_QuietText">Farbe für dezenten Text</string>
+      <string id="E_Color_QuietText">Als #RRGGBB geschrieben. Ersetzt diese Farbe des Farbschemas. Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Color_QuietText">Als #RRGGBB geschrieben. Ersetzt diese Farbe des Farbschemas. Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_Color_Accent">Akzentfarbe</string>
+      <string id="E_Color_Accent">Als #RRGGBB geschrieben. Ersetzt diese Farbe des Farbschemas. Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Color_Accent">Als #RRGGBB geschrieben. Ersetzt diese Farbe des Farbschemas. Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_Corners">Fensterecken</string>
+      <string id="E_Corners">Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Corners">Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="I_Corners_0">Rund</string>
+      <string id="I_Corners_1">Leicht gerundet</string>
+      <string id="I_Corners_2">Eckig</string>
+      <string id="P_FrostedGlass">Milchglas</string>
+      <string id="E_FrostedGlass">Zeichnet weich, was hinter dem Menü liegt. Nur das Startline-Design verwendet dies.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_FrostedGlass">Zeichnet weich, was hinter dem Menü liegt. Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_Opacity">Wie deckend das Menü ist</string>
+      <string id="E_Opacity">In Prozent, von 50 (am durchsichtigsten) bis 100 (deckend). Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Opacity">In Prozent, von 50 (am durchsichtigsten) bis 100 (deckend). Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_Sections">Was das Startmenü zeigt</string>
+      <string id="E_Sections">Eines pro Zeile, in der Reihenfolge, in der sie erscheinen sollen: Pinned, Recent, Frequent, AllApps. Nicht genannte werden ausgeblendet.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Sections">Eines pro Zeile, in der Reihenfolge, in der sie erscheinen sollen: Pinned, Recent, Frequent, AllApps. Nicht genannte werden ausgeblendet.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_RecentCount">Anzahl zuletzt verwendeter Dateien</string>
+      <string id="E_RecentCount">Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_RecentCount">Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_FrequentCount">Anzahl meistverwendeter Elemente</string>
+      <string id="E_FrequentCount">Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_FrequentCount">Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchAtBottom">Suchleiste unten</string>
+      <string id="E_SearchAtBottom">Nur das Startline-Design verwendet dies.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchAtBottom">Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_Columns">Angeheftete Apps pro Zeile</string>
+      <string id="E_Columns">Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Columns">Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_TileSize">Größe angehefteter Apps</string>
+      <string id="E_TileSize">Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_TileSize">Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_ShowLabels">Namen unter angehefteten Apps</string>
+      <string id="E_ShowLabels">Nur das Startline-Design verwendet dies.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_ShowLabels">Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_CompactRows">Kompakte Listen</string>
+      <string id="E_CompactRows">Nur das Startline-Design verwendet dies.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_CompactRows">Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_HorizontalPosition">Wo es sich waagerecht öffnet</string>
+      <string id="E_HorizontalPosition">Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_HorizontalPosition">Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="I_HorizontalPosition_0">Links</string>
+      <string id="I_HorizontalPosition_1">Mitte</string>
+      <string id="I_HorizontalPosition_2">Rechts</string>
+      <string id="I_HorizontalPosition_3">Neben der Startschaltfläche</string>
+      <string id="P_VerticalPosition">Wo es sich senkrecht öffnet</string>
+      <string id="E_VerticalPosition">Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_VerticalPosition">Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="I_VerticalPosition_0">Oben</string>
+      <string id="I_VerticalPosition_1">Mitte</string>
+      <string id="I_VerticalPosition_2">Unten</string>
+      <string id="P_Margin">Abstand zum Bildschirmrand</string>
+      <string id="E_Margin">Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Margin">Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_Width">Menübreite</string>
+      <string id="E_Width">Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Width">Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_Height">Menühöhe</string>
+      <string id="E_Height">Nur das Startline-Design verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Height">Nur das Startline-Design verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_PinnedApps">Angeheftete Apps</string>
+      <string id="E_PinnedApps">Einer pro Zeile: Section|Name|Target oder Section|Name|Target|Arguments. Target ist eine Datei, ein Ordner, ein Programm oder eine Webadresse, oder app:ID für eine installierte App. Umgebungsvariablen wie %USERPROFILE% funktionieren. Als feste Einstellung ersetzt dies die angehefteten Elemente des Benutzers, und er kann sie nicht mehr ändern; als Standard sind es die angehefteten Elemente, mit denen er beginnt.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_PinnedApps">Einer pro Zeile: Section|Name|Target oder Section|Name|Target|Arguments. Target ist eine Datei, ein Ordner, ein Programm oder eine Webadresse, oder app:ID für eine installierte App. Umgebungsvariablen wie %USERPROFILE% funktionieren. Als feste Einstellung ersetzt dies die angehefteten Elemente des Benutzers, und er kann sie nicht mehr ändern; als Standard sind es die angehefteten Elemente, mit denen er beginnt.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchFolders">Zu durchsuchende Ordner</string>
+      <string id="E_SearchFolders">Ein Ordner oder Laufwerk pro Zeile. Umgebungsvariablen wie %USERPROFILE% funktionieren. Dies ersetzt die eigenen Orte des Benutzers.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchFolders">Ein Ordner oder Laufwerk pro Zeile. Umgebungsvariablen wie %USERPROFILE% funktionieren. Dies ersetzt die eigenen Orte des Benutzers.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchNetworkDrives">Netzlaufwerke durchsuchen</string>
+      <string id="E_SearchNetworkDrives">Bezieht jedes Netzlaufwerk ein, sobald es verbunden wird. Große Freigaben brauchen eine Weile zum Einlesen.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchNetworkDrives">Bezieht jedes Netzlaufwerk ein, sobald es verbunden wird. Große Freigaben brauchen eine Weile zum Einlesen.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchUsbDrives">USB-Laufwerke durchsuchen</string>
+      <string id="E_SearchUsbDrives">Bezieht USB-Sticks und -Festplatten ein, sobald sie angeschlossen werden.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchUsbDrives">Bezieht USB-Sticks und -Festplatten ein, sobald sie angeschlossen werden.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchSkipFolders">Nie gefundene Ordner</string>
+      <string id="E_SearchSkipFolders">Ein Ordner pro Zeile, etwa %USERPROFILE%\AppData. Auch alles darin wird nie gefunden.
+
+Aktiviert fügt die Einträge unten zu den eigenen der Benutzer hinzu, und sie können sie nicht entfernen. Weitere hinzufügen können sie weiterhin. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchSkipFolders">Ein Ordner pro Zeile, etwa %USERPROFILE%\AppData. Auch alles darin wird nie gefunden.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchSkipFolderNames">Nie gefundene Ordnernamen</string>
+      <string id="E_SearchSkipFolderNames">Ein Name pro Zeile. Ein Ordner mit diesem Namen wird nie gefunden, auch nichts darin, wo immer er liegt.
+
+Aktiviert fügt die Einträge unten zu den eigenen der Benutzer hinzu, und sie können sie nicht entfernen. Weitere hinzufügen können sie weiterhin. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchSkipFolderNames">Ein Name pro Zeile. Ein Ordner mit diesem Namen wird nie gefunden, auch nichts darin, wo immer er liegt.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchSkipFileTypes">Nie gefundene Dateitypen</string>
+      <string id="E_SearchSkipFileTypes">Einer pro Zeile, etwa .iso.
+
+Aktiviert fügt die Einträge unten zu den eigenen der Benutzer hinzu, und sie können sie nicht entfernen. Weitere hinzufügen können sie weiterhin. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchSkipFileTypes">Einer pro Zeile, etwa .iso.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchSkipPatterns">Nie gefundene Pfade (reguläre Ausdrücke)</string>
+      <string id="E_SearchSkipPatterns">Ein regulärer Ausdruck pro Zeile, verglichen mit dem ganzen Pfad, ohne Rücksicht auf Groß- und Kleinschreibung. Eine passende Datei oder ein passender Ordner wird nie gefunden, auch nichts in einem passenden Ordner. Zum Beispiel \\Payroll(\\|$) oder \.(key|pem|pfx)$. Ein ungültiges Muster wird ignoriert.
+
+Aktiviert fügt die Einträge unten zu den eigenen der Benutzer hinzu, und sie können sie nicht entfernen. Weitere hinzufügen können sie weiterhin. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchSkipPatterns">Ein regulärer Ausdruck pro Zeile, verglichen mit dem ganzen Pfad, ohne Rücksicht auf Groß- und Kleinschreibung. Eine passende Datei oder ein passender Ordner wird nie gefunden, auch nichts in einem passenden Ordner. Zum Beispiel \\Payroll(\\|$) oder \.(key|pem|pfx)$. Ein ungültiges Muster wird ignoriert.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchSkipHidden">Ausgeblendete Dateien und Ordner werden nie gefunden</string>
+      <string id="E_SearchSkipHidden">Was Windows ausblendet. Deaktiviert findet sie.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchSkipHidden">Was Windows ausblendet. Deaktiviert findet sie.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchSkipSystem">Systemdateien werden nie gefunden</string>
+      <string id="E_SearchSkipSystem">Dateien und Ordner, die Windows als Teil des Systems kennzeichnet, etwa desktop.ini. Deaktiviert findet sie.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchSkipSystem">Dateien und Ordner, die Windows als Teil des Systems kennzeichnet, etwa desktop.ini. Deaktiviert findet sie.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchResults">Arten von Ergebnissen</string>
+      <string id="E_SearchResults">Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Files, Web. Eine nicht genannte Art wird nie angezeigt.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchResults">Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Files, Web. Eine nicht genannte Art wird nie angezeigt.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchMaxApps">Höchstzahl angezeigter Apps</string>
+      <string id="E_SearchMaxApps">Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchMaxApps">Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchMaxSettings">Höchstzahl angezeigter Einstellungen</string>
+      <string id="E_SearchMaxSettings">Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchMaxSettings">Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchMaxFiles">Höchstzahl angezeigter Dateien</string>
+      <string id="E_SearchMaxFiles">Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchMaxFiles">Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchShowFolders">Ordner unter jeder Datei anzeigen</string>
+      <string id="E_SearchShowFolders">Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchShowFolders">Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchWebName">Name der Websuche</string>
+      <string id="E_SearchWebName">Angezeigt als: Search &lt;name&gt; for ...
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchWebName">Angezeigt als: Search &lt;name&gt; for ...
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchWebAddress">Adresse der Websuche</string>
+      <string id="E_SearchWebAddress">Muss mit http:// oder https:// beginnen und {} dort enthalten, wo die Suchbegriffe stehen. Alles andere wird ignoriert.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchWebAddress">Muss mit http:// oder https:// beginnen und {} dort enthalten, wo die Suchbegriffe stehen. Alles andere wird ignoriert.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchChangeWindowsSettings">Windows-Einstellungen über die Suche ändern</string>
+      <string id="E_SearchChangeWindowsSettings">Deaktiviert entfernt alle Windows-Einstellungen, die die Suche ändern kann.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchChangeWindowsSettings">Deaktiviert entfernt alle Windows-Einstellungen, die die Suche ändern kann.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchWindowsSettingsPages">Verknüpfungen zu Windows-Einstellungen und -Tools</string>
+      <string id="E_SearchWindowsSettingsPages">Deaktiviert entfernt die Verknüpfungen der Suche zu Seiten der Windows-Einstellungen und zu Tools sowie die Links zu Systemsteuerung, Druckern und Standardprogrammen.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchWindowsSettingsPages">Deaktiviert entfernt die Verknüpfungen der Suche zu Seiten der Windows-Einstellungen und zu Tools sowie die Links zu Systemsteuerung, Druckern und Standardprogrammen.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchRegex">Suchen als reguläre Ausdrücke behandeln</string>
+      <string id="E_SearchRegex">Die ganze Suche ist ein regulärer Ausdruck, verglichen mit Namen ohne Rücksicht auf Groß- und Kleinschreibung. Der Schalter im Suchfeld schaltet das ein und aus.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchRegex">Die ganze Suche ist ein regulärer Ausdruck, verglichen mit Namen ohne Rücksicht auf Groß- und Kleinschreibung. Der Schalter im Suchfeld schaltet das ein und aus.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchShowRegexSwitch">Schalter für reguläre Ausdrücke im Suchfeld</string>
+      <string id="E_SearchShowRegexSwitch">Deaktiviert blendet den Schalter aus, und Suchen sind dann nie reguläre Ausdrücke, es sei denn, SearchRegex ist aktiviert.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchShowRegexSwitch">Deaktiviert blendet den Schalter aus, und Suchen sind dann nie reguläre Ausdrücke, es sei denn, SearchRegex ist aktiviert.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchShowHelp">Hilfeschaltfläche im Suchfeld</string>
+      <string id="E_SearchShowHelp">Das ?, das zeigt, was eingegeben werden kann: Wörter, &quot;exakter Text&quot;, Platzhalter, -ohne, ext:, kind:, size:, modified: und reguläre Ausdrücke.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchShowHelp">Das ?, das zeigt, was eingegeben werden kann: Wörter, &quot;exakter Text&quot;, Platzhalter, -ohne, ext:, kind:, size:, modified: und reguläre Ausdrücke.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchFileTypeButtons">Dateityp-Schaltflächen unter der Suche</string>
+      <string id="E_SearchFileTypeButtons">Die Schaltflächen, die die Ergebnisse auf eine Dateiart eingrenzen.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchFileTypeButtons">Die Schaltflächen, die die Ergebnisse auf eine Dateiart eingrenzen.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchShowTime">Anzeigen, wie lange eine Suche gedauert hat</string>
+      <string id="E_SearchShowTime">Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchShowTime">Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchShowHints">Tastaturhinweise unter den Ergebnissen</string>
+      <string id="E_SearchShowHints">Die Zeile, die erklärt, was Eingabetaste, Strg+Eingabetaste, Umschalt+Eingabetaste und Esc tun.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchShowHints">Die Zeile, die erklärt, was Eingabetaste, Strg+Eingabetaste, Umschalt+Eingabetaste und Esc tun.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_StartWithWindows">Mit Windows starten</string>
+      <string id="E_StartWithWindows">Hält das Startmenü nach einem Neustart in Betrieb.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_StartWithWindows">Hält das Startmenü nach einem Neustart in Betrieb.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_TakeOverStartKey">Windows-Taste und Startschaltfläche öffnen dieses Menü</string>
+      <string id="E_TakeOverStartKey">Umschalt + Windows-Taste öffnet weiterhin das Windows-Menü.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_TakeOverStartKey">Umschalt + Windows-Taste öffnet weiterhin das Windows-Menü.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_TakeOverSearchKey">Windows-Taste + S öffnet dieses Menü ebenfalls</string>
+      <string id="E_TakeOverSearchKey">Andere Windows-Tastenkombinationen funktionieren weiter.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_TakeOverSearchKey">Andere Windows-Tastenkombinationen funktionieren weiter.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SkipWelcome">Begrüßungshinweis überspringen</string>
+      <string id="E_SkipWelcome">Aktiviert blendet den Hinweis aus, der beim ersten Start erscheint.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SkipWelcome">Aktiviert blendet den Hinweis aus, der beim ersten Start erscheint.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_AutomaticUpdates">Updates automatisch installieren</string>
+      <string id="E_AutomaticUpdates">Startline installiert neue Versionen selbst und startet neu, während sein Menü geschlossen ist. Bei einer Installation für den ganzen PC installiert die Aufgabe Startline Updater sie innerhalb einer Stunde als SYSTEM. Deaktiviert überlässt Updates dem Benutzer oder, bei einer Installation für den ganzen PC, dem Administrator.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_AutomaticUpdates">Startline installiert neue Versionen selbst und startet neu, während sein Menü geschlossen ist. Bei einer Installation für den ganzen PC installiert die Aufgabe Startline Updater sie innerhalb einer Stunde als SYSTEM. Deaktiviert überlässt Updates dem Benutzer oder, bei einer Installation für den ganzen PC, dem Administrator.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_CheckForUpdates">Nach Updates suchen</string>
+      <string id="E_CheckForUpdates">Deaktiviert verhindert, dass Startline überhaupt nach neuen Versionen sucht, für Organisationen, die sie auf eigene Weise verteilen.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="P_SearchSkipAppData">Nie gefunden: App-Daten</string>
+      <string id="E_SearchSkipAppData">Einstellungen und Caches, die Programme in AppData ablegen. Aktiviert findet sie nie, Deaktiviert findet sie immer.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchSkipAppData">Einstellungen und Caches, die Programme in AppData ablegen. Aktiviert findet sie nie, Deaktiviert findet sie immer.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchSkipWindows">Nie gefunden: Windows und installierte Programme</string>
+      <string id="E_SearchSkipWindows">Windows, Programme und andere Systemordner. Aktiviert findet sie nie, Deaktiviert findet sie immer.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchSkipWindows">Windows, Programme und andere Systemordner. Aktiviert findet sie nie, Deaktiviert findet sie immer.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchSkipDeveloperFiles">Nie gefunden: Entwicklerdateien</string>
+      <string id="E_SearchSkipDeveloperFiles">node_modules, .git, Build-Ausgaben und Ähnliches. Aktiviert findet sie nie, Deaktiviert findet sie immer.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchSkipDeveloperFiles">node_modules, .git, Build-Ausgaben und Ähnliches. Aktiviert findet sie nie, Deaktiviert findet sie immer.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchSkipCloudFolders">Nie gefunden: Cloudordner</string>
+      <string id="E_SearchSkipCloudFolders">Ordner von OneDrive, Dropbox und Google Drive. Aktiviert findet sie nie, Deaktiviert findet sie immer.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchSkipCloudFolders">Ordner von OneDrive, Dropbox und Google Drive. Aktiviert findet sie nie, Deaktiviert findet sie immer.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchSkipTempFiles">Nie gefunden: Temporäre Dateien und Protokolldateien</string>
+      <string id="E_SearchSkipTempFiles">Überbleibsel wie .tmp, .log und .bak. Aktiviert findet sie nie, Deaktiviert findet sie immer.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchSkipTempFiles">Überbleibsel wie .tmp, .log und .bak. Aktiviert findet sie nie, Deaktiviert findet sie immer.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchSkipProgramParts">Nie gefunden: Programmteile</string>
+      <string id="E_SearchSkipProgramParts">Dateien, die Sie nie selbst öffnen, etwa .dll und .sys. Aktiviert findet sie nie, Deaktiviert findet sie immer.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchSkipProgramParts">Dateien, die Sie nie selbst öffnen, etwa .dll und .sys. Aktiviert findet sie nie, Deaktiviert findet sie immer.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchWindowsSettings">Windows-Einstellungen, die die Suche ändern kann</string>
+      <string id="E_SearchWindowsSettings">Nicht angehakte Einstellungen werden aus der Suche entfernt.
+
+Aktiviert wendet die Häkchen unten an. Deaktiviert oder Nicht konfiguriert lässt alles zu.</string>
+      <string id="P_Commands">Befehle, die Benutzer verwenden können</string>
+      <string id="E_Commands">Nicht angehakte Befehle werden überall entfernt, wo sie erscheinen. Wird Customize Startline entfernt, ist auch das Einstellungsfenster gesperrt.
+
+Aktiviert wendet die Häkchen unten an. Deaktiviert oder Nicht konfiguriert lässt alles zu.</string>
+      <string id="P_RightClickOptions">Optionen im Kontextmenü</string>
+      <string id="E_RightClickOptions">Nicht angehakte Optionen werden entfernt. Auch ihre Tastenkombinationen funktionieren dann nicht mehr.
+
+Aktiviert wendet die Häkchen unten an. Deaktiviert oder Nicht konfiguriert lässt alles zu.</string>
+    </stringTable>
+    <presentationTable>
+      <presentation id="P_Experience">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Aussehen:</dropdownList>
+      </presentation>
+      <presentation id="P_Language">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Sprache:</dropdownList>
+      </presentation>
+      <presentation id="P_TextAndIconSize">
+        <decimalTextBox refId="Value" defaultValue="100">Text- und Symbolgröße:</decimalTextBox>
+      </presentation>
+      <presentation id="P_ColorTheme">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Farbschema:</dropdownList>
+      </presentation>
+      <presentation id="P_Color_Background">
+        <textBox refId="Value">
+          <label>Hintergrundfarbe:</label>
+          <defaultValue>#1B1B1A</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Color_Panels">
+        <textBox refId="Value">
+          <label>Flächenfarbe:</label>
+          <defaultValue>#272725</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Color_Text">
+        <textBox refId="Value">
+          <label>Textfarbe:</label>
+          <defaultValue>#ECEAE5</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Color_QuietText">
+        <textBox refId="Value">
+          <label>Farbe für dezenten Text:</label>
+          <defaultValue>#94928C</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Color_Accent">
+        <textBox refId="Value">
+          <label>Akzentfarbe:</label>
+          <defaultValue>#D9A46B</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Corners">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Fensterecken:</dropdownList>
+      </presentation>
+      <presentation id="P_Opacity">
+        <decimalTextBox refId="Value" defaultValue="96">Wie deckend das Menü ist:</decimalTextBox>
+      </presentation>
+      <presentation id="P_Sections">
+        <listBox refId="Value">Was das Startmenü zeigt:</listBox>
+      </presentation>
+      <presentation id="P_RecentCount">
+        <decimalTextBox refId="Value" defaultValue="6">Anzahl zuletzt verwendeter Dateien:</decimalTextBox>
+      </presentation>
+      <presentation id="P_FrequentCount">
+        <decimalTextBox refId="Value" defaultValue="6">Anzahl meistverwendeter Elemente:</decimalTextBox>
+      </presentation>
+      <presentation id="P_Columns">
+        <decimalTextBox refId="Value" defaultValue="6">Angeheftete Apps pro Zeile:</decimalTextBox>
+      </presentation>
+      <presentation id="P_TileSize">
+        <decimalTextBox refId="Value" defaultValue="84">Größe angehefteter Apps:</decimalTextBox>
+      </presentation>
+      <presentation id="P_HorizontalPosition">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Wo es sich waagerecht öffnet:</dropdownList>
+      </presentation>
+      <presentation id="P_VerticalPosition">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Wo es sich senkrecht öffnet:</dropdownList>
+      </presentation>
+      <presentation id="P_Margin">
+        <decimalTextBox refId="Value" defaultValue="12">Abstand zum Bildschirmrand:</decimalTextBox>
+      </presentation>
+      <presentation id="P_Width">
+        <decimalTextBox refId="Value" defaultValue="660">Menübreite:</decimalTextBox>
+      </presentation>
+      <presentation id="P_Height">
+        <decimalTextBox refId="Value" defaultValue="720">Menühöhe:</decimalTextBox>
+      </presentation>
+      <presentation id="P_PinnedApps">
+        <listBox refId="Value">Angeheftete Apps:</listBox>
+      </presentation>
+      <presentation id="P_SearchFolders">
+        <listBox refId="Value">Zu durchsuchende Ordner:</listBox>
+      </presentation>
+      <presentation id="P_SearchSkipFolders">
+        <listBox refId="Value">Nie gefundene Ordner:</listBox>
+      </presentation>
+      <presentation id="P_SearchSkipFolderNames">
+        <listBox refId="Value">Nie gefundene Ordnernamen:</listBox>
+      </presentation>
+      <presentation id="P_SearchSkipFileTypes">
+        <listBox refId="Value">Nie gefundene Dateitypen:</listBox>
+      </presentation>
+      <presentation id="P_SearchSkipPatterns">
+        <listBox refId="Value">Nie gefundene Pfade (reguläre Ausdrücke):</listBox>
+      </presentation>
+      <presentation id="P_SearchResults">
+        <listBox refId="Value">Arten von Ergebnissen:</listBox>
+      </presentation>
+      <presentation id="P_SearchMaxApps">
+        <decimalTextBox refId="Value" defaultValue="8">Höchstzahl angezeigter Apps:</decimalTextBox>
+      </presentation>
+      <presentation id="P_SearchMaxSettings">
+        <decimalTextBox refId="Value" defaultValue="6">Höchstzahl angezeigter Einstellungen:</decimalTextBox>
+      </presentation>
+      <presentation id="P_SearchMaxFiles">
+        <decimalTextBox refId="Value" defaultValue="30">Höchstzahl angezeigter Dateien:</decimalTextBox>
+      </presentation>
+      <presentation id="P_SearchWebName">
+        <textBox refId="Value">
+          <label>Name der Websuche:</label>
+          <defaultValue>the web</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_SearchWebAddress">
+        <textBox refId="Value">
+          <label>Adresse der Websuche:</label>
+          <defaultValue>https://duckduckgo.com/?q={}</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_SearchWindowsSettings">
+        <checkBox refId="Setting_Wifi" defaultChecked="true">WLAN</checkBox>
+        <checkBox refId="Setting_Bluetooth" defaultChecked="true">Bluetooth</checkBox>
+        <checkBox refId="Setting_DarkMode" defaultChecked="true">Dunkelmodus</checkBox>
+        <checkBox refId="Setting_AppsDark" defaultChecked="true">Dunkelmodus für Apps</checkBox>
+        <checkBox refId="Setting_SystemDark" defaultChecked="true">Dunkle Taskleiste und Start</checkBox>
+        <checkBox refId="Setting_KeepAwake" defaultChecked="true">Wach halten</checkBox>
+        <checkBox refId="Setting_Mute" defaultChecked="true">Stumm</checkBox>
+        <checkBox refId="Setting_MicMute" defaultChecked="true">Mikrofon stumm</checkBox>
+        <checkBox refId="Setting_Transparency" defaultChecked="true">Transparenzeffekte</checkBox>
+        <checkBox refId="Setting_AccentTaskbar" defaultChecked="true">Akzentfarbe auf der Taskleiste</checkBox>
+        <checkBox refId="Setting_AccentTitleBars" defaultChecked="true">Akzentfarbe auf Titelleisten</checkBox>
+        <checkBox refId="Setting_AutoHideTaskbar" defaultChecked="true">Taskleiste ausblenden</checkBox>
+        <checkBox refId="Setting_TaskbarAlign" defaultChecked="true">Taskleistenausrichtung</checkBox>
+        <checkBox refId="Setting_TaskViewButton" defaultChecked="true">Schaltfläche Aktive Anwendungen</checkBox>
+        <checkBox refId="Setting_ClockSeconds" defaultChecked="true">Sekunden in der Uhr</checkBox>
+        <checkBox refId="Setting_FileExtensions" defaultChecked="true">Dateinamenerweiterungen</checkBox>
+        <checkBox refId="Setting_HiddenFiles" defaultChecked="true">Ausgeblendete Elemente</checkBox>
+        <checkBox refId="Setting_ItemCheckboxes" defaultChecked="true">Elementkontrollkästchen</checkBox>
+        <checkBox refId="Setting_CompactExplorer" defaultChecked="true">Kompakte Ansicht</checkBox>
+        <checkBox refId="Setting_ClipboardHistory" defaultChecked="true">Zwischenablageverlauf</checkBox>
+        <checkBox refId="Setting_GameMode" defaultChecked="true">Spielmodus</checkBox>
+        <checkBox refId="Setting_Animations" defaultChecked="true">Animationseffekte</checkBox>
+        <checkBox refId="Setting_SnapWindows" defaultChecked="true">Fenster andocken</checkBox>
+        <checkBox refId="Setting_DragContents" defaultChecked="true">Fensterinhalt beim Ziehen anzeigen</checkBox>
+        <checkBox refId="Setting_FontSmoothing" defaultChecked="true">Schriftarten glätten</checkBox>
+        <checkBox refId="Setting_WindowShadows" defaultChecked="true">Fensterschatten</checkBox>
+        <checkBox refId="Setting_HoverActivate" defaultChecked="true">Fenster beim Zeigen aktivieren</checkBox>
+        <checkBox refId="Setting_ScreenSaver" defaultChecked="true">Bildschirmschoner</checkBox>
+        <checkBox refId="Setting_PointerPrecision" defaultChecked="true">Zeigerbeschleunigung verbessern</checkBox>
+        <checkBox refId="Setting_SwapMouseButtons" defaultChecked="true">Maustasten tauschen</checkBox>
+        <checkBox refId="Setting_StickyKeys" defaultChecked="true">Einrastfunktion</checkBox>
+        <checkBox refId="Setting_Autostart" defaultChecked="true">Startline mit Windows starten</checkBox>
+        <checkBox refId="Setting_Volume" defaultChecked="true">Lautstärke</checkBox>
+        <checkBox refId="Setting_MicVolume" defaultChecked="true">Mikrofonpegel</checkBox>
+        <checkBox refId="Setting_Brightness" defaultChecked="true">Helligkeit</checkBox>
+        <checkBox refId="Setting_MouseSpeed" defaultChecked="true">Mausgeschwindigkeit</checkBox>
+        <checkBox refId="Setting_ScrollLines" defaultChecked="true">Zeilen pro Bildlauf</checkBox>
+        <checkBox refId="Setting_DoubleClick" defaultChecked="true">Doppelklickgeschwindigkeit</checkBox>
+        <checkBox refId="Setting_KeyRepeatSpeed" defaultChecked="true">Wiederholrate</checkBox>
+        <checkBox refId="Setting_KeyRepeatDelay" defaultChecked="true">Verzögerung bis zur Wiederholung</checkBox>
+        <checkBox refId="Setting_ScreenTimeout" defaultChecked="true">Bildschirm ausschalten nach</checkBox>
+        <checkBox refId="Setting_SleepTimeout" defaultChecked="true">Energiesparmodus nach</checkBox>
+        <checkBox refId="Setting_PowerMode" defaultChecked="true">Energiemodus</checkBox>
+      </presentation>
+      <presentation id="P_Commands">
+        <checkBox refId="Command_Lock" defaultChecked="true">Bildschirm sperren</checkBox>
+        <checkBox refId="Command_Sleep" defaultChecked="true">Energie sparen</checkBox>
+        <checkBox refId="Command_SignOut" defaultChecked="true">Abmelden</checkBox>
+        <checkBox refId="Command_SwitchUser" defaultChecked="true">Benutzer wechseln</checkBox>
+        <checkBox refId="Command_Restart" defaultChecked="true">Neu starten</checkBox>
+        <checkBox refId="Command_ShutDown" defaultChecked="true">Herunterfahren</checkBox>
+        <checkBox refId="Command_EmptyRecycleBin" defaultChecked="true">Papierkorb leeren</checkBox>
+        <checkBox refId="Command_Customize" defaultChecked="true">Startline anpassen</checkBox>
+        <checkBox refId="Command_PinPage" defaultChecked="true">Etwas an Start anheften</checkBox>
+        <checkBox refId="Command_RealStart" defaultChecked="true">Windows-Startmenü öffnen</checkBox>
+        <checkBox refId="Command_Quit" defaultChecked="true">Startline beenden</checkBox>
+        <checkBox refId="Command_SettingsFolder" defaultChecked="true">Meinen Einstellungsordner öffnen</checkBox>
+        <checkBox refId="Command_ResetSettings" defaultChecked="true">Alle Einstellungen zurücksetzen</checkBox>
+      </presentation>
+      <presentation id="P_RightClickOptions">
+        <checkBox refId="Menu_RunAsAdmin" defaultChecked="true">Als Administrator ausführen</checkBox>
+        <checkBox refId="Menu_OpenWith" defaultChecked="true">Öffnen mit</checkBox>
+        <checkBox refId="Menu_OpenLocation" defaultChecked="true">Dateipfad öffnen</checkBox>
+        <checkBox refId="Menu_Copy" defaultChecked="true">Pfad, Name oder Adresse kopieren</checkBox>
+        <checkBox refId="Menu_Uninstall" defaultChecked="true">Deinstallieren</checkBox>
+        <checkBox refId="Menu_Recycle" defaultChecked="true">In den Papierkorb verschieben</checkBox>
+        <checkBox refId="Menu_Properties" defaultChecked="true">Eigenschaften</checkBox>
+        <checkBox refId="Menu_ShellMenu" defaultChecked="true">Weitere Optionen anzeigen (das Windows-Menü)</checkBox>
+      </presentation>
+    </presentationTable>
+  </resources>
+</policyDefinitionResources>

@@ -2,6 +2,7 @@
 //! them, and skip rules. Plain logic with no disk access, so every case can be tested.
 
 use crate::config::Config;
+use crate::i18n::tx;
 
 /// A ready-made skip rule shown as one switch.
 pub struct SkipPreset {
@@ -16,43 +17,43 @@ pub struct SkipPreset {
 pub const SKIP_PRESETS: &[SkipPreset] = &[
     SkipPreset {
         key: "SearchSkipAppData",
-        title: "App data",
-        about: "Settings and caches programs keep in AppData.",
+        title: tx("App data"),
+        about: tx("Settings and caches programs keep in AppData."),
         names: &["AppData"],
         exts: &[],
     },
     SkipPreset {
         key: "SearchSkipWindows",
-        title: "Windows and installed programs",
-        about: "Windows, Program Files and other system folders.",
-        names: &["Windows", "Program Files", "Program Files (x86)", "ProgramData", "$Recycle.Bin", "System Volume Information", "$WinREAgent", "Recovery"],
+        title: tx("Windows and installed programs"),
+        about: tx("Windows, Program Files and other system folders."),
+        names: &["Windows", "Program Files", "Program Files (x86)", "ProgramData", "$Recycle.Bin", "System Volume Information", "$WinREAgent", "Recovery"], // i18n-ignore: folder names on disk
         exts: &[],
     },
     SkipPreset {
         key: "SearchSkipDeveloperFiles",
-        title: "Developer clutter",
-        about: "node_modules, .git, build output and similar.",
+        title: tx("Developer clutter"),
+        about: tx("node_modules, .git, build output and similar."),
         names: &["node_modules", ".git", ".svn", "target", "__pycache__", ".cache", ".cargo", ".rustup", ".npm", ".gradle", ".venv", "venv"],
         exts: &[],
     },
     SkipPreset {
         key: "SearchSkipCloudFolders",
-        title: "Cloud folders",
-        about: "OneDrive, Dropbox and Google Drive folders.",
-        names: &["OneDrive", "Dropbox", "Google Drive", "iCloudDrive"],
+        title: tx("Cloud folders"),
+        about: tx("OneDrive, Dropbox and Google Drive folders."),
+        names: &["OneDrive", "Dropbox", "Google Drive", "iCloudDrive"], // i18n-ignore: folder names on disk
         exts: &[],
     },
     SkipPreset {
         key: "SearchSkipTempFiles",
-        title: "Temporary and log files",
-        about: "Leftovers such as .tmp, .log and .bak.",
+        title: tx("Temporary and log files"),
+        about: tx("Leftovers such as .tmp, .log and .bak."),
         names: &[],
         exts: &[".tmp", ".temp", ".log", ".bak", ".dmp"],
     },
     SkipPreset {
         key: "SearchSkipProgramParts",
-        title: "Program parts",
-        about: "Files you never open yourself, such as .dll and .sys.",
+        title: tx("Program parts"),
+        about: tx("Files you never open yourself, such as .dll and .sys."),
         names: &[],
         exts: &[".dll", ".sys", ".mui", ".cat", ".pdb", ".obj", ".lib"],
     },

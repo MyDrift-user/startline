@@ -40,7 +40,7 @@ fn package_name(id: &str) -> &str {
     let Some((package, _)) = id.split_once('!') else { return "" };
     let Some((name, _)) = package.split_once('_') else { return "" };
     let name = name.rsplit('.').next().unwrap_or(name);
-    name.strip_prefix("Windows").filter(|rest| !rest.is_empty()).unwrap_or(name)
+    name.strip_prefix("Windows").filter(|rest| !rest.is_empty()).unwrap_or(name) // i18n-ignore: part of app ids
 }
 
 fn cache_path() -> std::path::PathBuf {
@@ -108,7 +108,7 @@ pub fn enumerate() -> Option<Vec<App>> {
 /// Uninstallers and readmes clutter the list and are a bad thing to launch by accident.
 fn is_noise(name: &str) -> bool {
     let lower = matching::lower(name);
-    ["uninstall", "deinstall", "readme", "read me"].iter().any(|n| lower.contains(n))
+    ["uninstall", "deinstall", "readme", "read me"].iter().any(|n| lower.contains(n)) // i18n-ignore: words in shortcut names to leave out
 }
 
 unsafe fn display_name(item: &IShellItem, kind: SIGDN) -> Option<String> {

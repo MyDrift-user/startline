@@ -16,6 +16,8 @@ pub struct Pal {
     pub on_accent: Color32,
     pub line: Color32,
     pub selected: Color32,
+    /// The search box's own fill.
+    pub field: Color32,
     pub style: Experience,
     /// How round small things are: rows, buttons, cards.
     pub radius: u8,
@@ -43,6 +45,12 @@ pub fn palette(look: &Look) -> Pal {
         Experience::Windows7 => mix(Color32::WHITE, accent, 0.20),
         Experience::WindowsXp => accent,
     };
+    // Lighter Mica: a pale wash the backdrop shows through, rather than a solid panel.
+    let dark = luminance(theme.bg) < 0.5;
+    let wash = |dark_alpha: u8, light_alpha: u8| if dark { Color32::from_white_alpha(dark_alpha) } else { Color32::from_white_alpha(light_alpha) };
+    let lighter = look.mica && look.mica_light;
+    let selected = if lighter { wash(26, 150) } else { selected };
+    let field = if lighter { wash(18, 170) } else { surface };
     let radius = match style {
         Experience::Startline => 6,
         Experience::Windows11 => 4,
@@ -59,9 +67,25 @@ pub fn palette(look: &Look) -> Pal {
         on_accent: if luminance(theme.accent) > 0.55 { Color32::from_rgb(10, 12, 18) } else { Color32::WHITE },
         line: mix(bg, text, 0.13),
         selected,
+        field,
         style,
         radius,
     }
+}
+
+/// The icon font's chevron for something that opens below, drawn where egui would draw its triangle: right when
+/// closed and down when open for a section, down when closed and up when open for a drop-down list.
+pub fn chevron(ui: &Ui, rect: Rect, open: bool, list: bool, color: Color32) {
+    const RIGHT: char = '\u{E76C}';
+    const DOWN: char = '\u{E70D}';
+    const UP: char = '\u{E70E}';
+    let glyph = match (list, open) {
+        (false, false) => RIGHT,
+        (false, true) | (true, false) => DOWN,
+        (true, true) => UP,
+    };
+    let size = rect.height().clamp(9.0, 12.0);
+    ui.painter().text(rect.center(), Align2::CENTER_CENTER, glyph, icon_font(size), color);
 }
 
 /// The highlight behind a chosen row, the way each look draws it.
@@ -448,24 +472,17 @@ pub fn segmented(ui: &mut Ui, id: &str, options: &[&str], current: usize, width:
 
 pub fn relative_time(seconds: u32) -> String {
     match seconds {
-        0..60 => "Just now".into(),
-        60..3600 => format!("{} min ago", seconds / 60),
-        3600..86_400 => format!("{} h ago", seconds / 3600),
-        86_400..172_800 => "Yesterday".into(),
-        _ => format!("{} days ago", seconds / 86_400),
+        0..60 => crate::i18n::tr("Just now").into(),
+        60..3600 => crate::trf!("{n} min ago", n = seconds / 60),
+        3600..86_400 => crate::trf!("{n} h ago", n = seconds / 3600),
+        86_400..172_800 => crate::i18n::tr("Yesterday").into(),
+        _ => crate::trf!("{n} days ago", n = crate::i18n::fmt_count((seconds / 86_400) as usize)),
     }
 }
 
+/// A count as the language shown writes it: 1,234 in English, 1.234 in German and Italian.
 pub fn thousands(value: usize) -> String {
-    let digits = value.to_string();
-    let mut out = String::new();
-    for (i, c) in digits.chars().enumerate() {
-        if i > 0 && (digits.len() - i) % 3 == 0 {
-            out.push(',');
-        }
-        out.push(c);
-    }
-    out
+    crate::i18n::fmt_count(value)
 }
 
 pub fn install_fonts(ctx: &Context, style: Experience) {

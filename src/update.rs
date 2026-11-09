@@ -12,6 +12,7 @@
 //! - Portable: the program replaces its own file and starts the new one.
 
 use crate::config::data_dir;
+use crate::i18n::tr;
 use crate::policy::{self, Policies};
 use std::os::windows::process::CommandExt;
 use std::path::{Path, PathBuf};
@@ -119,9 +120,9 @@ fn signature_ok(key: &[u8; 32], text: &[u8], sig: &[u8]) -> bool {
 
 fn verified_manifest(text: &[u8], sig: &[u8]) -> Result<Manifest, String> {
     if !trusted_keys().iter().any(|key| signature_ok(key, text, sig)) {
-        return Err("The update's signature doesn't match, so it was ignored".into());
+        return Err(tr("The update's signature doesn't match, so it was ignored").into());
     }
-    std::str::from_utf8(text).ok().and_then(parse_manifest).ok_or_else(|| "The update's file list couldn't be read".to_string())
+    std::str::from_utf8(text).ok().and_then(parse_manifest).ok_or_else(|| tr("The update's file list couldn't be read").to_string())
 }
 
 fn sha256_of(path: &Path) -> Option<String> {
@@ -151,7 +152,7 @@ fn machine_may_update(policy: &Policies, switch: Option<bool>) -> bool {
 
 /// The settings page's switch for a PC-wide install, as the task can't read anyone's settings: 0 or 1 in this file.
 fn machine_switch_file() -> Option<PathBuf> {
-    Some(PathBuf::from(std::env::var_os("ProgramData")?).join("Startline").join("auto-update.txt"))
+    Some(PathBuf::from(std::env::var_os("ProgramData")?).join("Startline").join("auto-update.txt")) // i18n-ignore: folder name
 }
 
 /// What the switch says, if anyone has used it.
@@ -170,7 +171,7 @@ pub fn set_machine_switch(on: bool) -> Result<(), String> {
     if let Some(dir) = file.parent() {
         let _ = std::fs::create_dir_all(dir);
     }
-    std::fs::write(&file, if on { "1" } else { "0" }).map_err(|_| "Another account set this for the whole PC. That account or an administrator can change it".to_string())
+    std::fs::write(&file, if on { "1" } else { "0" }).map_err(|_| tr("Another account set this for the whole PC. That account or an administrator can change it").to_string())
 }
 
 // ---- How this copy was installed ----
@@ -252,8 +253,8 @@ fn download(url: &str, to: &Path, tested: bool) -> Result<(), String> {
     }
     match c.status() {
         Ok(s) if s.success() => Ok(()),
-        Ok(s) => Err(format!("The download failed ({s})")),
-        Err(e) => Err(format!("Couldn't run curl: {e}")),
+        Ok(s) => Err(crate::trf!("The download failed ({status})", status = s)),
+        Err(e) => Err(crate::trf!("Couldn't run curl: {error}", error = e)),
     }
 }
 
@@ -276,9 +277,9 @@ fn fetch_manifest(dir: &Path, service: bool) -> Result<Manifest, String> {
 
 /// Downloads the file this install needs and checks it against the signed list.
 fn fetch_asset(manifest: &Manifest, install: &Install, dir: &Path, service: bool) -> Result<PathBuf, String> {
-    let suffix = asset_suffix(install).ok_or("This copy can't update itself")?;
+    let suffix = asset_suffix(install).ok_or(tr("This copy can't update itself"))?;
     let name = format!("startline-v{}-{suffix}", manifest.version);
-    let hash = manifest.files.iter().find(|(n, _)| *n == name).map(|(_, h)| h.as_str()).ok_or_else(|| format!("The release has no {name}"))?;
+    let hash = manifest.files.iter().find(|(n, _)| *n == name).map(|(_, h)| h.as_str()).ok_or_else(|| crate::trf!("The release has no {name}", name = name))?;
     let path = dir.join(&name);
     if sha256_of(&path).as_deref() != Some(hash) {
         let test = base_url(service);
@@ -289,7 +290,7 @@ fn fetch_asset(manifest: &Manifest, install: &Install, dir: &Path, service: bool
         download(&url, &path, test.is_some())?;
         if sha256_of(&path).as_deref() != Some(hash) {
             let _ = std::fs::remove_file(&path);
-            return Err("The downloaded update didn't match its signed checksum, so it was deleted".into());
+            return Err(tr("The downloaded update didn't match its signed checksum, so it was deleted").into());
         }
     }
     Ok(path)
@@ -380,7 +381,7 @@ fn installer_command(installer: &Path, install: &Install, folder: &Path) -> Resu
             c.arg(if matches!(install, Install::Machine { .. }) { "/ALLUSERS" } else { "/CURRENTUSER" });
             c.raw_arg(format!("/LOG=\"{}\"", log.display()));
         }
-        _ => return Err("This copy isn't installed by an installer".into()),
+        _ => return Err(tr("This copy isn't installed by an installer").into()),
     }
     Ok(c)
 }
@@ -389,9 +390,9 @@ fn installer_command(installer: &Path, install: &Install, folder: &Path) -> Resu
 /// Startline again. The installer closes every startline.exe, this one included, but not the copy.
 fn hand_over(installer: &Path, install: &Install, restart: &Restart) -> Result<(), String> {
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
-    let folder = exe.parent().ok_or("Startline's folder is unknown")?;
+    let folder = exe.parent().ok_or(tr("Startline's folder is unknown"))?;
     let helper = installer.with_file_name(HELPER);
-    std::fs::copy(&exe, &helper).map_err(|e| format!("Couldn't prepare the update: {e}"))?;
+    std::fs::copy(&exe, &helper).map_err(|e| crate::trf!("Couldn't prepare the update: {error}", error = e))?;
     hidden(&helper)
         .arg("--finish-update")
         .arg(installer)
@@ -399,7 +400,7 @@ fn hand_over(installer: &Path, install: &Install, restart: &Restart) -> Result<(
         .arg(folder)
         .arg(restart.to_arg())
         .spawn()
-        .map_err(|e| format!("Couldn't start the update: {e}"))?;
+        .map_err(|e| crate::trf!("Couldn't start the update: {error}", error = e))?;
     log(&format!("handed {} over to the helper, restart {restart:?}", installer.display()));
     Ok(())
 }
@@ -624,8 +625,8 @@ impl Updater {
     pub fn finish(&self) -> Result<(), String> {
         let (path, version) = {
             let mut shared = self.shared.lock().unwrap_or_else(PoisonError::into_inner);
-            let Some(Status::Ready(version)) = shared.status.clone() else { return Err("Nothing is ready to install".into()) };
-            let Some(path) = shared.ready.take() else { return Err("Nothing is ready to install".into()) };
+            let Some(Status::Ready(version)) = shared.status.clone() else { return Err(tr("Nothing is ready to install").into()) };
+            let Some(path) = shared.ready.take() else { return Err(tr("Nothing is ready to install").into()) };
             shared.status = Some(Status::Installing(version.clone()));
             (path, version)
         };
@@ -639,13 +640,13 @@ fn install_downloaded(path: &Path, install: &Install, restart: bool) -> Result<(
     match install {
         Install::PerUser { .. } => hand_over(path, install, if restart { &Restart::Me } else { &Restart::Nobody }),
         Install::Portable(target) => {
-            replace_file(target, path).map_err(|e| format!("Couldn't install the update: {e}"))?;
+            replace_file(target, path).map_err(|e| crate::trf!("Couldn't install the update: {error}", error = e))?;
             if restart {
                 Command::new(target).arg("--wait-for").arg(std::process::id().to_string()).arg("--background").spawn().map_err(|e| e.to_string())?;
             }
             Ok(())
         }
-        Install::Machine { .. } | Install::Unmanaged => Err("This copy can't update itself".to_string()),
+        Install::Machine { .. } | Install::Unmanaged => Err(tr("This copy can't update itself").to_string()),
     }
 }
 
@@ -675,7 +676,7 @@ impl Worker {
             return self.set(Status::Idle);
         }
         self.set(Status::Checking);
-        let Some(dir) = updates_dir(false) else { return self.fail("There's no folder to download updates to".into()) };
+        let Some(dir) = updates_dir(false) else { return self.fail(tr("There's no folder to download updates to").into()) };
         match fetch_manifest(&dir, false) {
             Err(e) => self.fail(e),
             Ok(manifest) if !is_newer(&manifest.version, CURRENT) => {
@@ -704,7 +705,7 @@ impl Worker {
         }
         let Some(manifest) = self.manifest.take() else { return };
         let version = manifest.version.clone();
-        let Some(dir) = updates_dir(false) else { return self.fail("There's no folder to download updates to".into()) };
+        let Some(dir) = updates_dir(false) else { return self.fail(tr("There's no folder to download updates to").into()) };
         self.set(Status::Downloading(version.clone()));
         match fetch_asset(&manifest, &self.install, &dir, false) {
             Ok(path) => {

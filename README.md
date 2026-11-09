@@ -29,7 +29,9 @@ While Startline runs, the Start key and the Start button open it instead of the 
 - Apps and settings are answered in the same frame as the key press
 - Files come from an index that keeps every name in one block of memory, so a million files is one fast scan. It's saved to disk, so search works from the first moment, and kept fresh by watching for changes
 - Filter chips for folders, documents, pictures and each file type in the results, with the time the search took
+- A search language: `"exact text"`, wildcards (`*.pdf`, `img_??.png`), `-word` to leave out, `ext:pdf,docx`, `kind:picture`, `size:>10mb`, `modified:today` or `date:2025-03`, and regular expressions with `re:` or `/…/`, or a switch that makes the whole search one. The `?` in the search box lists it all
 - Choose where to search, including network and USB drives as they're attached, and what's never found: ready-made groups, hidden and system files, folders, file types and regular expressions
+- Choose which kinds of results show, in which order and how many of each, and hide the parts of the search box you don't use
 - A web search for what you typed
 
 ### 🎚️ Settings right in the search
@@ -37,6 +39,9 @@ Type what you want and act on it from the result: "dark mode", "volume 40", "lou
 
 ### 🎨 Make it yours
 - Five looks: Windows 11, Windows 10, Windows 7, Windows XP, or Startline's own, which you can place anywhere on screen
+- Presets that set a look in one go: like Windows 11 Start, Startline's own, or compact. Each setting stays yours to change afterwards
+- Mica behind the menu on Windows 11 (22H2 and later), with a lighter Mica through the search box and the selected item if you like
+- English, German and Italian, following the language Windows is shown in, or chosen in Settings
 - Colour presets (Stone, Graphite, Moss, Harbor, Clay, Black, Daylight and Paper) or your own colours
 - Pin apps, files, folders, web addresses and programs with arguments, in the order you like
 - Choose which sections the menu shows (Pinned, Recent files, Most used, All apps) and how many
@@ -44,7 +49,7 @@ Type what you want and act on it from the result: "dark mode", "volume 40", "lou
 - Start with Windows, on by default
 
 ### 🏢 Ready for IT departments
-Every setting can be fixed by **Group Policy**, for computers or users, with ADMX/ADML templates included, including whether updates install by themselves and whether Startline looks for them at all. Open menus pick up changes within a minute. See [`PolicyDefinitions/README.txt`](PolicyDefinitions/README.txt).
+Every setting can be fixed, or given as a default people can change, by **Group Policy** or straight in the Registry (`Software\Policies\Startline` and its `Recommended` subkey, under HKLM or HKCU), for computers or users. ADMX templates come with ADML in English, German and Italian. Pins and their sections, the layout and size, what the menu shows, how search behaves and whether updates install by themselves can all be deployed this way, without copying `start2.bin` around. Fixed settings show greyed out with "Managed by your organization", and running copies pick up changes within a minute. [`PolicyDefinitions/README.txt`](PolicyDefinitions/README.txt) lists every value.
 
 ## ⌨️ Keyboard
 
@@ -56,7 +61,7 @@ Every setting can be fixed by **Group Policy**, for computers or users, with ADM
 | `Enter` | Open, or apply a setting |
 | `Ctrl + Enter` | Run as administrator |
 | `Shift + Enter` | Show in its folder |
-| `↓`, then `←` `→` | Change a selected setting |
+| `Down`, then `Left` and `Right` | Change a selected setting |
 | `.pdf` | Only one kind of file |
 | `Esc` | Clear, go back, then close |
 
@@ -90,7 +95,7 @@ Nothing is signed by a known publisher, so SmartScreen may show a warning. Unins
 
 ## 🔄 Updates
 
-Startline looks for a new release 90 seconds after it starts and every 6 hours, and installs it by itself unless you turn that off under **Settings → About & updates**, which also shows the version and lets you check by hand. As Startline is always running, it closes and starts again with the new version, only while neither the menu nor the settings window is open:
+Startline looks for a new release 90 seconds after it starts and every 6 hours, and installs it by itself unless you turn that off under **Settings > About & updates**, which also shows the version and lets you check by hand. As Startline is always running, it closes and starts again with the new version, only while neither the menu nor the settings window is open:
 
 | Installed as | How updates land |
 |---|---|
@@ -121,7 +126,7 @@ The program ends up in `target/release/startline.exe`. Its icon and version need
 Every push is built and tested by the CI workflow, which also checks that `PolicyDefinitions` matches what the program writes with `startline.exe --write-policy-templates PolicyDefinitions`. Releases only start by hand:
 
 1. Raise `version` in `Cargo.toml` and push. A version can't change once it's released, because updates go by the number.
-2. Go to **Actions → Release → Run workflow**. Turning off **Publish** only builds and tests, leaving the files on the run.
+2. Go to **Actions > Release > Run workflow**. Turning off **Publish** only builds and tests, leaving the files on the run.
 
 Publishing waits for an approval on GitHub, as the signing key is a secret of the protected `release` environment. If that key is lost or leaks, a release signed with the offline backup key can still reach every copy, and replace it.
 
@@ -141,7 +146,8 @@ src/
   system.rs, platform.rs  the Start key, tray icon and Windows calls
   customize.rs, pins_page.rs, setting_list.rs, widgets.rs, styles.rs   Settings and the looks
   config.rs               what's saved
-  policy.rs               Group Policy
+  i18n/                   English, German and Italian, with the house style and glossary in its README
+  policy*.rs              Group Policy: the list, reading it, the templates and admin guide, and their tests
   update.rs               signed updates from GitHub releases
 build.rs                  puts the icon and version into startline.exe
 PolicyDefinitions/        ADMX / ADML templates

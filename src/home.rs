@@ -3,6 +3,7 @@
 use crate::actions::Do;
 use crate::config::{Category, Pin, SectionKind, Target};
 use crate::customize::Tab;
+use crate::i18n::{tr, tx};
 use crate::icons;
 use crate::intent::{self, Want};
 use crate::platform;
@@ -24,7 +25,8 @@ impl Menu {
         let in_settings = matches!(self.page, Page::Customize(_));
         let style = look.experience;
         let opacity = if in_settings && style != Experience::Startline { 1.0 } else { look.opacity };
-        let alpha = (opacity.clamp(0.25, 1.0) * 255.0) as u8;
+        // Over Mica the window is clear: Windows paints the material, already tinted for light or dark.
+        let alpha = if look.mica && (!in_settings || style == Experience::Startline) { 0 } else { (opacity.clamp(0.25, 1.0) * 255.0) as u8 };
         let fill = Color32::from_rgba_unmultiplied(pal.bg.r(), pal.bg.g(), pal.bg.b(), alpha);
         // Exactly the window's own corner, so no second shape can show around the paint.
         let round = look.corner_points(ui.ctx().pixels_per_point()).round() as u8;
@@ -99,8 +101,8 @@ impl Menu {
     pub(crate) fn draw_search_bar(&mut self, ui: &mut Ui, rect: Rect, pal: Pal) {
         let style = pal.style;
         let (radius, fill, border) = match style {
-            Experience::Startline => (CornerRadius::same(pal.radius), pal.surface, pal.surface),
-            Experience::Windows11 => (CornerRadius::same((rect.height() / 2.0) as u8), pal.surface, pal.line),
+            Experience::Startline => (CornerRadius::same(pal.radius), pal.field, pal.field),
+            Experience::Windows11 => (CornerRadius::same((rect.height() / 2.0) as u8), pal.field, pal.line),
             Experience::Windows10 => (CornerRadius::ZERO, pal.surface, pal.line),
             Experience::Windows7 => (CornerRadius::same(3), Color32::WHITE, Color32::from_rgb(142, 164, 186)),
             Experience::WindowsXp => (CornerRadius::same(2), Color32::WHITE, Color32::from_rgb(127, 157, 185)),
@@ -113,30 +115,63 @@ impl Menu {
         let text_left = if glass_at_end { rect.left() + 8.0 } else { rect.left() + TEXT_COLUMN };
         let font_size = if glass_at_end { 13.0 } else { 15.0 };
         ui.painter().text(pos2(glass_x, rect.center().y), Align2::CENTER_CENTER, '\u{E721}', icon_font(if glass_at_end { 13.0 } else { 16.0 }), pal.sub);
+        // From the right: the help button, the regular expression switch, then how long the search took.
+        let mut x = rect.right() - if glass_at_end { 30.0 } else { 8.0 };
+        let size = (rect.height() - 10.0).clamp(18.0, 28.0);
+        let slot = |x: &mut f32| {
+            *x -= size;
+            let area = Rect::from_center_size(pos2(*x + size / 2.0, rect.center().y), Vec2::splat(size));
+            *x -= 2.0;
+            area
+        };
+        if self.cfg.show_search_help {
+            let area = slot(&mut x);
+            let response = ui.interact(area, Id::unique("search-help"), Sense::click());
+            self.paint_box_button(ui, area, response.hovered(), self.help_open, pal);
+            ui.painter().text(area.center(), Align2::CENTER_CENTER, '\u{E897}', icon_font(size * 0.5), pal.sub);
+            if response.on_hover_text(tr("What you can type")).clicked() {
+                self.help_open = !self.help_open;
+            }
+        }
+        if self.cfg.show_regex_switch {
+            let area = slot(&mut x);
+            let on = self.cfg.regex_search;
+            let response = ui.interact(area, Id::unique("search-regex"), Sense::click());
+            self.paint_box_button(ui, area, response.hovered(), on, pal);
+            let ink = if on { pal.accent } else { pal.sub };
+            ui.painter().text(area.center() - vec2(0.0, ink_nudge(12.0)), Align2::CENTER_CENTER, ".*", FontId::monospace(12.0), ink);
+            let tip = if on { tr("Regular expression: on. The whole search is one pattern.") } else { tr("Regular expression: off") };
+            if response.on_hover_text(tip).clicked() {
+                self.cfg.regex_search = !on;
+                self.query_changed();
+            }
+        }
         let timing = if glass_at_end || style != Experience::Startline { String::new() } else { self.timing_label() };
-        let timing_w = if timing.is_empty() {
-            0.0
-        } else {
+        if !timing.is_empty() {
             let galley = line_galley(ui, &timing, FontId::proportional(12.0), pal.sub, 200.0);
             let width = galley.size().x;
-            ui.painter().galley(pos2(rect.right() - width - 14.0, rect.center().y - galley.size().y / 2.0 - ink_nudge(12.0)), galley, pal.sub);
-            width + 20.0
-        };
-        let end_room = if glass_at_end { 30.0 } else { 10.0 + timing_w };
+            ui.painter().galley(pos2(x - width - 6.0, rect.center().y - galley.size().y / 2.0 - ink_nudge(12.0)), galley, pal.sub);
+            x -= width + 12.0;
+        }
+        let end_room = rect.right() - x + 4.0;
         // Exactly one line tall with no padding, so the letters land in the middle of the bar.
         let font = FontId::proportional(font_size);
-        let line_height = line_galley(ui, "Ag", font.clone(), pal.text, 100.0).size().y;
+        let line_height = line_galley(ui, "Ag", font.clone(), pal.text, 100.0).size().y; // i18n-ignore: sample letters to measure a line
         let top = rect.center().y - line_height / 2.0 - ink_nudge(font_size);
         let edit_rect = Rect::from_min_max(pos2(text_left, top), pos2(rect.right() - end_room, top + line_height));
         let before = self.query.clone();
         let hint_text = match style {
-            Experience::Windows11 => "Search for apps, settings, and documents",
-            Experience::Windows10 => "Type here to search",
-            Experience::Windows7 => "Search programs and files",
-            Experience::WindowsXp => "Search",
-            Experience::Startline => "Search",
+            Experience::Windows11 => tx("Search for apps, settings, and documents"),
+            Experience::Windows10 => tx("Type here to search"),
+            Experience::Windows7 => tx("Search programs and files"),
+            Experience::WindowsXp => tx("Search"),
+            Experience::Startline => tx("Search"),
         };
-        let hint = RichText::new(hint_text).color(pal.sub).size(font_size);
+        let hint_text = if self.regex_on() { tr("Regular expression") } else { tr(hint_text) };
+        // A hint longer in another language than the box is wide gets a little smaller rather than cut off.
+        let needed = ui.painter().layout_no_wrap(hint_text.to_string(), FontId::proportional(font_size), pal.sub).size().x;
+        let hint_size = if needed > edit_rect.width() { (font_size * edit_rect.width() / needed).max(font_size * 0.8) } else { font_size };
+        let hint = RichText::new(hint_text).color(pal.sub).size(hint_size);
         let edit = TextEdit::singleline(&mut self.query)
             .id(Id::unique("search"))
             .frame(Frame::NONE)
@@ -153,6 +188,60 @@ impl Menu {
         if self.query != before {
             self.query_changed();
         }
+        if self.help_open {
+            self.draw_search_help(ui, rect, pal);
+        }
+    }
+
+    /// A small square button in the search box, lit while its thing is on.
+    fn paint_box_button(&self, ui: &Ui, area: Rect, hovered: bool, on: bool, pal: Pal) {
+        if on {
+            ui.painter().rect_filled(area, pal.radius.min(4), mix(pal.field, pal.accent, 0.18));
+        } else if hovered {
+            ui.painter().rect_filled(area, pal.radius.min(4), pal.hover);
+        }
+    }
+
+    /// What can be typed in the search box, in a panel beside it. Closes with a click elsewhere or Esc.
+    fn draw_search_help(&mut self, ui: &Ui, anchor: Rect, pal: Pal) {
+        const LINES: [(&str, &str); 9] = [
+            ("report final", tx("Names holding every word, or the other words naming a folder they're in")), // i18n-ignore: search syntax
+            ("\"exact text\"", tx("These words together, in this order")), // i18n-ignore: search syntax
+            ("*.pdf   img_??.png", tx("Wildcards: * any letters, ? one letter")),
+            ("-draft", tx("Leave out names holding this")),
+            ("ext:pdf,docx", tx("Only these file types")),
+            ("kind:picture", tx("folder, document, picture, video, music, archive, code or app")),
+            ("size:>10mb   size:1mb..1gb", tx("Bigger, smaller or in between")),
+            ("modified:today   date:2025-03", tx("today, yesterday, week, month, year, a year, a month, a day, >2026-01-01 or <2026-01-01")),
+            ("re:^img_\\d+   /^img_\\d+/", tx("A regular expression, whatever the case")),
+        ];
+        let ctx = ui.ctx().clone();
+        let width = anchor.width().min(520.0);
+        let height = 44.0 + LINES.len() as f32 * 36.0;
+        let window = ctx.content_rect();
+        let below = anchor.bottom() + 6.0 + height <= window.bottom();
+        let top = if below { anchor.bottom() + 6.0 } else { (anchor.top() - 6.0 - height).max(window.top() + 4.0) };
+        let rect = Rect::from_min_size(pos2(anchor.left(), top), vec2(width, height));
+        Area::new(Id::unique("search-help-panel")).order(Order::Foreground).fixed_pos(rect.min).show(&ctx, |ui| {
+            ui.set_min_size(rect.size());
+            let round = pal.radius.saturating_add(2);
+            ui.painter().add(ctx.global_style().visuals.popup_shadow.as_shape(rect, round));
+            ui.painter().rect_filled(rect, round, mix(pal.bg, pal.surface, 0.6));
+            ui.painter().rect_stroke(rect, round, Stroke::new(1.0, pal.line), StrokeKind::Inside);
+            let mut y = rect.top() + 14.0;
+            ui.painter().text(pos2(rect.left() + 14.0, y), Align2::LEFT_TOP, tr("What you can type"), semibold(13.0), pal.text);
+            y += 26.0;
+            for (example, what) in LINES {
+                ui.painter().text(pos2(rect.left() + 14.0, y), Align2::LEFT_TOP, example, FontId::monospace(12.0), pal.accent);
+                let galley = line_galley(ui, tr(what), FontId::proportional(12.0), pal.sub, width - 28.0);
+                ui.painter().galley(pos2(rect.left() + 14.0, y + 16.0), galley, pal.sub);
+                y += 36.0;
+            }
+        });
+        let pressed_elsewhere = ctx.input(|i| i.pointer.any_pressed() && i.pointer.interact_pos().is_some_and(|p| !rect.contains(p) && !anchor.contains(p)));
+        if pressed_elsewhere || ctx.input_mut(|i| i.consume_key(Modifiers::NONE, Key::Escape)) {
+            self.help_open = false;
+        }
     }
 
     fn timing_label(&self) -> String {
@@ -161,9 +250,9 @@ impl Menu {
         }
         let micros = self.file_micros.unwrap_or(0) + self.fast_micros;
         if micros < 1000 {
-            format!("{micros} µs")
+            crate::trf!("{n} µs", n = crate::i18n::fmt_count(micros as usize))
         } else {
-            format!("{:.1} ms", micros as f32 / 1000.0)
+            crate::trf!("{n} ms", n = crate::i18n::fmt_decimal(micros as f64 / 1000.0, 1))
         }
     }
 
@@ -180,7 +269,7 @@ impl Menu {
                 SectionKind::Recent => self.draw_recent(ui, pal),
                 SectionKind::Frequent => self.draw_frequent(ui, pal),
                 SectionKind::AllApps => {
-                    section_title(ui, "All apps", pal);
+                    section_title(ui, tr("All apps"), pal);
                     self.draw_app_list(ui, pal);
                 }
             }
@@ -191,16 +280,16 @@ impl Menu {
     fn draw_welcome(&mut self, ui: &mut Ui, pal: Pal) {
         Frame::new().fill(pal.surface).corner_radius(pal.radius + 2).inner_margin(12).show(ui, |ui| {
             ui.set_width(ui.available_width());
-            ui.label(RichText::new("This is your new Start menu").font(semibold(14.0)).color(pal.text));
+            ui.label(RichText::new(tr("This is your new Start menu")).font(semibold(14.0)).color(pal.text));
             ui.add_space(2.0);
             let text = if self.cfg.take_over_start {
-                "The Start key and Start button open it now. Shift + Start still opens the Windows one. Pick another look any time in Settings."
+                tr("The Start key and Start button open it now. Shift + Start still opens the Windows one. Pick another look any time in Settings.")
             } else {
-                "Pick another look any time in Settings."
+                tr("Pick another look any time in Settings.")
             };
             ui.label(RichText::new(text).size(13.0).color(pal.sub));
             ui.add_space(6.0);
-            if pill_button(ui, "Got it", pal, true).clicked() {
+            if pill_button(ui, tr("Got it"), pal, true).clicked() {
                 self.cfg.seen_welcome = true;
             }
         });
@@ -229,12 +318,12 @@ impl Menu {
             }
             any |= !group.pins.is_empty();
             let title_top = ui.cursor().min.y;
-            section_title(ui, &group.name, pal);
+            section_title(ui, if group.name == "Pinned" { tr("Pinned") } else { group.name.as_str() }, pal); // i18n-ignore: the first section's saved name
             if pal.style == Experience::Windows11 && group_index == 0 {
                 let spot = Rect::from_min_size(pos2(ui.max_rect().right() - 70.0, title_top + 1.0), vec2(70.0, 24.0));
                 let all = ui.interact(spot, Id::unique("win11-all"), Sense::click());
                 ui.painter().rect_filled(spot, pal.radius, if all.hovered() { pal.hover } else { pal.surface });
-                ui.painter().text(spot.center() - vec2(6.0, ink_nudge(12.5)), Align2::CENTER_CENTER, "All", FontId::proportional(12.5), pal.text);
+                ui.painter().text(spot.center() - vec2(6.0, ink_nudge(12.5)), Align2::CENTER_CENTER, tr("All"), FontId::proportional(12.5), pal.text);
                 ui.painter().text(pos2(spot.right() - 14.0, spot.center().y), Align2::CENTER_CENTER, '\u{E76C}', icon_font(9.0), pal.text);
                 if all.clicked() {
                     self.intents.push(Intent::Show(Page::AllApps));
@@ -253,7 +342,7 @@ impl Menu {
             }
         }
         if !any && groups.len() <= 1 {
-            ui.label(RichText::new("Right-click any app or file to pin it here.").size(13.0).color(pal.sub));
+            ui.label(RichText::new(tr("Right-click any app or file to pin it here.")).size(13.0).color(pal.sub));
         }
         if pointer_up {
             self.drag_pin = None;
@@ -387,7 +476,7 @@ impl Menu {
         let name = highlighted_galley(ui, &row.name, &self.subject, FontId::proportional(14.0), name_ink, mark, text_width);
         let mut line = intent::hint(info.control, value, want);
         if info.late && !matches!(value, Value::Unavailable | Value::Loading) {
-            line.push_str("  ·  May need a sign-out to show");
+            line = crate::trf!("{hint} (may need a sign-out to show)", hint = line);
         }
         if compact {
             ui.painter().galley(pos2(text_left, center - name.size().y / 2.0 - ink_nudge(14.0)), name, name_ink);
@@ -436,9 +525,9 @@ impl Menu {
 
     fn draw_recent(&mut self, ui: &mut Ui, pal: Pal) {
         let list = self.recent.lock().unwrap().clone();
-        section_title(ui, if pal.style == Experience::Windows11 { "Recommended" } else { "Recent files" }, pal);
+        section_title(ui, if pal.style == Experience::Windows11 { tr("Recommended") } else { tr("Recent files") }, pal);
         if list.is_empty() {
-            ui.label(RichText::new("Files you open will show up here.").size(13.0).color(pal.sub));
+            ui.label(RichText::new(tr("Files you open will show up here.")).size(13.0).color(pal.sub));
             return;
         }
         let now = platform::unix_now();
@@ -466,9 +555,9 @@ impl Menu {
         let mut items: Vec<_> = self.cfg.usage.values().filter(|u| u.target.is_some() && u.count > 0).cloned().collect();
         items.sort_by_key(|u| std::cmp::Reverse((u.count, u.last)));
         items.truncate(self.cfg.frequent_count.max(1));
-        section_title(ui, "Most used", pal);
+        section_title(ui, tr("Most used"), pal);
         if items.is_empty() {
-            ui.label(RichText::new("What you open most will show up here.").size(13.0).color(pal.sub));
+            ui.label(RichText::new(tr("What you open most will show up here.")).size(13.0).color(pal.sub));
             return;
         }
         let gap = 6.0;
@@ -481,7 +570,7 @@ impl Menu {
                     let row = Row {
                         category: Category::Apps,
                         name: usage.name.clone(),
-                        detail: format!("Opened {} times", usage.count),
+                        detail: crate::trn!(usage.count, "Opened once", "Opened {n} times"),
                         icon: Icon::for_target_cached(&target),
                         kind: RowKind::Open(target),
                         path: None,
@@ -495,9 +584,9 @@ impl Menu {
     fn draw_all_apps_page(&mut self, ui: &mut Ui, pal: Pal) {
         // The title belongs on the left and the way out on the right, as in the Windows menu.
         ui.horizontal(|ui| {
-            ui.label(RichText::new("All apps").font(semibold(14.0)).color(pal.text));
+            ui.label(RichText::new(tr("All apps")).font(semibold(14.0)).color(pal.text));
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                if pill_button(ui, "Back", pal, false).clicked() {
+                if pill_button(ui, tr("Back"), pal, false).clicked() {
                     self.intents.push(Intent::Show(Page::Home));
                 }
             });
@@ -530,13 +619,13 @@ impl Menu {
             self.draw_row(ui, &row, width, pal, false);
         }
         if apps.is_empty() {
-            ui.label(RichText::new("Reading your apps...").size(13.0).color(pal.sub));
+            ui.label(RichText::new(tr("Reading your apps...")).size(13.0).color(pal.sub));
         }
     }
 
     /// How much room the file type buttons take, right beside the search bar.
     pub(crate) fn chip_row_height(&self) -> f32 {
-        if self.policy.file_buttons() && !self.query.trim().is_empty() && (self.facets.total > 0 || self.filtering()) { 32.0 } else { 0.0 }
+        if self.cfg.show_file_buttons && !self.query.trim().is_empty() && (self.facets.total > 0 || self.filtering()) { 32.0 } else { 0.0 }
     }
 
     /// One row of buttons for the kinds of file the words matched. It stays in one place right
@@ -560,7 +649,7 @@ impl Menu {
 
         let mut chips: Vec<(String, Option<u32>, bool, Press)> = Vec::new();
         if facets.folders > 0 || filter.folders {
-            chips.push(("Folders".to_string(), Some(facets.folders), filter.folders, Press::Folders));
+            chips.push((tr("Folders").to_string(), Some(facets.folders), filter.folders, Press::Folders));
         }
         let mut in_kinds: Vec<&str> = Vec::new();
         for (label, exts) in FILE_KINDS {
@@ -570,7 +659,7 @@ impl Menu {
                 in_kinds.extend(exts.iter().copied());
             }
             if count > 0 || all_on {
-                chips.push((label.to_string(), Some(count), all_on, Press::Kind(exts)));
+                chips.push((tr(*label).to_string(), Some(count), all_on, Press::Kind(exts)));
             }
         }
         for (ext, count) in &facets.exts {
@@ -586,7 +675,7 @@ impl Menu {
         chips.sort_by_key(|c| !c.2);
 
         let filtering = self.filtering();
-        let clear_room = if filtering { chip_width(ui, "Clear", None) + 6.0 } else { 0.0 };
+        let clear_room = if filtering { chip_width(ui, tr("Clear"), None) + 6.0 } else { 0.0 };
         let mut child = ui.new_child(UiBuilder::new().max_rect(rect).layout(Layout::left_to_right(Align::Center)));
         child.set_clip_rect(rect);
         child.spacing_mut().item_spacing = vec2(5.0, 0.0);
@@ -602,7 +691,7 @@ impl Menu {
                 press = Some(action.clone());
             }
         }
-        if filtering && chip(&mut child, "Clear", None, false, pal).clicked() {
+        if filtering && chip(&mut child, tr("Clear"), None, false, pal).clicked() {
             press = Some(Press::Clear);
         }
         match press {
@@ -617,17 +706,21 @@ impl Menu {
     pub(crate) fn draw_results(&mut self, ui: &mut Ui, pal: Pal) {
         let rows = std::mem::take(&mut self.rows);
         let width = ui.available_width();
+        if let Some(error) = &self.search_error {
+            ui.add_space(6.0);
+            ui.label(RichText::new(crate::trf!("This regular expression can't be used: {error}", error = error)).size(13.0).color(Color32::from_rgb(222, 120, 96)));
+        }
         if rows.is_empty() {
             ui.add_space(30.0);
             ui.vertical_centered(|ui| {
-                ui.label(RichText::new(format!("Nothing found for \"{}\"", self.query.trim())).size(14.0).color(pal.sub));
+                ui.label(RichText::new(crate::trf!("Nothing found for \"{query}\"", query = self.query.trim())).size(14.0).color(pal.sub));
             });
         }
         let mut last = None;
         for row in &rows {
             if last != Some(row.category) {
                 last = Some(row.category);
-                section_title(ui, row.category.label(), pal);
+                section_title(ui, tr(row.category.label()), pal);
             }
             if let RowKind::Quick(id, want) = row.kind {
                 self.draw_setting_row(ui, row, id, want, width, pal);
@@ -684,7 +777,7 @@ impl Menu {
         let text_left = rect.left() + TEXT_COLUMN;
         let text_width = rect.right() - text_left - 8.0;
         let confirming = matches!(row.kind, RowKind::Run(what) if self.confirm.is_some_and(|(d, at)| d == what && at.elapsed() < Duration::from_secs(5)));
-        let shown_name = if confirming { format!("Press again to confirm: {}", row.name) } else { row.name.clone() };
+        let shown_name = if confirming { crate::trf!("Press again to confirm: {name}", name = row.name) } else { row.name.clone() };
         let name_color = if confirming && !lit { pal.accent } else { name_ink };
         let mark = if lit && pal.style == Experience::WindowsXp { pal.on_accent } else { pal.accent };
         let name = highlighted_galley(ui, &shown_name, &self.tokens, FontId::proportional(14.0), name_color, mark, text_width);
@@ -737,7 +830,7 @@ impl Menu {
     /// Opens the power menu above the button that was clicked.
     pub(crate) fn open_power_menu(&mut self, anchor: Rect) {
         let item = |glyph, label: &str, what| Entry::Item { glyph, label: label.to_string(), intent: Intent::Run(what) };
-        let entries = vec![item('\u{E708}', "Sleep", Do::Sleep), item('\u{E7E8}', "Shut down", Do::ShutDown), item('\u{E777}', "Restart", Do::Restart)];
+        let entries = vec![item('\u{E708}', tr("Sleep"), Do::Sleep), item('\u{E7E8}', tr("Shut down"), Do::ShutDown), item('\u{E777}', tr("Restart"), Do::Restart)];
         let height = popup::height_of(&entries);
         self.open_popup(pos2(anchor.right() - 248.0, anchor.top() - height - 4.0), entries);
     }
@@ -746,15 +839,21 @@ impl Menu {
         // In the middle of the darker band in Windows 11, which reaches down to the window edge.
         let center = rect.center().y + if pal.style == Experience::Windows11 { 5.0 } else { 0.0 };
         if !self.query.trim().is_empty() {
+            if !self.cfg.show_search_hints {
+                return;
+            }
             let on_setting = self.selected_entry().is_some_and(|e| matches!(e.kind, NavKind::Quick(..)));
             let hint = if on_setting {
-                "Enter applies   ·   Down, then left and right adjusts   ·   Right-click for more   ·   Esc clears".to_string()
+                tr("Enter applies, Down, then left and right adjusts, Right-click for more, Esc clears")
             } else {
-                let admin = if self.policy.allows("Menu_RunAsAdmin") { "Ctrl+Enter as admin   ·   " } else { "" };
-                let folder = if self.policy.allows("Menu_OpenLocation") { "Shift+Enter shows in folder   ·   " } else { "" };
-                format!("Enter opens   ·   {admin}{folder}Esc clears")
+                match (self.policy.allows("Menu_RunAsAdmin"), self.policy.allows("Menu_OpenLocation")) {
+                    (true, true) => tr("Enter opens, Ctrl+Enter as admin, Shift+Enter shows in folder, Esc clears"),
+                    (true, false) => tr("Enter opens, Ctrl+Enter as admin, Esc clears"),
+                    (false, true) => tr("Enter opens, Shift+Enter shows in folder, Esc clears"),
+                    (false, false) => tr("Enter opens, Esc clears"),
+                }
             };
-            let galley = line_galley(ui, &hint, FontId::proportional(12.0), pal.sub, rect.width());
+            let galley = line_galley(ui, hint, FontId::proportional(12.0), pal.sub, rect.width());
             ui.painter().galley(pos2(rect.left() + 4.0, center - galley.size().y / 2.0 - ink_nudge(12.0)), galley, pal.sub);
             return;
         }
@@ -763,7 +862,7 @@ impl Menu {
         let label = if status.is_empty() { platform::user_name() } else { status };
         let galley = line_galley(ui, &label, FontId::proportional(13.0), pal.text, rect.width() - 180.0);
         let button = Rect::from_min_size(pos2(rect.left(), center - 18.0), vec2(galley.size().x + TEXT_COLUMN + 12.0, 36.0));
-        let user = ui.interact(button, Id::unique("user-button"), Sense::click()).on_hover_text("Account");
+        let user = ui.interact(button, Id::unique("user-button"), Sense::click()).on_hover_text(tr("Account"));
         if user.hovered() {
             ui.painter().rect_filled(button, pal.radius, pal.hover);
         }
@@ -782,11 +881,11 @@ impl Menu {
             icon_button(ui, area, Id::unique(id), glyph, tip, active, pal)
         };
         let can_power = [Do::Sleep, Do::ShutDown, Do::Restart].into_iter().any(|what| self.policy.allows_do(what));
-        let power = if can_power { Some(place(ui, "power", '\u{E7E8}', "Power", false)) } else { None };
-        let gear = if self.policy.allows_do(Do::Customize) { Some(place(ui, "customize", '\u{E713}', "Settings", false)) } else { None };
+        let power = if can_power { Some(place(ui, "power", '\u{E7E8}', tr("Power"), false)) } else { None };
+        let gear = if self.policy.allows_do(Do::Customize) { Some(place(ui, "customize", '\u{E713}', tr("Settings"), false)) } else { None };
         // Windows 11 keeps this as the "All" button above the pinned apps.
         if pal.style == Experience::Startline {
-            let all = place(ui, "all", '\u{E71D}', "All apps", self.page == Page::AllApps);
+            let all = place(ui, "all", '\u{E71D}', tr("All apps"), self.page == Page::AllApps);
             if all.clicked() {
                 let next = if self.page == Page::AllApps { Page::Home } else { Page::AllApps };
                 self.intents.push(Intent::Show(next));
@@ -804,7 +903,7 @@ impl Menu {
         let status = &self.index.status;
         if status.walking.load(Ordering::Relaxed) && self.file_count() < 1000 {
             let walked = status.walked.load(Ordering::Relaxed);
-            return format!("Reading your folders... {} so far", thousands(walked));
+            return crate::trf!("Reading your folders... {count} so far", count = thousands(walked));
         }
         String::new()
     }

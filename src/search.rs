@@ -7,6 +7,7 @@ use crate::apps::App;
 use crate::config::{Category, Config, Target};
 use crate::index::{Facets, FileFilter, Hit, Index};
 use crate::intent::{self, Want};
+use crate::i18n::{tr, tx};
 use crate::matching;
 use crate::settings::QuickId;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -24,6 +25,8 @@ pub struct FileAnswer {
     pub hits: Vec<Hit>,
     pub facets: Facets,
     pub micros: u64,
+    /// Why a regular expression in the search couldn't be used.
+    pub error: Option<String>,
 }
 
 impl FileSearch {
@@ -47,7 +50,7 @@ impl FileSearch {
                     };
                     if latest_worker.load(Ordering::Relaxed) == generation {
                         let micros = started.elapsed().as_micros() as u64;
-                        *done_worker.lock().unwrap() = Some(FileAnswer { generation, hits: answer.hits, facets: answer.facets, micros });
+                        *done_worker.lock().unwrap() = Some(FileAnswer { generation, hits: answer.hits, facets: answer.facets, micros, error: answer.error });
                         ctx.request_repaint();
                     }
                 }
@@ -107,14 +110,13 @@ pub struct Row {
 
 /// Groups of file types offered as one filter button.
 pub const FILE_KINDS: &[(&str, &[&str])] = &[
-    ("Documents", &[".pdf", ".doc", ".docx", ".txt", ".rtf", ".odt", ".xls", ".xlsx", ".csv", ".ppt", ".pptx", ".md"]),
-    ("Pictures", &[".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".svg", ".heic", ".tif", ".tiff"]),
-    ("Videos", &[".mp4", ".mkv", ".mov", ".avi", ".wmv", ".webm"]),
-    ("Music", &[".mp3", ".wav", ".flac", ".m4a", ".ogg", ".aac"]),
-    ("Archives", &[".zip", ".rar", ".7z", ".tar", ".gz", ".iso"]),
+    (tx("Documents"), &[".pdf", ".doc", ".docx", ".txt", ".rtf", ".odt", ".xls", ".xlsx", ".csv", ".ppt", ".pptx", ".md"]),
+    (tx("Pictures"), &[".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".svg", ".heic", ".tif", ".tiff"]),
+    (tx("Videos"), &[".mp4", ".mkv", ".mov", ".avi", ".wmv", ".webm"]),
+    (tx("Music"), &[".mp3", ".wav", ".flac", ".m4a", ".ogg", ".aac"]),
+    (tx("Archives"), &[".zip", ".rar", ".7z", ".tar", ".gz", ".iso"]),
 ];
 
-const MAX_APPS: usize = 8;
 const MAX_PAGES: usize = 4;
 
 pub fn app_rows(apps: &[App], cfg: &Config, tokens: &[String]) -> Vec<Row> {
@@ -135,13 +137,13 @@ pub fn app_rows(apps: &[App], cfg: &Config, tokens: &[String]) -> Vec<Row> {
     scored.sort_by_key(|(score, app)| (std::cmp::Reverse(*score), app.lower.len()));
     scored
         .into_iter()
-        .take(MAX_APPS)
+        .take(cfg.max_apps.max(1))
         .map(|(_, app)| {
             let target = Target::App(app.id.clone());
             Row {
                 category: Category::Apps,
                 name: app.name.clone(),
-                detail: "App".into(),
+                detail: tr("App").into(),
                 icon: Icon::for_target(&target),
                 kind: RowKind::Open(target),
                 path: (!app.path.is_empty()).then(|| app.path.clone()),
@@ -170,7 +172,7 @@ pub fn setting_rows(tokens: &[String]) -> SettingRows {
                 hit.score + 100,
                 Row {
                     category: Category::Settings,
-                    name: info.label.into(),
+                    name: tr(info.label).into(),
                     detail: String::new(),
                     icon: Icon::Glyph(info.glyph),
                     kind: RowKind::Quick(hit.id, hit.want),
@@ -181,17 +183,19 @@ pub fn setting_rows(tokens: &[String]) -> SettingRows {
         .collect();
     let mut pages: Vec<(i32, Row)> = Vec::new();
     for action in ACTIONS {
-        let name = matching::lower(action.name);
-        let score = matching::score_all(&name, action.keywords, tokens).or_else(|| matching::score_all(&name, action.keywords, &found.subject));
+        // Found by its English name and by the name shown, in German or Italian.
+        let (name, shown) = (matching::lower(action.name), matching::lower(tr(action.name)));
+        let best = |words: &[String]| [&name, &shown].into_iter().filter_map(|n| matching::score_all(n, action.keywords, words)).max();
+        let score = best(tokens).or_else(|| best(&found.subject));
         if let Some(score) = score.filter(|s| *s >= 300) {
             pages.push((
                 score,
                 Row {
                     category: Category::Settings,
-                    name: action.name.into(),
+                    name: tr(action.name).into(),
                     detail: match action.what {
-                        Do::Open(_) => "Windows settings".into(),
-                        _ => "Action".into(),
+                        Do::Open(_) => tr("Windows settings").into(),
+                        _ => tr("Action").into(),
                     },
                     icon: Icon::Glyph(action.glyph),
                     kind: RowKind::Run(action.what),
@@ -238,9 +242,16 @@ pub fn web_row(query: &str, cfg: &Config) -> Option<Row> {
     if !cfg.shows(Category::Web) || query.trim().is_empty() {
         return None;
     }
+    // Startline's own default has a whole sentence of its own in each language; a name the person or an administrator
+    // chose stays as they wrote it.
+    let name = if cfg.web_name == "the web" { // i18n-ignore: the saved default
+        crate::trf!("Search the web for \"{query}\"", query = query.trim())
+    } else {
+        crate::trf!("Search {name} for \"{query}\"", name = cfg.web_name, query = query.trim())
+    };
     Some(Row {
         category: Category::Web,
-        name: format!("Search {} for \"{}\"", cfg.web_name, query.trim()),
+        name,
         detail: String::new(),
         icon: Icon::Glyph('\u{E774}'),
         kind: RowKind::Web(cfg.web_url.replace("{}", &percent_encode(query.trim()))),
@@ -256,7 +267,7 @@ pub fn direct_row(query: &str) -> Option<Row> {
         let url = if text.starts_with("www.") { format!("https://{text}") } else { text.to_string() };
         return Some(Row {
             category: Category::Web,
-            name: format!("Open {text}"),
+            name: crate::trf!("Open {address}", address = text),
             detail: String::new(),
             icon: Icon::Glyph('\u{E774}'),
             kind: RowKind::Open(Target::path(url)),
@@ -269,7 +280,7 @@ pub fn direct_row(query: &str) -> Option<Row> {
             let path = text.replace('/', "\\");
             return Some(Row {
                 category: Category::Files,
-                name: format!("Open {path}"),
+                name: crate::trf!("Open {path}", path = path),
                 detail: String::new(),
                 icon: Icon::Image { key: crate::icons::file_icon_key(&path, is_dir), source: path.clone() },
                 kind: RowKind::Open(Target::path(path.clone())),

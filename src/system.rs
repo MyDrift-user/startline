@@ -3,6 +3,7 @@
 //! nothing else, so Windows always gets its answer in time; a second one moves the window.
 
 use crate::config::{HAnchor, VAnchor};
+use crate::i18n::tr;
 use crate::platform;
 use crate::styles::NativeCorner;
 use std::collections::VecDeque;
@@ -215,7 +216,7 @@ impl Shared {
         self.place_window(true);
         let placed = started.elapsed();
         force_foreground(hwnd);
-        log_if_testing(self, &format!("opened: placing took {placed:?}, focus took {:?}", started.elapsed() - placed));
+        log_if_testing(self, &format!("opened: placing took {placed:?}, focus took {:?}", started.elapsed() - placed)); // i18n-ignore: test log
         if let Some(ctx) = self.ctx.get() {
             ctx.request_repaint();
         }
@@ -278,7 +279,7 @@ impl Shared {
 
     pub fn toggle(self: &Arc<Self>, how: Opened) {
         let is_foreground = self.window().is_some_and(|w| unsafe { GetForegroundWindow() } == w);
-        log_if_testing(self, &format!("toggle visible={} foreground={is_foreground}", self.visible.load(Ordering::SeqCst)));
+        log_if_testing(self, &format!("toggle visible={} foreground={is_foreground}", self.visible.load(Ordering::SeqCst))); // i18n-ignore: test log
         if self.visible.load(Ordering::SeqCst) && is_foreground {
             self.hide();
         } else {
@@ -305,6 +306,12 @@ impl Shared {
     pub fn set_blur(&self, on: bool, tint: [u8; 3], alpha: f32) {
         let Some(hwnd) = self.window() else { return };
         set_blur(hwnd, on, tint, alpha);
+    }
+
+    /// Windows 11's Mica behind the window, tinted for a dark or light theme, or none.
+    pub fn set_mica(&self, on: bool, dark: bool) {
+        let Some(hwnd) = self.window() else { return };
+        set_backdrop(hwnd, on, dark);
     }
 
     /// The menu closed a moment ago, so a Windows menu showing up now is not a request to open it.
@@ -696,7 +703,7 @@ fn window_thread(shared: Arc<Shared>, jobs: Receiver<Job>) {
             Job::Foreground(raw) => on_foreground(&shared, HWND(raw as *mut c_void)),
         }
         if started.elapsed() > Duration::from_millis(100) {
-            log_if_testing(&shared, &format!("a window job took {:?}", started.elapsed()));
+            log_if_testing(&shared, &format!("a window job took {:?}", started.elapsed())); // i18n-ignore: test log
         }
     }
 }
@@ -707,7 +714,7 @@ fn on_foreground(shared: &Arc<Shared>, hwnd: HWND) {
         return;
     }
     let name = process_name(hwnd).unwrap_or_default();
-    log_if_testing(shared, &format!("foreground -> {name} (menu visible={})", shared.visible.load(Ordering::SeqCst)));
+    log_if_testing(shared, &format!("foreground -> {name} (menu visible={})", shared.visible.load(Ordering::SeqCst))); // i18n-ignore: test log
     let native_start = name == "startmenuexperiencehost.exe";
     let native_search = name == "searchhost.exe" || name == "searchapp.exe";
     if (native_start && shared.take_start.load(Ordering::Relaxed) || native_search && shared.take_search.load(Ordering::Relaxed))
@@ -763,24 +770,30 @@ const MENU_TAKE_OVER: usize = 3;
 const MENU_NATIVE: usize = 4;
 const MENU_QUIT: usize = 5;
 
+/// A menu item in the language shown now. The tray menu is built each time it opens, so it follows the language.
+fn append_item(menu: HMENU, flags: MENU_ITEM_FLAGS, id: usize, text: &str) {
+    let text = platform::wide(text);
+    let _ = unsafe { AppendMenuW(menu, flags, id, PCWSTR(text.as_ptr())) };
+}
+
 unsafe fn show_tray_menu(hwnd: HWND, shared: &Arc<Shared>) {
     unsafe {
         let Ok(menu) = CreatePopupMenu() else { return };
         let taking = shared.take_start.load(Ordering::Relaxed);
-        let _ = AppendMenuW(menu, MF_STRING, MENU_OPEN, w!("Open Startline"));
+        append_item(menu, MF_STRING, MENU_OPEN, tr("Open Startline"));
         if !shared.tray_no_settings.load(Ordering::Relaxed) {
-            let _ = AppendMenuW(menu, MF_STRING, MENU_CUSTOMIZE, w!("Customize..."));
+            append_item(menu, MF_STRING, MENU_CUSTOMIZE, tr("Settings..."));
         }
         let _ = AppendMenuW(menu, MF_SEPARATOR, 0, PCWSTR::null());
         let check = if taking { MF_CHECKED } else { MF_UNCHECKED };
         let fixed = if shared.tray_fixed_start.load(Ordering::Relaxed) { MF_GRAYED } else { MF_ENABLED };
-        let _ = AppendMenuW(menu, MF_STRING | check | fixed, MENU_TAKE_OVER, w!("Start key opens Startline"));
+        append_item(menu, MF_STRING | check | fixed, MENU_TAKE_OVER, tr("Start key opens Startline"));
         if !shared.tray_no_native.load(Ordering::Relaxed) {
-            let _ = AppendMenuW(menu, MF_STRING, MENU_NATIVE, w!("Open the Windows Start menu"));
+            append_item(menu, MF_STRING, MENU_NATIVE, tr("Open the Windows Start menu"));
         }
         if !shared.tray_no_quit.load(Ordering::Relaxed) {
             let _ = AppendMenuW(menu, MF_SEPARATOR, 0, PCWSTR::null());
-            let _ = AppendMenuW(menu, MF_STRING, MENU_QUIT, w!("Quit"));
+            append_item(menu, MF_STRING, MENU_QUIT, tr("Quit Startline"));
         }
         let mut point = POINT::default();
         let _ = GetCursorPos(&mut point);
@@ -829,7 +842,7 @@ fn add_tray(hwnd: HWND) {
         hIcon: make_tray_icon(),
         ..Default::default()
     };
-    let tip = platform::wide("Startline");
+    let tip = platform::wide("Startline"); // i18n-ignore: the app's name
     data.szTip[..tip.len()].copy_from_slice(&tip);
     let _ = unsafe { Shell_NotifyIconW(NIM_ADD, &data) };
 }
@@ -995,14 +1008,14 @@ pub fn shutdown() -> ! {
 pub fn probe_start_button() -> String {
     let _ = unsafe { CoInitializeEx(None, COINIT_MULTITHREADED) };
     let Ok(automation) = (unsafe { CoCreateInstance::<_, IUIAutomation>(&CUIAutomation, None, CLSCTX_INPROC_SERVER) }) else {
-        return "start button: automation unavailable\n".into();
+        return "start button: automation unavailable\n".into(); // i18n-ignore: probe report for tests
     };
     let bars = taskbars();
     let started = Instant::now();
     let rects = find_start_buttons(&automation, &bars);
-    let mut out = format!("taskbars={} start buttons found={} in {:?}\n", bars.len(), rects.len(), started.elapsed());
+    let mut out = format!("taskbars={} start buttons found={} in {:?}\n", bars.len(), rects.len(), started.elapsed()); // i18n-ignore: probe report for tests
     for rect in rects {
-        out.push_str(&format!("  start button at left={} top={} right={} bottom={}\n", rect.left, rect.top, rect.right, rect.bottom));
+        out.push_str(&format!("  start button at left={} top={} right={} bottom={}\n", rect.left, rect.top, rect.right, rect.bottom)); // i18n-ignore: probe report for tests
     }
     out
 }
@@ -1039,6 +1052,21 @@ fn cut_to_shape(hwnd: HWND, shape: Shape, width: i32, height: i32, scale: f32) {
         // paints. Starting one row down leaves it out and lines the corners up with the paint.
         let region = CreateRoundRectRgn(0, 1, width + 1, bottom, diameter, diameter);
         SetWindowRgn(hwnd, Some(region), true);
+    }
+}
+
+/// Mica, or none. Mica Alt, as Explorer uses behind its tabs: more of the desktop picture's color comes through than
+/// plain Mica's. Mica only shows where the window counts as frame to Windows, so the frame is stretched over all of
+/// it. Stretched from the bottom rather than the top, so Windows doesn't draw caption buttons of its own there.
+fn set_backdrop(hwnd: HWND, on: bool, dark: bool) {
+    use windows::Win32::UI::Controls::MARGINS;
+    let dark = BOOL::from(dark);
+    let kind = if on { DWMSBT_TABBEDWINDOW } else { DWMSBT_NONE };
+    let up = if on { 32_000 } else { 0 };
+    unsafe {
+        let _ = DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &dark as *const _ as *const c_void, 4);
+        let _ = DwmSetWindowAttribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, &kind as *const _ as *const c_void, 4);
+        let _ = DwmExtendFrameIntoClientArea(hwnd, &MARGINS { cxLeftWidth: 0, cxRightWidth: 0, cyTopHeight: 0, cyBottomHeight: up });
     }
 }
 

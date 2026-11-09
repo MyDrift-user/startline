@@ -1,0 +1,87 @@
+Startline: guide for administrators
+===================================
+
+Everything that can be set in Startline's settings can also be set by Group Policy or straight in the Registry, for
+the whole PC or for one account: the look, the language, the pinned apps and their sections, the layout and size of
+the menu, what it shows, and how search behaves. That makes Startline a way to deploy a Start menu without the usual
+tricks, such as copying start2.bin into profiles or importing layout XML: write the values below and every Startline
+picks them up, including copies that are already running.
+
+This file is written by Startline from its own list of policies, together with the templates next to it. To write
+them all again:
+    startline.exe --write-policy-templates <folder>
+
+
+INSTALLING THE TEMPLATES
+Copy Startline.admx to C:\Windows\PolicyDefinitions, and the language folders you need (en-US, de-DE, it-IT) with
+their Startline.adml to the folders of the same name under it. For a domain, copy them to the same places in the
+Central Store (\\<domain>\SYSVOL\<domain>\Policies\PolicyDefinitions). The editor shows Startline under
+Administrative Templates, both under Computer Configuration and under User Configuration.
+
+
+FIXED SETTINGS AND DEFAULTS
+Each setting comes twice:
+  Startline                          A fixed setting. It always applies. People see it greyed out in Settings with
+                                     "Managed by your organization", and can't change it. Removing the policy brings
+                                     back what they had chosen before.
+  Startline > Defaults people        A default. It applies until the person changes that setting themselves, and from
+  can change                         then on their own choice stays, even if the default changes later.
+Where both are set, the fixed one wins. Where the computer and the account both set one, the computer's wins.
+
+Some policies aren't settings but limits on what people can do (the commands, the right-click options and the
+Windows settings search can change). They can only be fixed.
+
+Startline reads the policies when it starts and every half minute while it runs, so a gpupdate or a script's change
+reaches running copies within a minute.
+
+
+THE REGISTRY
+For Group Policy Preferences, Intune or scripts, write the values yourself:
+  Fixed:      HKLM\Software\Policies\Startline             (the whole PC)
+              HKCU\Software\Policies\Startline             (one account)
+  Defaults:   HKLM\Software\Policies\Startline\Recommended
+              HKCU\Software\Policies\Startline\Recommended
+Switches and numbers are REG_DWORD, text is REG_SZ (REG_EXPAND_SZ works too). A list is a REG_DWORD of 1 under the
+list's name, with its items as REG_SZ values named 1, 2, 3 and so on in a subkey of the same name. A list with the
+REG_DWORD of 1 and no items is an empty list. Tick boxes are REG_DWORD values named Allow_<item>, 0 or 1.
+
+For example, a Start menu with two sections of pins, the Startline look, search at the top and German text, fixed
+for everyone on the PC:
+
+    reg add HKLM\Software\Policies\Startline /v Experience /t REG_SZ /d Startline /f
+    reg add HKLM\Software\Policies\Startline /v Language /t REG_SZ /d de /f
+    reg add HKLM\Software\Policies\Startline /v SearchAtBottom /t REG_DWORD /d 0 /f
+    reg add HKLM\Software\Policies\Startline /v PinnedApps /t REG_DWORD /d 1 /f
+    reg add HKLM\Software\Policies\Startline\PinnedApps /v 1 /t REG_SZ /d "Office|Word|C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE" /f
+    reg add HKLM\Software\Policies\Startline\PinnedApps /v 2 /t REG_SZ /d "Office|Intranet|https://intranet.example.com" /f
+    reg add HKLM\Software\Policies\Startline\PinnedApps /v 3 /t REG_SZ /d "Tools|Explorer|app:Microsoft.Windows.Explorer" /f
+
+The same under ...\Startline\Recommended makes them the starting point, which people can then rearrange.
+
+Pinned apps are written Section|Name|Target or Section|Name|Target|Arguments. The target is a file, folder, program or
+web address, or app:<ID> for an app installed from the Store or with an Application User Model ID. Environment
+variables such as %USERPROFILE% and %ProgramFiles% work in targets and arguments.
+
+
+SEARCH
+The search policies are under Startline > Search, in four parts:
+  Where to search   the places, and whether network and USB drives are searched as they attach.
+  Never found       what search never shows: six ready-made groups (SearchSkipAppData, SearchSkipWindows,
+                    SearchSkipDeveloperFiles, SearchSkipCloudFolders, SearchSkipTempFiles, SearchSkipProgramParts),
+                    hidden files, system files, and lists of folders, folder names, file types and regular
+                    expressions. Fixed, the lists add to what people leave out themselves: they see your items with a
+                    lock and can't remove them, but can still add their own.
+  Results           which kinds of results show, in what order and how many of each (SearchResults: Apps, Settings,
+                    Files, Web, one per line; a kind left out is never shown), and how they look.
+  Search box        regular expression mode, and which parts of the search box and results show.
+SearchSkipPatterns are regular expressions matched against the whole path, whatever the case. A file or folder that
+matches is never found, nor anything in a folder that matches. For example:
+    \\Payroll(\\|$)                    the Payroll folder and everything in it, wherever it is
+    \.(key|pem|pfx)$                   key and certificate files
+    ^C:\\Users\\[^\\]+\\Secret(\\|$)   a Secret folder at the top of anyone's home folder
+A pattern that isn't valid is ignored. People see theirs marked in Settings.
+
+What people can type in the search box: words (all of them have to be in the name, or name a folder it's in),
+"exact text", wildcards (*.pdf, img_??.png), -word to leave out, ext:pdf,docx, kind:folder, document, picture, video,
+music, archive, code or app, size:>10mb, size:<1k, size:1mb..1gb, modified:today, yesterday, week, month, year, 2025,
+2025-03, >2026-01-01 or <2026-01-01 (date: the same), and regular expressions with re:pattern or /pattern/.

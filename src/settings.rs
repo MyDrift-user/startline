@@ -57,7 +57,7 @@ fn reg_flag(id: QuickId) -> Option<RegFlag> {
         QuickId::TaskViewButton => flag(EXPLORER_ADVANCED, "ShowTaskViewButton", 1, 0, true, Notify::Taskbar),
         QuickId::ClockSeconds => flag(EXPLORER_ADVANCED, "ShowSecondsInSystemClock", 1, 0, false, Notify::Taskbar),
         QuickId::FileExtensions => flag(EXPLORER_ADVANCED, "HideFileExt", 0, 1, false, Notify::Shell),
-        QuickId::HiddenFiles => flag(EXPLORER_ADVANCED, "Hidden", 1, 2, false, Notify::Shell),
+        QuickId::HiddenFiles => flag(EXPLORER_ADVANCED, "Hidden", 1, 2, false, Notify::Shell), // i18n-ignore: registry value name
         QuickId::ItemCheckboxes => flag(EXPLORER_ADVANCED, "AutoCheckSelect", 1, 0, false, Notify::Shell),
         QuickId::CompactExplorer => flag(EXPLORER_ADVANCED, "UseCompactMode", 1, 0, false, Notify::Shell),
         QuickId::ClipboardHistory => flag("Software\\Microsoft\\Clipboard", "EnableClipboardHistory", 1, 0, false, Notify::Nothing),
@@ -275,7 +275,7 @@ pub fn probe_report() -> String {
         let started = std::time::Instant::now();
         let value = backend.get(id);
         let read_ms = started.elapsed().as_millis();
-        out.push_str(&format!("{:<20} {value:?} read in {read_ms}ms\n", id.info().label));
+        out.push_str(&format!("{:<20} {value:?} read in {read_ms}ms\n", id.info().label)); // i18n-ignore: test report
     }
     out
 }
@@ -295,7 +295,7 @@ pub fn probe_changes_report() -> String {
             (Control::Slider { min, .. }, Value::Number(v)) => Value::Number(if v > min { v - 1.0 } else { v + 1.0 }),
             (Control::Choice(options), Value::Pick(i)) => Value::Pick((i + 1) % options.len()),
             _ => {
-                out.push_str(&format!("{:<20} skipped: {before:?}\n", id.info().label));
+                out.push_str(&format!("{:<20} skipped: {before:?}\n", id.info().label)); // i18n-ignore: test report
                 continue;
             }
         };
@@ -310,7 +310,7 @@ pub fn probe_changes_report() -> String {
         }
         let restored = backend.get(id);
         let verdict = if after == changed && restored == before { "works" } else { "FAILED" };
-        out.push_str(&format!("{:<20} {verdict}: {before:?} -> {after:?} -> {restored:?}\n", id.info().label));
+        out.push_str(&format!("{:<20} {verdict}: {before:?} -> {after:?} -> {restored:?}\n", id.info().label)); // i18n-ignore: test report
     }
     out
 }
@@ -607,7 +607,7 @@ const RUN_KEY: &str = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
 
 /// Whether the menu starts together with Windows.
 pub fn autostart_enabled() -> bool {
-    let (key_w, name_w) = (platform::wide(RUN_KEY), platform::wide("Startline"));
+    let (key_w, name_w) = (platform::wide(RUN_KEY), platform::wide("Startline")); // i18n-ignore: registry value name
     let mut size = 0u32;
     unsafe {
         RegGetValueW(HKEY_CURRENT_USER, PCWSTR(key_w.as_ptr()), PCWSTR(name_w.as_ptr()), RRF_RT_REG_SZ, None, None, Some(&mut size))
@@ -616,7 +616,7 @@ pub fn autostart_enabled() -> bool {
 }
 
 pub fn set_autostart(on: bool) -> bool {
-    let (key_w, name_w) = (platform::wide(RUN_KEY), platform::wide("Startline"));
+    let (key_w, name_w) = (platform::wide(RUN_KEY), platform::wide("Startline")); // i18n-ignore: registry value name
     if !on {
         return unsafe { RegDeleteKeyValueW(HKEY_CURRENT_USER, PCWSTR(key_w.as_ptr()), PCWSTR(name_w.as_ptr())) }.is_ok();
     }

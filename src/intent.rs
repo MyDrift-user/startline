@@ -2,8 +2,10 @@
 //! "switch to light mode", "wlan aus", "volume 40" and "louder" each land on one live row.
 //! It only reads the words: nothing changes until the person acts on the row.
 
+use crate::i18n::tr;
 use crate::matching;
 use crate::settings::{Control, QuickId, Value};
+use crate::trf;
 use std::sync::OnceLock;
 
 #[derive(Clone, Copy, PartialEq, Debug)]
@@ -138,6 +140,8 @@ fn number_of(word: &str) -> Option<f32> {
 struct Entry {
     id: QuickId,
     control: Control,
+    /// The English label, for its translation in the language shown.
+    source: &'static str,
     label: String,
     /// The label without its hyphen, so "wifi" names "Wi-Fi" exactly.
     plain_label: String,
@@ -176,6 +180,7 @@ fn catalog() -> &'static [Entry] {
                 Entry {
                     id,
                     control: info.control,
+                    source: info.label,
                     plain_label: label.replace('-', ""),
                     label,
                     names,
@@ -241,13 +246,26 @@ fn is_typo_of(word: &str, token: &str) -> bool {
     distance(&w, &t, limit) <= limit
 }
 
+/// The label as it's shown, when that isn't English: "Dunkelmodus" finds dark mode in German.
+fn shown_label(entry: &Entry) -> Option<String> {
+    let shown = crate::i18n::tr(entry.source);
+    (shown != entry.source).then(|| matching::lower(shown))
+}
+
 fn token_score(entry: &Entry, token: &str, typos: bool) -> Option<i32> {
-    let in_label = matching::score_token(entry.label.as_bytes(), token.as_bytes()).filter(|s| *s > matching::LOOSE);
+    let shown = shown_label(entry);
+    let in_label = [Some(entry.label.as_str()), shown.as_deref()]
+        .into_iter()
+        .flatten()
+        .filter_map(|label| matching::score_token(label.as_bytes(), token.as_bytes()))
+        .filter(|s| *s > matching::LOOSE)
+        .max();
     let in_words = entry.words.iter().filter_map(|w| word_score(w, token)).max();
     if let Some(best) = in_label.into_iter().chain(in_words).max() {
         return Some(best);
     }
-    if typos && entry.label.split([' ', '-']).chain(entry.words.iter().map(String::as_str)).any(|w| is_typo_of(w, token)) {
+    let shown_words = shown.as_deref().unwrap_or("").split([' ', '-']).filter(|w| !w.is_empty());
+    if typos && entry.label.split([' ', '-']).chain(shown_words).chain(entry.words.iter().map(String::as_str)).any(|w| is_typo_of(w, token)) {
         return Some(320);
     }
     None
@@ -290,7 +308,8 @@ fn match_entry(entry: &Entry, parsed: &Parsed, typos: bool) -> Option<Hit> {
     let mut needs_own_word = None;
     if let Control::Choice(options) = entry.control {
         for (index, option) in options.iter().enumerate() {
-            let option = matching::lower(option);
+            let shown = matching::lower(crate::i18n::tr(*option));
+            let option = if tokens.contains(&shown.as_str()) { shown } else { matching::lower(option) };
             if tokens.contains(&option.as_str()) {
                 want = Want::Pick(index);
                 tokens.retain(|t| *t != option);
@@ -315,7 +334,8 @@ fn match_entry(entry: &Entry, parsed: &Parsed, typos: bool) -> Option<Hit> {
         total / tokens.len() as i32
     };
     let joined = tokens.join(" ");
-    let exact = !tokens.is_empty() && (joined == entry.label || joined == entry.plain_label || entry.names.contains(&joined));
+    let shown = shown_label(entry);
+    let exact = !tokens.is_empty() && (joined == entry.label || joined == entry.plain_label || entry.names.contains(&joined) || shown.as_deref().is_some_and(|s| joined == s || joined == s.replace('-', "")));
     let consumed = tokens.len() != before;
     let phrase = if entry.control == Control::Toggle { phrase_side(entry, &parsed.raw) } else { None };
     if let Some((turns_on, own_word)) = phrase {
@@ -410,7 +430,7 @@ pub fn resolve(control: Control, now: Value, want: Want) -> Option<Value> {
 
 pub fn format_number(value: f32, unit: &str) -> String {
     if value == 0.0 && unit == " min" {
-        return "Never".into();
+        return tr("Never").into();
     }
     format!("{}{unit}", value.round() as i32)
 }
@@ -420,22 +440,25 @@ pub fn hint(control: Control, now: Value, want: Want) -> String {
     let asked = !matches!(want, Want::Nothing | Want::Flip);
     let next = resolve(control, now, want);
     match (control, now) {
-        (_, Value::Loading) => "Checking...".into(),
-        (_, Value::Unavailable) => "Not available on this PC. Enter opens its Windows page".into(),
+        (_, Value::Loading) => tr("Checking...").into(),
+        (_, Value::Unavailable) => tr("Not available on this PC. Enter opens its Windows page").into(),
         (Control::Toggle, Value::On(on)) => match (asked, next) {
-            (true, Some(Value::On(true))) => "Enter turns it on".into(),
-            (true, Some(Value::On(false))) => "Enter turns it off".into(),
-            (true, _) => format!("Already {}", if on { "on" } else { "off" }),
-            _ => (if on { "On" } else { "Off" }).into(),
+            (true, Some(Value::On(true))) => tr("Enter turns it on").into(),
+            (true, Some(Value::On(false))) => tr("Enter turns it off").into(),
+            (true, _) => (if on { tr("Already on") } else { tr("Already off") }).into(),
+            _ => (if on { tr("On") } else { tr("Off") }).into(),
         },
         (Control::Slider { unit, .. }, Value::Number(value)) => match (asked, next) {
-            (true, Some(Value::Number(target))) => format!("Enter sets it to {}", format_number(target, unit)),
-            (true, _) => format!("Already at {}", format_number(value, unit)),
-            _ => "Drag to change".into(),
+            (true, Some(Value::Number(target))) => trf!("Enter sets it to {value}", value = format_number(target, unit)),
+            (true, _) => trf!("Already at {value}", value = format_number(value, unit)),
+            _ => tr("Drag to change").into(),
         },
         (Control::Choice(options), Value::Pick(current)) => match (asked, next) {
-            (true, Some(Value::Pick(index))) => format!("Enter switches to {}", options[index]),
-            _ => format!("Now: {}", options.get(current).copied().unwrap_or("")),
+            (true, Some(Value::Pick(index))) => trf!("Enter switches to {choice}", choice = tr(options[index])),
+            _ => {
+                let choice = options.get(current).map_or("", |o| tr(*o));
+                trf!("Now: {choice}", choice = choice)
+            }
         },
         _ => String::new(),
     }

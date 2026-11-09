@@ -1,5 +1,7 @@
 //! Every Windows setting search can change, and the words that find it.
 
+use crate::i18n::tx;
+
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 pub enum QuickId {
     Wifi,
@@ -87,6 +89,9 @@ pub struct Info {
 const PERCENT: Control = Control::Slider { min: 0.0, max: 100.0, step: 1.0, unit: "%" };
 const MINUTES: Control = Control::Slider { min: 0.0, max: 120.0, step: 1.0, unit: " min" };
 const LINES: Control = Control::Slider { min: 1.0, max: 20.0, step: 1.0, unit: "" };
+const ALIGNMENT: &[&str] = &[tx("Left"), tx("Center")];
+const REPEAT_DELAY: &[&str] = &[tx("Short"), tx("Medium"), tx("Long"), tx("Longest")];
+const POWER_MODES: &[&str] = &[tx("Saver"), tx("Balanced"), tx("Best")];
 
 const COLORS: &str = "ms-settings:colors";
 const TASKBAR: &str = "ms-settings:taskbar";
@@ -154,92 +159,92 @@ impl QuickId {
 
     pub fn info(self) -> Info {
         match self {
-            QuickId::Wifi => Info { names: "wifi, wlan, wireless", ..toggle("Wi-Fi", '\u{E701}', "internet network netzwerk", "ms-settings:network-wifi") },
-            QuickId::Bluetooth => Info { names: "bt", ..toggle("Bluetooth", '\u{E702}', "headphones wireless devices", "ms-settings:bluetooth") },
+            QuickId::Wifi => Info { names: "wifi, wlan, wireless", ..toggle(tx("Wi-Fi"), '\u{E701}', "internet network netzwerk", "ms-settings:network-wifi") }, // i18n-ignore: search words
+            QuickId::Bluetooth => Info { names: "bt", ..toggle(tx("Bluetooth"), '\u{E702}', "headphones wireless devices", "ms-settings:bluetooth") }, // i18n-ignore: search words
             QuickId::DarkMode => Info {
-                names: "dark, dark theme, dunkelmodus",
-                on_phrases: "go dark",
-                off_phrases: "light mode, light theme, heller modus, hellmodus, go light",
-                ..toggle("Dark mode", '\u{E708}', "theme night black colors appearance dunkel farben", COLORS)
+                names: "dark, dark theme, dunkelmodus", // i18n-ignore: search words
+                on_phrases: "go dark", // i18n-ignore: search words
+                off_phrases: "light mode, light theme, heller modus, hellmodus, go light", // i18n-ignore: search words
+                ..toggle(tx("Dark mode"), '\u{E708}', "theme night black colors appearance dunkel farben", COLORS) // i18n-ignore: search words
             },
-            QuickId::AppsDark => Info { off_phrases: "light mode for apps, light apps", ..toggle("Dark mode for apps", '\u{E708}', "theme applications programs light", COLORS) },
+            QuickId::AppsDark => Info { off_phrases: "light mode for apps, light apps", ..toggle(tx("Dark mode for apps"), '\u{E708}', "theme applications programs light", COLORS) }, // i18n-ignore: search words
             QuickId::SystemDark => Info {
-                names: "dark mode for windows, dark windows",
-                off_phrases: "light taskbar, light mode for windows",
-                ..toggle("Dark taskbar and Start", '\u{E708}', "theme windows system light menu", COLORS)
+                names: "dark mode for windows, dark windows", // i18n-ignore: search words
+                off_phrases: "light taskbar, light mode for windows", // i18n-ignore: search words
+                ..toggle(tx("Dark taskbar and Start"), '\u{E708}', "theme windows system light menu", COLORS) // i18n-ignore: search words
             },
             QuickId::KeepAwake => Info {
-                on_phrases: "keep awake, stay awake, keep screen on, caffeine",
-                off_phrases: "let it sleep",
-                ..toggle("Keep awake", '\u{E7F4}', "sleep prevent screen timeout wach", POWER)
+                on_phrases: "keep awake, stay awake, keep screen on, caffeine", // i18n-ignore: search words
+                off_phrases: "let it sleep", // i18n-ignore: search words
+                ..toggle(tx("Keep awake"), '\u{E7F4}', "sleep prevent screen timeout wach", POWER) // i18n-ignore: search words
             },
             QuickId::Mute => Info {
-                on_phrases: "mute, stumm, silence, sound off, off sound, ton aus",
-                off_phrases: "unmute, sound on, on sound, ton an",
-                ..toggle("Mute", '\u{E74F}', "sound audio speaker stummschalten ton", SOUND)
+                on_phrases: "mute, stumm, silence, sound off, off sound, ton aus", // i18n-ignore: search words
+                off_phrases: "unmute, sound on, on sound, ton an", // i18n-ignore: search words
+                ..toggle(tx("Mute"), '\u{E74F}', "sound audio speaker stummschalten ton", SOUND) // i18n-ignore: search words
             },
             QuickId::MicMute => Info {
-                on_phrases: "mute mic, mute microphone, mic off, off mic, microphone off, off microphone, mikrofon aus",
-                off_phrases: "unmute mic, unmute microphone, mic on, on mic, microphone on, on microphone, mikrofon an",
-                ..toggle("Mic mute", '\u{E720}', "microphone mikrofon silence recording input", SOUND)
+                on_phrases: "mute mic, mute microphone, mic off, off mic, microphone off, off microphone, mikrofon aus", // i18n-ignore: search words
+                off_phrases: "unmute mic, unmute microphone, mic on, on mic, microphone on, on microphone, mikrofon an", // i18n-ignore: search words
+                ..toggle(tx("Mic mute"), '\u{E720}', "microphone mikrofon silence recording input", SOUND) // i18n-ignore: search words
             },
-            QuickId::Transparency => Info { names: "transparency, transparency effects, transparenz", ..toggle("See-through effects", '\u{E790}', "acrylic blur glass", COLORS) },
-            QuickId::AccentTaskbar => toggle("Accent color on taskbar", '\u{E790}', "colour start menu personalize akzentfarbe", COLORS),
-            QuickId::AccentTitleBars => toggle("Accent color on title bars", '\u{E790}', "colour window windows borders akzentfarbe", COLORS),
+            QuickId::Transparency => Info { names: "transparency, transparency effects, transparenz", ..toggle(tx("See-through effects"), '\u{E790}', "acrylic blur glass", COLORS) }, // i18n-ignore: search words
+            QuickId::AccentTaskbar => toggle(tx("Accent color on taskbar"), '\u{E790}', "colour start menu personalize akzentfarbe", COLORS), // i18n-ignore: search words
+            QuickId::AccentTitleBars => toggle(tx("Accent color on title bars"), '\u{E790}', "colour window windows borders akzentfarbe", COLORS), // i18n-ignore: search words
             QuickId::AutoHideTaskbar => Info {
-                on_phrases: "hide taskbar, auto hide taskbar, autohide taskbar",
-                off_phrases: "show taskbar, always show taskbar",
-                ..toggle("Hide taskbar", '\u{E7C4}', "auto autohide taskleiste", TASKBAR)
+                on_phrases: "hide taskbar, auto hide taskbar, autohide taskbar", // i18n-ignore: search words
+                off_phrases: "show taskbar, always show taskbar", // i18n-ignore: search words
+                ..toggle(tx("Hide taskbar"), '\u{E7C4}', "auto autohide taskleiste", TASKBAR) // i18n-ignore: search words
             },
             QuickId::TaskbarAlign => Info {
-                names: "align taskbar",
+                names: "align taskbar", // i18n-ignore: search words
                 late: true,
-                ..base("Taskbar alignment", '\u{E7C4}', Control::Choice(&["Left", "Center"]), "taskbar start menu position taskleiste", TASKBAR)
+                ..base(tx("Taskbar alignment"), '\u{E7C4}', Control::Choice(ALIGNMENT), "taskbar start menu position taskleiste", TASKBAR) // i18n-ignore: search words
             },
-            QuickId::TaskViewButton => Info { on_phrases: "show task view", off_phrases: "hide task view", late: true, ..toggle("Task view button", '\u{E7C4}', "taskbar desktops", TASKBAR) },
-            QuickId::ClockSeconds => Info { on_phrases: "show seconds", off_phrases: "hide seconds", late: true, ..toggle("Seconds in the clock", '\u{E823}', "taskbar time uhr sekunden", TASKBAR) },
+            QuickId::TaskViewButton => Info { on_phrases: "show task view", off_phrases: "hide task view", late: true, ..toggle(tx("Task view button"), '\u{E7C4}', "taskbar desktops", TASKBAR) }, // i18n-ignore: search words
+            QuickId::ClockSeconds => Info { on_phrases: "show seconds", off_phrases: "hide seconds", late: true, ..toggle(tx("Seconds in the clock"), '\u{E823}', "taskbar time uhr sekunden", TASKBAR) }, // i18n-ignore: search words
             QuickId::FileExtensions => Info {
-                on_phrases: "show file extensions, show extensions",
-                off_phrases: "hide file extensions, hide extensions",
-                ..toggle("File extensions", '\u{E7C3}', "explorer types dateiendungen", FOR_DEVS)
+                on_phrases: "show file extensions, show extensions", // i18n-ignore: search words
+                off_phrases: "hide file extensions, hide extensions", // i18n-ignore: search words
+                ..toggle(tx("File extensions"), '\u{E7C3}', "explorer types dateiendungen", FOR_DEVS) // i18n-ignore: search words
             },
-            QuickId::HiddenFiles => Info { on_phrases: "show hidden", off_phrases: "hide hidden", ..toggle("Hidden files", '\u{E890}', "explorer folders versteckte", FOR_DEVS) },
-            QuickId::ItemCheckboxes => Info { late: true, ..toggle("File checkboxes", '\u{E73A}', "explorer select item check boxes", FOR_DEVS) },
-            QuickId::CompactExplorer => Info { late: true, ..toggle("Compact file view", '\u{E8FD}', "explorer dense spacing", FOR_DEVS) },
-            QuickId::ClipboardHistory => Info { names: "zwischenablage", late: true, ..toggle("Clipboard history", '\u{E77F}', "copy paste", "ms-settings:clipboard") },
-            QuickId::GameMode => Info { names: "spielmodus", late: true, ..toggle("Game Mode", '\u{E7FC}', "gaming games performance", "ms-settings:gaming-gamemode") },
-            QuickId::Animations => Info { off_phrases: "reduce motion", ..toggle("Animations", '\u{E945}', "effects motion transitions animationen", EFFECTS) },
-            QuickId::SnapWindows => toggle("Snap windows", '\u{E7C4}', "arrange aero multitasking fenster", "ms-settings:multitasking"),
-            QuickId::DragContents => toggle("Show window contents while dragging", '\u{E7C4}', "move performance", EFFECTS),
-            QuickId::FontSmoothing => Info { names: "cleartype, font smoothing", ..toggle("Smooth fonts", '\u{E8D2}', "text blurry schrift", "ms-settings:display") },
-            QuickId::WindowShadows => Info { names: "drop shadow", ..toggle("Window shadows", '\u{E7C4}', "effects schatten", EFFECTS) },
-            QuickId::HoverActivate => Info { names: "focus follows mouse", ..toggle("Focus window on hover", '\u{E962}', "activate tracking pointer", MOUSE) },
-            QuickId::ScreenSaver => Info { names: "screensaver, bildschirmschoner", ..toggle("Screen saver", '\u{E7F4}', "idle", "ms-settings:lockscreen") },
-            QuickId::PointerPrecision => Info { names: "mouse acceleration, mausbeschleunigung", ..toggle("Enhance pointer precision", '\u{E962}', "mouse cursor", MOUSE) },
-            QuickId::SwapMouseButtons => toggle("Swap mouse buttons", '\u{E962}', "primary button maustasten", MOUSE),
-            QuickId::StickyKeys => Info { names: "einrastfunktion", ..toggle("Sticky Keys", '\u{E765}', "accessibility keyboard shift", KEYBOARD) },
-            QuickId::Autostart => Info { names: "autostart", ..toggle("Start Startline with Windows", '\u{E7E8}', "login boot launch startup", "ms-settings:startupapps") },
+            QuickId::HiddenFiles => Info { on_phrases: "show hidden", off_phrases: "hide hidden", ..toggle(tx("Hidden files"), '\u{E890}', "explorer folders versteckte", FOR_DEVS) }, // i18n-ignore: search words
+            QuickId::ItemCheckboxes => Info { late: true, ..toggle(tx("File checkboxes"), '\u{E73A}', "explorer select item check boxes", FOR_DEVS) }, // i18n-ignore: search words
+            QuickId::CompactExplorer => Info { late: true, ..toggle(tx("Compact file view"), '\u{E8FD}', "explorer dense spacing", FOR_DEVS) }, // i18n-ignore: search words
+            QuickId::ClipboardHistory => Info { names: "zwischenablage", late: true, ..toggle(tx("Clipboard history"), '\u{E77F}', "copy paste", "ms-settings:clipboard") }, // i18n-ignore: search words
+            QuickId::GameMode => Info { names: "spielmodus", late: true, ..toggle(tx("Game Mode"), '\u{E7FC}', "gaming games performance", "ms-settings:gaming-gamemode") }, // i18n-ignore: search words
+            QuickId::Animations => Info { off_phrases: "reduce motion", ..toggle(tx("Animations"), '\u{E945}', "effects motion transitions animationen", EFFECTS) }, // i18n-ignore: search words
+            QuickId::SnapWindows => toggle(tx("Snap windows"), '\u{E7C4}', "arrange aero multitasking fenster", "ms-settings:multitasking"), // i18n-ignore: search words
+            QuickId::DragContents => toggle(tx("Show window contents while dragging"), '\u{E7C4}', "move performance", EFFECTS), // i18n-ignore: search words
+            QuickId::FontSmoothing => Info { names: "cleartype, font smoothing", ..toggle(tx("Smooth fonts"), '\u{E8D2}', "text blurry schrift", "ms-settings:display") }, // i18n-ignore: search words
+            QuickId::WindowShadows => Info { names: "drop shadow", ..toggle(tx("Window shadows"), '\u{E7C4}', "effects schatten", EFFECTS) }, // i18n-ignore: search words
+            QuickId::HoverActivate => Info { names: "focus follows mouse", ..toggle(tx("Focus window on hover"), '\u{E962}', "activate tracking pointer", MOUSE) }, // i18n-ignore: search words
+            QuickId::ScreenSaver => Info { names: "screensaver, bildschirmschoner", ..toggle(tx("Screen saver"), '\u{E7F4}', "idle", "ms-settings:lockscreen") }, // i18n-ignore: search words
+            QuickId::PointerPrecision => Info { names: "mouse acceleration, mausbeschleunigung", ..toggle(tx("Enhance pointer precision"), '\u{E962}', "mouse cursor", MOUSE) }, // i18n-ignore: search words
+            QuickId::SwapMouseButtons => toggle(tx("Swap mouse buttons"), '\u{E962}', "primary button maustasten", MOUSE), // i18n-ignore: search words
+            QuickId::StickyKeys => Info { names: "einrastfunktion", ..toggle(tx("Sticky Keys"), '\u{E765}', "accessibility keyboard shift", KEYBOARD) }, // i18n-ignore: search words
+            QuickId::Autostart => Info { names: "autostart", ..toggle(tx("Start Startline with Windows"), '\u{E7E8}', "login boot launch startup", "ms-settings:startupapps") }, // i18n-ignore: search words
             QuickId::Volume => Info {
-                names: "sound level, lautstärke",
-                up_words: "louder lauter",
-                down_words: "quieter softer leiser",
-                ..base("Volume", '\u{E767}', PERCENT, "sound audio speaker loud ton", SOUND)
+                names: "sound level, lautstärke", // i18n-ignore: search words
+                up_words: "louder lauter", // i18n-ignore: search words
+                down_words: "quieter softer leiser", // i18n-ignore: search words
+                ..base(tx("Volume"), '\u{E767}', PERCENT, "sound audio speaker loud ton", SOUND) // i18n-ignore: search words
             },
-            QuickId::MicVolume => Info { names: "mic volume, microphone volume", ..base("Mic level", '\u{E720}', PERCENT, "microphone mikrofon input recording gain", SOUND) },
+            QuickId::MicVolume => Info { names: "mic volume, microphone volume", ..base(tx("Mic level"), '\u{E720}', PERCENT, "microphone mikrofon input recording gain", SOUND) }, // i18n-ignore: search words
             QuickId::Brightness => Info {
-                names: "helligkeit",
-                up_words: "brighter heller",
-                down_words: "dimmer dim darker dunkler",
-                ..base("Brightness", '\u{E706}', PERCENT, "display screen monitor bildschirm", "ms-settings:display")
+                names: "helligkeit", // i18n-ignore: search words
+                up_words: "brighter heller", // i18n-ignore: search words
+                down_words: "dimmer dim darker dunkler", // i18n-ignore: search words
+                ..base(tx("Brightness"), '\u{E706}', PERCENT, "display screen monitor bildschirm", "ms-settings:display") // i18n-ignore: search words
             },
-            QuickId::MouseSpeed => Info { up_words: "faster", down_words: "slower", ..base("Mouse speed", '\u{E962}', LINES, "pointer cursor sensitivity maus geschwindigkeit", MOUSE) },
-            QuickId::ScrollLines => Info { names: "scroll speed", ..base("Scroll lines", '\u{E962}', LINES, "mouse wheel mausrad", MOUSE) },
-            QuickId::DoubleClick => Info { names: "double click speed", ..base("Double-click time", '\u{E962}', Control::Slider { min: 200.0, max: 900.0, step: 50.0, unit: " ms" }, "mouse doppelklick doubleclick", MOUSE) },
-            QuickId::KeyRepeatSpeed => base("Key repeat speed", '\u{E765}', Control::Slider { min: 0.0, max: 31.0, step: 1.0, unit: "" }, "keyboard typing tastatur rate", KEYBOARD),
-            QuickId::KeyRepeatDelay => base("Key repeat delay", '\u{E765}', Control::Choice(&["Short", "Medium", "Long", "Longest"]), "keyboard typing tastatur", KEYBOARD),
-            QuickId::ScreenTimeout => Info { names: "screen timeout, display timeout", ..base("Screen off after", '\u{E7F4}', MINUTES, "monitor display idle bildschirm", POWER) },
-            QuickId::SleepTimeout => Info { names: "sleep timeout", ..base("Sleep after", '\u{E708}', MINUTES, "standby idle energy", POWER) },
-            QuickId::PowerMode => base("Power mode", '\u{E945}', Control::Choice(&["Saver", "Balanced", "Best"]), "performance battery efficiency energy saver balanced best energiesparen", POWER),
+            QuickId::MouseSpeed => Info { up_words: "faster", down_words: "slower", ..base(tx("Mouse speed"), '\u{E962}', LINES, "pointer cursor sensitivity maus geschwindigkeit", MOUSE) }, // i18n-ignore: search words
+            QuickId::ScrollLines => Info { names: "scroll speed", ..base(tx("Scroll lines"), '\u{E962}', LINES, "mouse wheel mausrad", MOUSE) }, // i18n-ignore: search words
+            QuickId::DoubleClick => Info { names: "double click speed", ..base(tx("Double-click time"), '\u{E962}', Control::Slider { min: 200.0, max: 900.0, step: 50.0, unit: " ms" }, "mouse doppelklick doubleclick", MOUSE) }, // i18n-ignore: search words
+            QuickId::KeyRepeatSpeed => base(tx("Key repeat speed"), '\u{E765}', Control::Slider { min: 0.0, max: 31.0, step: 1.0, unit: "" }, "keyboard typing tastatur rate", KEYBOARD), // i18n-ignore: search words
+            QuickId::KeyRepeatDelay => base(tx("Key repeat delay"), '\u{E765}', Control::Choice(REPEAT_DELAY), "keyboard typing tastatur", KEYBOARD), // i18n-ignore: search words
+            QuickId::ScreenTimeout => Info { names: "screen timeout, display timeout", ..base(tx("Screen off after"), '\u{E7F4}', MINUTES, "monitor display idle bildschirm", POWER) }, // i18n-ignore: search words
+            QuickId::SleepTimeout => Info { names: "sleep timeout", ..base(tx("Sleep after"), '\u{E708}', MINUTES, "standby idle energy", POWER) }, // i18n-ignore: search words
+            QuickId::PowerMode => base(tx("Power mode"), '\u{E945}', Control::Choice(POWER_MODES), "performance battery efficiency energy saver balanced best energiesparen", POWER), // i18n-ignore: search words
         }
     }
 }

@@ -41,9 +41,9 @@ pub const HIDDEN: u32 = FILE_ATTRIBUTE_HIDDEN.0;
 pub const SYSTEM: u32 = FILE_ATTRIBUTE_SYSTEM.0;
 pub const HIDDEN_OR_SYSTEM: u32 = HIDDEN | SYSTEM;
 
-/// Calls `visit` with each item's name, whether it's a folder, whether it's a link, and when it last changed.
+/// Calls `visit` with each item's name, whether it's a folder, whether it's a link, when it last changed and its size.
 /// Items with any of the `skip_attrs` attributes are left out.
-pub fn list_dir(path: &str, skip_attrs: u32, mut visit: impl FnMut(&str, bool, bool, u32)) {
+pub fn list_dir(path: &str, skip_attrs: u32, mut visit: impl FnMut(&str, bool, bool, u32, u64)) {
     let pattern = wide(&format!("{}\\*", long_path(path.trim_end_matches('\\'))));
     let mut data = WIN32_FIND_DATAW::default();
     let handle = unsafe {
@@ -73,6 +73,7 @@ pub fn list_dir(path: &str, skip_attrs: u32, mut visit: impl FnMut(&str, bool, b
                 attrs & FILE_ATTRIBUTE_DIRECTORY.0 != 0,
                 attrs & FILE_ATTRIBUTE_REPARSE_POINT.0 != 0,
                 filetime_to_unix(data.ftLastWriteTime),
+                ((data.nFileSizeHigh as u64) << 32) | data.nFileSizeLow as u64,
             );
         }
         if unsafe { FindNextFileW(handle, &mut data) }.is_err() {
@@ -94,6 +95,74 @@ fn attributes(path: &str) -> Option<WIN32_FILE_ATTRIBUTE_DATA> {
 pub fn stat(path: &str) -> Option<(bool, u32)> {
     let data = attributes(path)?;
     Some((data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY.0 != 0, filetime_to_unix(data.ftLastWriteTime)))
+}
+
+/// A file's size in bytes, or `None` if it no longer exists.
+pub fn file_size(path: &str) -> Option<u64> {
+    let data = attributes(path)?;
+    Some(((data.nFileSizeHigh as u64) << 32) | data.nFileSizeLow as u64)
+}
+
+/// A moment as the clock on this PC shows it.
+#[derive(Clone, Copy, PartialEq, Debug)]
+pub struct LocalTime {
+    pub year: i32,
+    pub month: u32,
+    pub day: u32,
+    pub hour: u32,
+    pub minute: u32,
+}
+
+const UNIX_TO_FILETIME: u64 = 11_644_473_600;
+
+/// Seconds since 1970 in this PC's time zone.
+pub fn local_time(secs: u64) -> LocalTime {
+    use windows::Win32::System::Time::{FileTimeToSystemTime, SystemTimeToTzSpecificLocalTime};
+    let ticks = (secs + UNIX_TO_FILETIME) * 10_000_000;
+    let utc = FILETIME { dwLowDateTime: ticks as u32, dwHighDateTime: (ticks >> 32) as u32 };
+    let (mut st, mut local) = (SYSTEMTIME::default(), SYSTEMTIME::default());
+    unsafe {
+        let _ = FileTimeToSystemTime(&utc, &mut st);
+        if SystemTimeToTzSpecificLocalTime(None, &st, &mut local).is_err() {
+            local = st;
+        }
+    }
+    LocalTime { year: local.wYear as i32, month: local.wMonth as u32, day: local.wDay as u32, hour: local.wHour as u32, minute: local.wMinute as u32 }
+}
+
+/// The start of a day on this PC's clock, as seconds since 1970. `None` for a date that doesn't exist.
+pub fn local_midnight(year: i32, month: u32, day: u32) -> Option<u64> {
+    use windows::Win32::System::Time::{SystemTimeToFileTime, TzSpecificLocalTimeToSystemTime};
+    if !(1601..=30827).contains(&year) || !(1..=12).contains(&month) || !(1..=31).contains(&day) {
+        return None;
+    }
+    let local = SYSTEMTIME { wYear: year as u16, wMonth: month as u16, wDay: day as u16, ..Default::default() };
+    let (mut utc, mut ft) = (SYSTEMTIME::default(), FILETIME::default());
+    unsafe {
+        TzSpecificLocalTimeToSystemTime(None, &local, &mut utc).ok()?;
+        SystemTimeToFileTime(&utc, &mut ft).ok()?;
+    }
+    let ticks = ((ft.dwHighDateTime as u64) << 32) | ft.dwLowDateTime as u64;
+    (ticks / 10_000_000).checked_sub(UNIX_TO_FILETIME)
+}
+
+/// Whether Windows has Mica for apps: Windows 11 22H2, build 22621, and later.
+pub fn has_mica() -> bool {
+    static BUILD: std::sync::OnceLock<u32> = std::sync::OnceLock::new();
+    *BUILD.get_or_init(|| {
+        let mut info = windows::Win32::System::SystemInformation::OSVERSIONINFOW { dwOSVersionInfoSize: std::mem::size_of::<windows::Win32::System::SystemInformation::OSVERSIONINFOW>() as u32, ..Default::default() };
+        // GetVersionEx lies to programs without a manifest; RtlGetVersion doesn't.
+        type RtlGetVersion = unsafe extern "system" fn(*mut windows::Win32::System::SystemInformation::OSVERSIONINFOW) -> i32;
+        unsafe {
+            let ntdll = windows::Win32::System::LibraryLoader::GetModuleHandleW(w!("ntdll.dll")).ok();
+            let proc = ntdll.and_then(|m| windows::Win32::System::LibraryLoader::GetProcAddress(m, s!("RtlGetVersion")));
+            if let Some(proc) = proc {
+                let get: RtlGetVersion = std::mem::transmute(proc);
+                get(&mut info);
+            }
+        }
+        info.dwBuildNumber
+    }) >= 22621
 }
 
 /// Whether the item has any of these attributes, such as [`HIDDEN`] or [`SYSTEM`].
@@ -183,7 +252,7 @@ pub fn describe_drives() -> Vec<Drive> {
 pub fn child_folders(path: &str) -> Vec<(String, u32)> {
     let folders = |skip: u32| {
         let mut names = Vec::new();
-        list_dir(path, skip, |name, is_dir, is_link, _| {
+        list_dir(path, skip, |name, is_dir, is_link, _, _| {
             if is_dir && !is_link {
                 names.push(name.to_string());
             }
@@ -411,7 +480,7 @@ pub fn recent_files(limit: usize) -> Vec<(String, String, u32)> {
     let Some(appdata) = std::env::var_os("APPDATA") else { return Vec::new() };
     let folder = std::path::PathBuf::from(appdata).join("Microsoft\\Windows\\Recent");
     let mut links: Vec<(String, u32)> = Vec::new();
-    list_dir(&folder.to_string_lossy(), HIDDEN_OR_SYSTEM, |name, is_dir, _, mtime| {
+    list_dir(&folder.to_string_lossy(), HIDDEN_OR_SYSTEM, |name, is_dir, _, mtime, _| {
         if !is_dir && name.to_ascii_lowercase().ends_with(".lnk") {
             links.push((name.to_string(), mtime));
         }
@@ -461,7 +530,7 @@ pub fn user_name() -> String {
         if found && size > 0 {
             return String::from_utf16_lossy(&buffer[..size as usize]);
         }
-        std::env::var("USERNAME").unwrap_or_else(|_| "You".into())
+        std::env::var("USERNAME").unwrap_or_else(|_| crate::i18n::tr("You").to_string())
     })
     .clone()
 }
@@ -532,17 +601,17 @@ pub fn shell_context_menu(source: &str) -> std::result::Result<(), String> {
     com_init();
     unsafe {
         let source_w = wide(source);
-        let item: IShellItem = SHCreateItemFromParsingName(PCWSTR(source_w.as_ptr()), None).map_err(|e| format!("finding it: {e}"))?;
-        let menu: IContextMenu = item.BindToHandler(None, &BHID_SFUIObject).map_err(|e| format!("asking for its menu: {e}"))?;
+        let item: IShellItem = SHCreateItemFromParsingName(PCWSTR(source_w.as_ptr()), None).map_err(|e| format!("finding it: {e}"))?; // i18n-ignore: not shown, only the reason the Windows menu failed
+        let menu: IContextMenu = item.BindToHandler(None, &BHID_SFUIObject).map_err(|e| format!("asking for its menu: {e}"))?; // i18n-ignore: not shown, only the reason the Windows menu failed
         let instance = GetModuleHandleW(None).map(|m| HINSTANCE(m.0)).unwrap_or_default();
         let class = w!("StartlineShellMenu");
         let info = WNDCLASSW { lpfnWndProc: Some(shell_menu_proc), hInstance: instance, lpszClassName: class, ..Default::default() };
         RegisterClassW(&info);
-        let window = CreateWindowExW(Default::default(), class, PCWSTR::null(), WS_POPUP, 0, 0, 0, 0, None, None, Some(instance), None).map_err(|e| format!("making its window: {e}"))?;
-        let popup = CreatePopupMenu().map_err(|e| format!("making the menu: {e}"))?;
+        let window = CreateWindowExW(Default::default(), class, PCWSTR::null(), WS_POPUP, 0, 0, 0, 0, None, None, Some(instance), None).map_err(|e| format!("making its window: {e}"))?; // i18n-ignore: not shown, only the reason the Windows menu failed
+        let popup = CreatePopupMenu().map_err(|e| format!("making the menu: {e}"))?; // i18n-ignore: not shown, only the reason the Windows menu failed
         let filled = menu.QueryContextMenu(popup, 0, 1, 0x7FFF, CMF_NORMAL);
         if filled.is_err() {
-            return Err(format!("filling the menu: {filled:?}"));
+            return Err(format!("filling the menu: {filled:?}")); // i18n-ignore: not shown, only the reason the Windows menu failed
         }
         SHELL_MENU.with(|slot| *slot.borrow_mut() = menu.cast().ok());
         let mut point = POINT::default();
@@ -614,7 +683,7 @@ pub fn pick_path(owner: isize, folder: bool) -> Option<String> {
 }
 
 pub fn message_box_error(text: &str) {
-    let (text_w, title) = (wide(text), wide("Startline"));
+    let (text_w, title) = (wide(text), wide("Startline")); // i18n-ignore: the app's name
     unsafe {
         MessageBoxW(None, PCWSTR(text_w.as_ptr()), PCWSTR(title.as_ptr()), MB_OK | MB_ICONERROR);
     }

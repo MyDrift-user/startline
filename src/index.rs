@@ -24,6 +24,8 @@ struct Entry {
     orig_off: u32,
     parent: u32,
     mtime: u32,
+    /// Bytes, for files.
+    size: u64,
     lower_len: u16,
     orig_len: u16,
     flags: u8,
@@ -45,6 +47,7 @@ pub struct Hit {
     pub name: String,
     pub is_dir: bool,
     pub mtime: u32,
+    pub size: u64,
     pub score: i32,
 }
 
@@ -54,6 +57,10 @@ impl Index {
     }
 
     fn push(&mut self, name: &str, parent: u32, depth: u8, mtime: u32, flags: u8) -> u32 {
+        self.push_sized(name, parent, depth, mtime, 0, flags)
+    }
+
+    fn push_sized(&mut self, name: &str, parent: u32, depth: u8, mtime: u32, size: u64, flags: u8) -> u32 {
         let name_bytes = &name.as_bytes()[..name.len().min(u16::MAX as usize - 1)];
         let lowered = matching::lower(name);
         let lower_bytes = &lowered.as_bytes()[..lowered.len().min(u16::MAX as usize - 1)];
@@ -62,6 +69,7 @@ impl Index {
             orig_off: self.orig.len() as u32,
             parent,
             mtime,
+            size,
             lower_len: lower_bytes.len() as u16,
             orig_len: name_bytes.len() as u16,
             flags,
@@ -155,8 +163,8 @@ impl Index {
     }
 
     fn append_children(&mut self, me: u32, depth: u8, listing: &Listing) {
-        for (name, mtime) in &listing.files {
-            self.push(name, me, depth, *mtime, 0);
+        for (name, mtime, size) in &listing.files {
+            self.push_sized(name, me, depth, *mtime, *size, 0);
         }
         for dir in &listing.dirs {
             self.append_listing(me, depth, dir);
@@ -172,9 +180,9 @@ impl Index {
     /// The best matches that pass the filter, and a count of every file type the words matched,
     /// filter or not, so the filter buttons can show what else there is.
     pub fn search_filtered(&self, query: &str, filter: &FileFilter, limit: usize, cancel: &dyn Fn() -> bool) -> Answer {
-        let parsed = Query::parse(query);
-        if self.entries.is_empty() || (parsed.needle.is_empty() && parsed.typed.is_empty()) {
-            return Answer::default();
+        let parsed = if filter.regex { Query::regex(query) } else { Query::parse(query) };
+        if self.entries.is_empty() || parsed.is_empty() {
+            return Answer { error: parsed.error, ..Default::default() };
         }
         let mut wanted = filter.clone();
         wanted.exts.extend(parsed.typed.iter().cloned());
@@ -195,11 +203,12 @@ impl Index {
                     name: self.orig_name(e).to_string(),
                     is_dir: e.flags & FLAG_DIR != 0,
                     mtime: e.mtime,
+                    size: e.size,
                     score,
                 }
             })
             .collect();
-        Answer { hits, facets }
+        Answer { hits, facets, error: parsed.error }
     }
 
     fn scan(&self, q: &Query, filter: &FileFilter, limit: usize, cancel: &dyn Fn() -> bool, mode: Mode) -> (Vec<(usize, i32)>, Facets) {
@@ -314,6 +323,9 @@ impl Index {
             return None;
         }
         let name = self.lower_name(e);
+        if !q.terms.is_empty() && !q.passes(name, e.flags & FLAG_DIR != 0, e.size, e.mtime) {
+            return None;
+        }
         let mut score = match mode {
             Mode::Fuzzy => matching::subsequence_score(name, q.needle.as_bytes())?,
             Mode::Direct => matching::score_token(name, q.needle.as_bytes())?,
@@ -399,7 +411,8 @@ impl Index {
     }
 }
 
-const CACHE_MAGIC: u64 = 0x5354_4c49_4e45_3031;
+// Raised whenever Entry changes, so an older saved index is read again rather than misread.
+const CACHE_MAGIC: u64 = 0x5354_4c49_4e45_3032;
 
 fn cache_path() -> PathBuf {
     crate::config::data_dir().join("index.bin")
@@ -427,9 +440,12 @@ pub struct FileFilter {
     /// With the dot, lowercase: ".pdf".
     pub exts: Vec<String>,
     pub folders: bool,
+    /// The whole search is one regular expression, from the switch in the search box.
+    pub regex: bool,
 }
 
 impl FileFilter {
+    /// Whether it narrows the results at all. Regex mode changes how words are read, not what kinds are kept.
     pub fn is_empty(&self) -> bool {
         self.exts.is_empty() && !self.folders
     }
@@ -458,6 +474,8 @@ pub struct Facets {
 pub struct Answer {
     pub hits: Vec<Hit>,
     pub facets: Facets,
+    /// Why a regular expression in the search couldn't be used.
+    pub error: Option<String>,
 }
 
 #[derive(Default)]
@@ -517,30 +535,351 @@ pub fn typed_extension(word: &str) -> Option<String> {
     looks_right.then(|| format!(".{}", rest.to_ascii_lowercase()))
 }
 
+/// What a file or folder has to be, besides its name holding the words.
+#[derive(Clone, Debug)]
+enum Term {
+    /// The name doesn't hold this.
+    Without(String),
+    /// "exact text": the name holds this, spaces and all.
+    Phrase(String),
+    /// Wildcards: `*` any letters, `?` one. Matched against the whole name.
+    Glob(Vec<u8>, bool),
+    Kind(Kind),
+    SizeMin(u64),
+    SizeMax(u64),
+    After(u32),
+    Before(u32),
+    Regex(regex::bytes::Regex, bool),
+    /// A regular expression that isn't valid: finds nothing, and the person is told why.
+    Never,
+}
+
+/// The kinds `kind:` knows, and the words for them.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Kind {
+    Folder,
+    Document,
+    Picture,
+    Video,
+    Music,
+    Archive,
+    Code,
+    App,
+}
+
+impl Kind {
+    fn from_word(word: &str) -> Option<Kind> {
+        Some(match word {
+            "folder" | "folders" | "dir" => Kind::Folder,
+            "doc" | "docs" | "document" | "documents" | "text" => Kind::Document,
+            "image" | "images" | "picture" | "pictures" | "photo" | "photos" => Kind::Picture,
+            "video" | "videos" | "movie" | "movies" => Kind::Video,
+            "audio" | "music" | "sound" | "song" | "songs" => Kind::Music,
+            "archive" | "archives" | "zip" => Kind::Archive,
+            "code" | "source" => Kind::Code,
+            "app" | "apps" | "program" | "programs" | "exe" => Kind::App,
+            _ => return None,
+        })
+    }
+
+    fn types(self) -> &'static [&'static str] {
+        match self {
+            Kind::Folder => &[],
+            Kind::Document => crate::search::FILE_KINDS[0].1,
+            Kind::Picture => crate::search::FILE_KINDS[1].1,
+            Kind::Video => crate::search::FILE_KINDS[2].1,
+            Kind::Music => crate::search::FILE_KINDS[3].1,
+            Kind::Archive => crate::search::FILE_KINDS[4].1,
+            Kind::Code => &[".rs", ".py", ".js", ".ts", ".tsx", ".jsx", ".c", ".h", ".cpp", ".hpp", ".cs", ".java", ".go", ".rb", ".php", ".ps1", ".sh", ".bat", ".cmd", ".json", ".toml", ".yaml", ".yml", ".xml", ".html", ".css", ".sql", ".kt", ".swift", ".lua"],
+            Kind::App => &[".exe", ".msi", ".lnk", ".appx", ".msix", ".url"],
+        }
+    }
+
+    fn holds(self, lower_name: &[u8], is_dir: bool) -> bool {
+        match self {
+            Kind::Folder => is_dir,
+            _ => !is_dir && self.types().iter().any(|t| lower_name.ends_with(t.as_bytes())),
+        }
+    }
+}
+
+/// A search, as typed.
+///
+/// `report final`: names holding both words, or the other words naming a folder it's in; `"exact text"`;
+/// `*.rs`, `img_??.png`: wildcards; `-draft`: without; `ext:pdf,docx` (or `.pdf`); `kind:picture` and
+/// folder, document, video, music, archive, code, app; `size:>10mb`, `size:<1k`, `size:1mb..1gb`;
+/// `modified:today`, yesterday, week, month, year, `>2026-01-01`, `<2026-01-01`, 2025, 2025-03 (`date:` the same);
+/// `re:^img_\d+` or `/^img_\d+/`: a regular expression, whatever the case.
+#[derive(Clone, Debug, Default)]
 struct Query {
     /// The longest word: the rarest, so it drives the scan.
     needle: String,
     others: Vec<String>,
     typed: Vec<String>,
+    terms: Vec<Term>,
+    /// Why a regular expression couldn't be used.
+    error: Option<String>,
+}
+
+/// Words, with "quoted text" kept together, quotes and all.
+fn split_words(query: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut word = String::new();
+    let mut quoted = false;
+    for c in query.chars() {
+        match c {
+            '"' => {
+                word.push(c);
+                quoted = !quoted;
+            }
+            c if c.is_whitespace() && !quoted => {
+                if !word.is_empty() {
+                    out.push(std::mem::take(&mut word));
+                }
+            }
+            c => word.push(c),
+        }
+    }
+    if !word.is_empty() {
+        out.push(word);
+    }
+    out
+}
+
+/// `re:pattern`, `regex:pattern` (quotes allowed) or `/pattern/`.
+fn regex_word(word: &str) -> Option<&str> {
+    let lower = word.to_ascii_lowercase();
+    for prefix in ["re:", "regex:"] {
+        if lower.starts_with(prefix) {
+            return Some(word[prefix.len()..].trim_matches('"')).filter(|s| !s.is_empty());
+        }
+    }
+    (word.len() >= 3 && word.starts_with('/') && word.ends_with('/')).then(|| &word[1..word.len() - 1])
+}
+
+/// Wildcards, but not a question mark ending a question: "what is my ip?" is words.
+fn is_wildcard(word: &str) -> bool {
+    word.contains('*') || word.trim_end_matches('?').contains('?')
+}
+
+/// Whether the words use any of the search language beyond plain words, which only files can answer.
+pub fn uses_file_syntax(query: &str) -> bool {
+    split_words(query).iter().any(|word| {
+        let lower = matching::lower(word.trim_start_matches('-'));
+        regex_word(word.trim_start_matches('-')).is_some()
+            || is_wildcard(&lower)
+            || lower.split_once(':').is_some_and(|(key, _)| matches!(key, "ext" | "type" | "kind" | "is" | "size" | "modified" | "date" | "mod"))
+    })
+}
+
+fn parse_size(text: &str) -> Option<u64> {
+    let text = text.trim();
+    let split = text.find(|c: char| !(c.is_ascii_digit() || c == '.' || c == ',')).unwrap_or(text.len());
+    let number: f64 = text[..split].replace(',', ".").parse().ok()?;
+    let unit = match text[split..].trim() {
+        "" | "b" => 1.0,
+        "k" | "kb" => 1024.0,
+        "m" | "mb" => 1024.0 * 1024.0,
+        "g" | "gb" => 1024.0f64.powi(3),
+        "t" | "tb" => 1024.0f64.powi(4),
+        _ => return None,
+    };
+    Some((number * unit) as u64)
+}
+
+/// A day typed as 2026-03-01, 2026-03 or 2026, or as 01.03.2026 and 01/03/2026: its first and last second.
+fn parse_day(text: &str) -> Option<(u32, u32)> {
+    let parts: Vec<&str> = text.split(['-', '.', '/']).collect();
+    let number = |s: &str| s.parse::<u32>().ok();
+    let (year, month, day, whole) = match parts.as_slice() {
+        [y] if y.len() == 4 => (number(y)?, 1, 1, "year"),
+        [y, m] if y.len() == 4 => (number(y)?, number(m)?, 1, "month"),
+        [y, m, d] if y.len() == 4 => (number(y)?, number(m)?, number(d)?, "day"),
+        [d, m, y] if y.len() == 4 => (number(y)?, number(m)?, number(d)?, "day"),
+        _ => return None,
+    };
+    let start = platform::local_midnight(year as i32, month, day)?;
+    let end = match whole {
+        "year" => platform::local_midnight(year as i32 + 1, 1, 1)?,
+        "month" if month == 12 => platform::local_midnight(year as i32 + 1, 1, 1)?,
+        "month" => platform::local_midnight(year as i32, month + 1, 1)?,
+        _ => start + 86_400,
+    };
+    Some((start.min(u32::MAX as u64) as u32, end.min(u32::MAX as u64) as u32))
+}
+
+fn parse_date(value: &str) -> Option<Vec<Term>> {
+    let now = platform::unix_now();
+    let today = platform::local_time(now as u64);
+    let midnight = platform::local_midnight(today.year, today.month, today.day)? as u32;
+    const DAY: u32 = 86_400;
+    Some(match value {
+        "today" => vec![Term::After(midnight)],
+        "yesterday" => vec![Term::After(midnight.saturating_sub(DAY)), Term::Before(midnight)],
+        "week" | "thisweek" => vec![Term::After(now.saturating_sub(7 * DAY))],
+        "month" | "thismonth" => vec![Term::After(now.saturating_sub(30 * DAY))],
+        "year" | "thisyear" => vec![Term::After(now.saturating_sub(365 * DAY))],
+        _ => {
+            if let Some(rest) = value.strip_prefix(">=").or_else(|| value.strip_prefix('>')) {
+                vec![Term::After(parse_day(rest)?.0)]
+            } else if let Some(rest) = value.strip_prefix("<=") {
+                vec![Term::Before(parse_day(rest)?.1)]
+            } else if let Some(rest) = value.strip_prefix('<') {
+                vec![Term::Before(parse_day(rest)?.0)]
+            } else if let Some((from, to)) = value.split_once("..") {
+                vec![Term::After(parse_day(from)?.0), Term::Before(parse_day(to)?.1)]
+            } else {
+                let (start, end) = parse_day(value)?;
+                vec![Term::After(start), Term::Before(end)]
+            }
+        }
+    })
+}
+
+/// `key:value` as terms, or `None` if it isn't one the search language knows.
+fn parse_filter(key: &str, value: &str, typed: &mut Vec<String>) -> Option<Vec<Term>> {
+    Some(match key {
+        "ext" | "type" => {
+            typed.extend(value.split([',', '|', ';']).map(|t| t.trim().trim_start_matches("*.").trim_start_matches('.')).filter(|t| !t.is_empty()).map(|t| format!(".{t}")));
+            Vec::new()
+        }
+        "kind" | "is" => vec![Term::Kind(Kind::from_word(value)?)],
+        "size" => {
+            if let Some((from, to)) = value.split_once("..") {
+                vec![Term::SizeMin(parse_size(from)?), Term::SizeMax(parse_size(to)?)]
+            } else if let Some(rest) = value.strip_prefix(">=").or_else(|| value.strip_prefix('>')) {
+                vec![Term::SizeMin(parse_size(rest)?)]
+            } else if let Some(rest) = value.strip_prefix("<=").or_else(|| value.strip_prefix('<')) {
+                vec![Term::SizeMax(parse_size(rest)?)]
+            } else {
+                vec![Term::SizeMin(parse_size(value)?)]
+            }
+        }
+        "modified" | "date" | "mod" => parse_date(value)?,
+        _ => return None,
+    })
+}
+
+/// A wildcard pattern, `*` and `?`, against the whole name.
+fn glob_match(pattern: &[u8], name: &[u8]) -> bool {
+    let (mut p, mut n) = (0, 0);
+    let mut star: Option<(usize, usize)> = None;
+    while n < name.len() {
+        if p < pattern.len() && (pattern[p] == b'?' || pattern[p] == name[n]) {
+            p += 1;
+            n += 1;
+        } else if p < pattern.len() && pattern[p] == b'*' {
+            star = Some((p, n));
+            p += 1;
+        } else if let Some((sp, sn)) = star {
+            p = sp + 1;
+            n = sn + 1;
+            star = Some((sp, sn + 1));
+        } else {
+            return false;
+        }
+    }
+    pattern[p..].iter().all(|&c| c == b'*')
+}
+
+/// The line of a regular expression's error that says what's wrong.
+fn short_error(error: &regex::Error) -> String {
+    let text = error.to_string();
+    text.lines().filter(|l| !l.trim().is_empty()).last().unwrap_or("").trim().trim_start_matches("error: ").to_string()
 }
 
 impl Query {
     fn parse(query: &str) -> Query {
-        let mut words = matching::tokens(query);
-        let mut typed = Vec::new();
-        words.retain(|word| match typed_extension(word) {
-            Some(ext) => {
-                typed.push(ext);
-                false
+        let mut out = Query::default();
+        let mut words = Vec::new();
+        for raw in split_words(query) {
+            let (without, word) = match raw.strip_prefix('-') {
+                Some(rest) if !rest.is_empty() => (true, rest.to_string()),
+                _ => (false, raw.clone()),
+            };
+            if let Some(pattern) = regex_word(&word) {
+                out.push_regex(pattern, without);
+                continue;
             }
-            None => true,
-        });
+            let lower = matching::lower(&word);
+            if !without {
+                if let Some(ext) = typed_extension(&lower) {
+                    out.typed.push(ext);
+                    continue;
+                }
+            }
+            if let Some((key, value)) = lower.split_once(':') {
+                if let Some(terms) = parse_filter(key, value, &mut out.typed) {
+                    out.terms.extend(terms);
+                    continue;
+                }
+            }
+            if lower.starts_with('"') {
+                let inner = lower.trim_matches('"').to_string();
+                if inner.is_empty() {
+                    continue;
+                }
+                out.terms.push(if without { Term::Without(inner) } else { Term::Phrase(inner) });
+            } else if is_wildcard(&lower) {
+                out.terms.push(Term::Glob(lower.into_bytes(), without));
+            } else if without {
+                out.terms.push(Term::Without(lower));
+            } else if !lower.is_empty() {
+                words.push(lower);
+            }
+        }
+        // A quoted phrase can drive the scan too when nothing else is typed.
+        if words.is_empty() {
+            if let Some(Term::Phrase(phrase)) = out.terms.iter().find(|t| matches!(t, Term::Phrase(_))) {
+                words.push(phrase.clone());
+            }
+        }
         let longest = words.iter().enumerate().max_by_key(|(_, w)| w.len()).map(|(i, _)| i);
-        let needle = match longest {
-            Some(i) => words.remove(i),
-            None => String::new(),
-        };
-        Query { needle, others: words, typed }
+        if let Some(i) = longest {
+            out.needle = words.remove(i);
+        }
+        out.others = words;
+        out
+    }
+
+    /// Regex mode: the whole search is one regular expression.
+    fn regex(query: &str) -> Query {
+        let mut out = Query::default();
+        let pattern = query.trim();
+        if !pattern.is_empty() {
+            out.push_regex(pattern, false);
+        }
+        out
+    }
+
+    fn push_regex(&mut self, pattern: &str, without: bool) {
+        match regex::bytes::RegexBuilder::new(pattern).case_insensitive(true).size_limit(1 << 22).build() {
+            Ok(r) => self.terms.push(Term::Regex(r, without)),
+            Err(e) => {
+                self.error = Some(short_error(&e));
+                self.terms.push(Term::Never);
+            }
+        }
+    }
+
+    fn is_empty(&self) -> bool {
+        self.needle.is_empty() && self.typed.is_empty() && self.terms.is_empty()
+    }
+
+    /// Everything but the words: what the name, kind, size and date must be.
+    fn passes(&self, lower_name: &[u8], is_dir: bool, size: u64, mtime: u32) -> bool {
+        self.terms.iter().all(|term| match term {
+            Term::Without(text) => memmem::find(lower_name, text.as_bytes()).is_none(),
+            Term::Phrase(text) => memmem::find(lower_name, text.as_bytes()).is_some(),
+            Term::Glob(pattern, without) => glob_match(pattern, lower_name) != *without,
+            Term::Kind(kind) => kind.holds(lower_name, is_dir),
+            Term::SizeMin(n) => !is_dir && size >= *n,
+            Term::SizeMax(n) => !is_dir && size <= *n,
+            Term::After(t) => mtime >= *t,
+            Term::Before(t) => mtime < *t,
+            Term::Regex(r, without) => r.is_match(lower_name) != *without,
+            Term::Never => false,
+        })
     }
 }
 
@@ -550,7 +889,7 @@ impl Query {
 pub struct Listing {
     name: String,
     mtime: u32,
-    files: Vec<(Box<str>, u32)>,
+    files: Vec<(Box<str>, u32, u64)>,
     dirs: Vec<Listing>,
 }
 
@@ -656,19 +995,19 @@ impl Rules {
 fn walk(path: &str, name: String, mtime: u32, rules: &Rules, counter: &AtomicUsize) -> Listing {
     let mut listing = Listing { name, mtime, ..Default::default() };
     let mut subdirs = Vec::new();
-    platform::list_dir(path, rules.skip_attrs, |entry_name, is_dir, is_link, entry_mtime| {
+    platform::list_dir(path, rules.skip_attrs, |entry_name, is_dir, is_link, entry_mtime, entry_size| {
         if is_dir {
             if rules.skips_folder(path, entry_name) {
                 return;
             }
             if is_link {
                 // Links can loop back up the tree: list them but never walk through them.
-                listing.files.push((entry_name.into(), entry_mtime));
+                listing.files.push((entry_name.into(), entry_mtime, entry_size));
             } else {
                 subdirs.push((entry_name.to_string(), entry_mtime));
             }
         } else if !rules.skips_file(path, entry_name) {
-            listing.files.push((entry_name.into(), entry_mtime));
+            listing.files.push((entry_name.into(), entry_mtime, entry_size));
         }
     });
     counter.fetch_add(listing.files.len() + subdirs.len(), Ordering::Relaxed);
@@ -713,18 +1052,18 @@ fn walk_all(params: &IndexParams, counter: &AtomicUsize, store: &mut dyn FnMut(&
         // Read the top level first, then finish one top-level folder at a time.
         let mut top = Listing::default();
         let mut subdirs = Vec::new();
-        platform::list_dir(root, params.skip_attrs, |name, is_dir, is_link, mtime| {
+        platform::list_dir(root, params.skip_attrs, |name, is_dir, is_link, mtime, size| {
             if is_dir {
                 if rules.skips_folder(root, name) {
                     return;
                 }
                 if is_link {
-                    top.files.push((name.into(), mtime));
+                    top.files.push((name.into(), mtime, size));
                 } else {
                     subdirs.push((name.to_string(), mtime));
                 }
             } else if !rules.skips_file(root, name) {
-                top.files.push((name.into(), mtime));
+                top.files.push((name.into(), mtime, size));
             }
         });
         counter.fetch_add(top.files.len(), Ordering::Relaxed);
@@ -758,6 +1097,7 @@ impl Index {
                 if let Some(idx) = self.find_path(path) {
                     if let Some((_, mtime)) = platform::stat(path) {
                         self.entries[idx].mtime = mtime;
+                        self.entries[idx].size = platform::file_size(path).unwrap_or(0);
                     }
                 }
             }
@@ -777,7 +1117,7 @@ impl Index {
                     let listing = walk(path, name.to_string(), mtime, rules, &counter);
                     self.append_listing(parent as u32, depth, &listing);
                 } else {
-                    self.push(name, parent as u32, depth, mtime, 0);
+                    self.push_sized(name, parent as u32, depth, mtime, platform::file_size(path).unwrap_or(0), 0);
                 }
             }
         }
@@ -1072,7 +1412,7 @@ mod tests {
     }
 
     fn filtered(index: &Index, query: &str, exts: &[&str], folders: bool) -> Answer {
-        let filter = FileFilter { exts: exts.iter().map(|e| e.to_string()).collect(), folders };
+        let filter = FileFilter { exts: exts.iter().map(|e| e.to_string()).collect(), folders, ..Default::default() };
         index.search_filtered(query, &filter, 10, &|| false)
     }
 
@@ -1168,5 +1508,79 @@ mod tests {
         let excluded = vec!["target".to_string()];
         assert!(path_is_excluded("C:\\code\\target\\debug", &excluded));
         assert!(!path_is_excluded("C:\\code\\targets\\debug", &excluded));
+    }
+}
+
+#[cfg(test)]
+mod query_tests {
+    use super::*;
+
+    /// A few files with sizes and dates, all in one folder.
+    fn files() -> Index {
+        let mut index = Index::default();
+        let root = index.push(r"C:\work", NO_PARENT, 0, 0, FLAG_DIR | FLAG_ROOT);
+        let day = |y, m, d| platform::local_midnight(y, m, d).unwrap() as u32 + 3600;
+        index.push_sized("Report final.docx", root, 1, day(2025, 3, 14), 40_000, 0);
+        index.push_sized("report draft.docx", root, 1, day(2026, 1, 2), 9_000, 0);
+        index.push_sized("img_01.png", root, 1, day(2026, 1, 2), 2_500_000, 0);
+        index.push_sized("img_123.png", root, 1, day(2024, 6, 1), 300, 0);
+        index.push_sized("movie.mkv", root, 1, day(2026, 1, 3), 3 << 30, 0);
+        index.push_sized("Photos", root, 1, day(2026, 1, 3), 0, FLAG_DIR);
+        index
+    }
+
+    fn names(query: &str) -> Vec<String> {
+        let mut found: Vec<String> = files().search_filtered(query, &FileFilter::default(), 50, &|| false).hits.into_iter().map(|h| h.name).collect();
+        found.sort();
+        found
+    }
+
+    #[test]
+    fn words_quotes_wildcards_and_without() {
+        assert_eq!(names("report"), ["Report final.docx", "report draft.docx"]);
+        assert_eq!(names("report -draft"), ["Report final.docx"]);
+        assert_eq!(names("\"report final\""), ["Report final.docx"]);
+        assert_eq!(names("\"final report\""), Vec::<String>::new(), "a phrase keeps its order");
+        assert_eq!(names("img_??.png"), ["img_01.png"]);
+        assert_eq!(names("*.png"), ["img_01.png", "img_123.png"], "a plain *.type is a file type");
+        assert_eq!(names("img*"), ["img_01.png", "img_123.png"]);
+        assert_eq!(names("-*.png report"), ["Report final.docx", "report draft.docx"]);
+    }
+
+    #[test]
+    fn types_kinds_sizes_and_dates() {
+        assert_eq!(names("ext:png,mkv"), ["img_01.png", "img_123.png", "movie.mkv"]);
+        assert_eq!(names("kind:picture"), ["img_01.png", "img_123.png"]);
+        assert_eq!(names("kind:folder"), ["Photos"]);
+        assert_eq!(names("size:>1mb"), ["img_01.png", "movie.mkv"]);
+        assert_eq!(names("size:<1k"), ["img_123.png"]);
+        assert_eq!(names("size:1k..100k"), ["Report final.docx", "report draft.docx"]);
+        assert_eq!(names("modified:2025"), ["Report final.docx"]);
+        assert_eq!(names("date:2026-01-02"), ["img_01.png", "report draft.docx"]);
+        assert_eq!(names("date:02.01.2026"), ["img_01.png", "report draft.docx"], "as German writes it");
+        assert_eq!(names("modified:<2025-01-01"), ["img_123.png"]);
+        assert_eq!(names("modified:>2026-01-01 kind:video"), ["movie.mkv"]);
+    }
+
+    #[test]
+    fn regular_expressions() {
+        assert_eq!(names(r"re:^img_\d{2}\."), ["img_01.png"]);
+        assert_eq!(names(r"/^IMG_\d+/"), ["img_01.png", "img_123.png"], "whatever the case");
+        assert_eq!(names(r"-re:draft report"), ["Report final.docx"]);
+        let answer = files().search_filtered("re:([unclosed", &FileFilter::default(), 50, &|| false);
+        assert!(answer.hits.is_empty() && answer.error.is_some(), "an invalid pattern finds nothing and says why");
+        let whole = FileFilter { regex: true, ..Default::default() };
+        let found = files().search_filtered(r"^report (final|draft)\.docx$", &whole, 50, &|| false).hits;
+        assert_eq!(found.len(), 2, "in regex mode the whole search is one pattern, spaces and all");
+    }
+
+    #[test]
+    fn only_file_syntax_counts_as_file_syntax() {
+        for query in ["ext:pdf", "kind:image", "size:>1mb", "modified:today", "re:x", "/x/", "*.tmp", "img_??.png", "-*.log"] {
+            assert!(uses_file_syntax(query), "{query}");
+        }
+        for query in ["dark mode", "volume 40", r"c:\users", "notes: plan", "what is my ip?"] {
+            assert!(!uses_file_syntax(query), "{query}");
+        }
     }
 }

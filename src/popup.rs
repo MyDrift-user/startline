@@ -4,6 +4,7 @@
 
 use crate::actions::Do;
 use crate::config::{Config, Target};
+use crate::i18n::tr;
 use crate::ui::{Intent, Menu, Page};
 use crate::widgets::*;
 use egui::*;
@@ -44,50 +45,50 @@ pub fn target_entries(cfg: &Config, name: &str, target: &Target, path: Option<&s
     let is_app = matches!(target, Target::App(_));
     let is_folder = matches!(target, Target::Path { path, .. } if !is_web && crate::platform::stat(path).is_some_and(|s| s.0));
     let pinned = cfg.is_pinned(target);
-    let pin_label = if pinned { "Unpin from Start" } else { "Pin to Start" };
+    let pin_label = if pinned { tr("Unpin from Start") } else { tr("Pin to Start") };
     let pin_glyph = if pinned { '\u{E77A}' } else { '\u{E718}' };
     let toggle = Intent::TogglePin { name: name.to_string(), target: target.clone() };
 
-    let mut entries = vec![item('\u{E8E5}', "Open", open(false))];
+    let mut entries = vec![item('\u{E8E5}', tr("Open"), open(false))];
     if is_web {
         if let Target::Path { path, .. } = target {
             entries.push(Entry::Line);
-            entries.push(item('\u{E8C8}', "Copy address", Intent::Copy(path.clone())));
+            entries.push(item('\u{E8C8}', tr("Copy address"), Intent::Copy(path.clone())));
         }
         entries.push(item(pin_glyph, pin_label, toggle));
     } else {
         if !is_folder {
-            entries.push(item('\u{E7EF}', "Run as administrator", open(true)));
+            entries.push(item('\u{E7EF}', tr("Run as administrator"), open(true)));
         }
         let file = path.map(str::to_string).filter(|_| !is_folder || !is_app);
         if let (Some(file), false) = (&file, is_app || is_folder) {
-            entries.push(item('\u{E7AC}', "Open with...", Intent::OpenWith(file.clone())));
+            entries.push(item('\u{E7AC}', tr("Open with..."), Intent::OpenWith(file.clone())));
         }
         entries.push(Entry::Line);
         if let Some(file) = &file {
-            entries.push(item('\u{E838}', "Open file location", Intent::Folder(file.clone())));
-            entries.push(item('\u{E8C8}', "Copy path", Intent::Copy(file.clone())));
+            entries.push(item('\u{E838}', tr("Open file location"), Intent::Folder(file.clone())));
+            entries.push(item('\u{E8C8}', tr("Copy path"), Intent::Copy(file.clone())));
         }
-        entries.push(item('\u{E8AC}', "Copy name", Intent::Copy(name.to_string())));
+        entries.push(item('\u{E8AC}', tr("Copy name"), Intent::Copy(name.to_string())));
         entries.push(Entry::Line);
         entries.push(item(pin_glyph, pin_label, toggle));
         if is_app {
-            entries.push(item('\u{E74D}', "Uninstall", Intent::Run(Do::Open("ms-settings:appsfeatures"))));
+            entries.push(item('\u{E74D}', tr("Uninstall"), Intent::Run(Do::Open("ms-settings:appsfeatures"))));
         } else if let Some(file) = &file {
-            entries.push(item('\u{E74D}', "Move to Recycle Bin", Intent::Recycle(file.clone())));
+            entries.push(item('\u{E74D}', tr("Move to Recycle Bin"), Intent::Recycle(file.clone())));
         }
         if let Some(file) = &file {
-            entries.push(item('\u{E946}', "Properties", Intent::Properties(file.clone())));
+            entries.push(item('\u{E946}', tr("Properties"), Intent::Properties(file.clone())));
         }
         let source = match target {
             Target::App(id) => format!("shell:AppsFolder\\{id}"),
             Target::Path { path, .. } => path.clone(),
         };
         entries.push(Entry::Line);
-        entries.push(item('\u{E712}', "More options", Intent::ShellMenu(source)));
+        entries.push(item('\u{E712}', tr("More options"), Intent::ShellMenu(source)));
     }
     if on_start_menu && pinned {
-        entries.push(item('\u{E70F}', "Edit pinned apps...", Intent::Show(Page::Customize(crate::customize::Tab::Pins))));
+        entries.push(item('\u{E70F}', tr("Edit pinned apps..."), Intent::Show(Page::Customize(crate::customize::Tab::Pins))));
     }
     entries
 }
@@ -95,17 +96,17 @@ pub fn target_entries(cfg: &Config, name: &str, target: &Target, path: Option<&s
 /// The account menu behind your picture and name.
 pub fn user_entries() -> Vec<Entry> {
     vec![
-        item('\u{E77B}', "Account settings", Intent::Run(Do::Open("ms-settings:yourinfo"))),
-        item('\u{E8D7}', "Sign-in options", Intent::Run(Do::Open("ms-settings:signinoptions"))),
+        item('\u{E77B}', tr("Account settings"), Intent::Run(Do::Open("ms-settings:yourinfo"))),
+        item('\u{E8D7}', tr("Sign-in options"), Intent::Run(Do::Open("ms-settings:signinoptions"))),
         Entry::Line,
-        item('\u{E748}', "Switch user", Intent::Run(Do::SwitchUser)),
-        item('\u{E72E}', "Lock", Intent::Run(Do::Lock)),
-        item('\u{F3B1}', "Sign out", Intent::Run(Do::SignOut)),
+        item('\u{E748}', tr("Switch user"), Intent::Run(Do::SwitchUser)),
+        item('\u{E72E}', tr("Lock"), Intent::Run(Do::Lock)),
+        item('\u{F3B1}', tr("Sign out"), Intent::Run(Do::SignOut)),
     ]
 }
 
 pub fn setting_entries(page: &'static str) -> Vec<Entry> {
-    vec![item('\u{E713}', "Open its Windows settings page", Intent::Run(Do::Open(page)))]
+    vec![item('\u{E713}', tr("Open its Windows settings page"), Intent::Run(Do::Open(page)))]
 }
 
 /// Leaves out what a policy removed, along with any divider that no longer divides anything.
@@ -223,7 +224,7 @@ impl Menu {
                         let armed = matches!(intent, Intent::Run(what) if what.needs_confirm() && self.confirm.is_some_and(|(d, at)| d == *what && at.elapsed() < Duration::from_secs(5)));
                         let color = if armed { pal.accent } else { pal.text };
                         ui.painter().text(pos2(row.left() + 16.0, row.center().y), Align2::CENTER_CENTER, *glyph, icon_font(14.0), color);
-                        let text = if armed { format!("Click again to {}", label.to_lowercase()) } else { label.clone() };
+                        let text = if armed { crate::trf!("Click again to confirm: {action}", action = label) } else { label.clone() };
                         ui.painter().text(pos2(row.left() + 36.0, row.center().y - ink_nudge(13.0)), Align2::LEFT_CENTER, text, FontId::proportional(13.0), color);
                         if response.clicked() {
                             chosen = Some(intent.clone());

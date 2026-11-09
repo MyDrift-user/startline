@@ -1,6 +1,7 @@
 //! The Pinned apps page: your real icons to drag around, and three easy ways to add more.
 
 use crate::config::{Pin, PinGroup, Target};
+use crate::i18n::tr;
 use crate::popup::Entry;
 use crate::search::Icon;
 use crate::ui::{Intent, Menu, Picked};
@@ -65,13 +66,13 @@ enum Act {
 }
 
 pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
-    crate::customize::page_header(ui, "Pinned apps", "Drag to rearrange, click one to edit it, right-click for more.", pal);
+    crate::customize::page_header(ui, tr("Pinned apps"), tr("Drag to rearrange, click one to edit it, right-click for more."), pal);
     let policy = menu.policy.clone();
     policy.lock(ui, &["PinnedApps"], |ui| two_columns(menu, ui, |menu, ui| pin_grid(menu, ui, pal), |menu, ui| add_panel(menu, ui, pal)));
 }
 
 fn pin_grid(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
-    crate::customize::heading(ui, "On your Start menu", pal);
+    crate::customize::heading(ui, tr("On your Start menu"), pal);
     if !ui.input(|i| i.pointer.any_down()) {
         menu.pin_ui.dragging = None;
     }
@@ -89,7 +90,7 @@ fn pin_grid(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         if count == 0 {
             let (rect, _) = ui.allocate_exact_size(vec2(ui.available_width(), 56.0), Sense::hover());
             ui.painter().rect_stroke(rect, pal.radius + 2, Stroke::new(1.0, pal.line), StrokeKind::Inside);
-            ui.painter().text(rect.center() - vec2(0.0, ink_nudge(12.5)), Align2::CENTER_CENTER, "Drag apps here", FontId::proportional(12.5), pal.sub);
+            ui.painter().text(rect.center() - vec2(0.0, ink_nudge(12.5)), Align2::CENTER_CENTER, tr("Drag apps here"), FontId::proportional(12.5), pal.sub);
             if let (Some(from), Some(point)) = (menu.pin_ui.dragging, pointer) {
                 if rect.contains(point) {
                     act = Some(Act::MoveToGroup { from, group: g });
@@ -150,8 +151,8 @@ fn pin_grid(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
     }
 
     ui.add_space(4.0);
-    if pill_button(ui, "New section", pal, false).on_hover_text("Sections group your pins under a heading.").clicked() {
-        let name = format!("Section {}", menu.cfg.groups.len() + 1);
+    if pill_button(ui, tr("New section"), pal, false).on_hover_text(tr("Sections group your pins under a heading.")).clicked() {
+        let name = crate::trf!("Section {n}", n = menu.cfg.groups.len() + 1);
         menu.cfg.groups.push(PinGroup { name, pins: Vec::new() });
     }
 }
@@ -160,7 +161,7 @@ fn group_heading(menu: &mut Menu, ui: &mut Ui, g: usize, group_count: usize, pal
     let response = ui
         .horizontal(|ui| {
             let edit = TextEdit::singleline(&mut menu.cfg.groups[g].name).frame(Frame::NONE).font(semibold(14.0)).text_color(pal.text).desired_width(220.0);
-            ui.add(edit).on_hover_text("Click to rename. Right-click for more.")
+            ui.add(edit).on_hover_text(tr("Click to rename. Right-click for more."))
         })
         .inner;
     if response.secondary_clicked() {
@@ -168,12 +169,12 @@ fn group_heading(menu: &mut Menu, ui: &mut Ui, g: usize, group_count: usize, pal
         let item = |glyph, label: &str, intent| Entry::Item { glyph, label: label.to_string(), intent };
         let mut entries = Vec::new();
         if g > 0 {
-            entries.push(item('\u{E74A}', "Move section up", Intent::MoveSection(g, -1)));
+            entries.push(item('\u{E74A}', tr("Move section up"), Intent::MoveSection(g, -1)));
         }
         if g + 1 < group_count {
-            entries.push(item('\u{E74B}', "Move section down", Intent::MoveSection(g, 1)));
+            entries.push(item('\u{E74B}', tr("Move section down"), Intent::MoveSection(g, 1)));
         }
-        entries.push(item('\u{E74D}', "Remove section, keep its pins", Intent::RemoveSection(g)));
+        entries.push(item('\u{E74D}', tr("Remove section, keep its pins"), Intent::RemoveSection(g)));
         menu.open_popup(at, entries);
     }
 }
@@ -211,7 +212,7 @@ fn pin_tile(menu: &mut Menu, ui: &mut Ui, size: Vec2, pin: &Pin, slot: (usize, u
     let mut remove_clicked = false;
     if response.hovered() || selected {
         let corner = Rect::from_center_size(body.right_top() + vec2(-10.0, 10.0), Vec2::splat(18.0));
-        let remove = ui.interact(corner, id.with("unpin"), Sense::click()).on_hover_text("Unpin");
+        let remove = ui.interact(corner, id.with("unpin"), Sense::click()).on_hover_text(tr("Unpin"));
         ui.painter().circle_filled(corner.center(), 9.0, if remove.hovered() { pal.accent } else { pal.surface });
         ui.painter().text(corner.center(), Align2::CENTER_CENTER, '\u{E711}', icon_font(9.0), if remove.hovered() { pal.on_accent } else { pal.text });
         if remove.clicked() {
@@ -238,7 +239,7 @@ fn add_tile(ui: &mut Ui, size: Vec2, act: &mut Option<Act>, pal: Pal) {
     }
     ui.painter().rect_stroke(body, pal.radius + 2, Stroke::new(1.0, pal.line), StrokeKind::Inside);
     ui.painter().text(pos2(rect.center().x, rect.top() + 32.0), Align2::CENTER_CENTER, '\u{E710}', icon_font(20.0), color);
-    ui.painter().text(pos2(rect.center().x, rect.top() + 64.0), Align2::CENTER_CENTER, "Add", FontId::proportional(12.0), color);
+    ui.painter().text(pos2(rect.center().x, rect.top() + 64.0), Align2::CENTER_CENTER, tr("Add"), FontId::proportional(12.0), color);
     if response.clicked() {
         *act = Some(Act::ShowAdd);
     }
@@ -249,23 +250,23 @@ fn pin_details(menu: &mut Menu, ui: &mut Ui, g: usize, p: usize, pal: Pal) {
         ui.set_width(ui.available_width());
         let pin = &mut menu.cfg.groups[g].pins[p];
         ui.horizontal(|ui| {
-            ui.label(RichText::new("Name").size(13.0).color(pal.sub));
+            ui.label(RichText::new(tr("Name")).size(13.0).color(pal.sub));
             ui.add(TextEdit::singleline(&mut pin.name).desired_width(280.0));
         });
         match &mut pin.target {
             Target::App(_) => {
-                ui.label(RichText::new("An installed app").size(12.5).color(pal.sub));
+                ui.label(RichText::new(tr("An installed app")).size(12.5).color(pal.sub));
             }
             Target::Path { path, args } => {
                 ui.horizontal(|ui| {
-                    ui.label(RichText::new("Opens").size(13.0).color(pal.sub));
+                    ui.label(RichText::new(tr("Opens")).size(13.0).color(pal.sub));
                     ui.add(TextEdit::singleline(path).desired_width(ui.available_width()));
                 });
                 let is_web = path.contains("://");
                 if !is_web {
                     ui.horizontal(|ui| {
-                        ui.label(RichText::new("Options").size(13.0).color(pal.sub));
-                        ui.add(TextEdit::singleline(args).desired_width(280.0).hint_text("Only if a program needs them"));
+                        ui.label(RichText::new(tr("Options")).size(13.0).color(pal.sub));
+                        ui.add(TextEdit::singleline(args).desired_width(280.0).hint_text(tr("Only if a program needs them")));
                     });
                 }
             }
@@ -275,13 +276,13 @@ fn pin_details(menu: &mut Menu, ui: &mut Ui, g: usize, p: usize, pal: Pal) {
 }
 
 fn add_panel(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
-    crate::customize::heading(ui, "Add to Start", pal);
+    crate::customize::heading(ui, tr("Add to Start"), pal);
     let panel = Frame::new().fill(pal.surface).stroke(Stroke::new(1.0, pal.line)).corner_radius(pal.radius + 2).inner_margin(12).show(ui, |ui| {
         ui.set_width(ui.available_width());
         let options = [AddFrom::Apps, AddFrom::Files, AddFrom::Website];
         let now = options.iter().position(|o| *o == menu.pin_ui.add_from).unwrap_or(0);
         let width = ui.available_width().min(360.0);
-        if let Some(i) = segmented(ui, "pin-add-from", &["App", "File or folder", "Website"], now, width, pal) {
+        if let Some(i) = segmented(ui, "pin-add-from", &[tr("App"), tr("File or folder"), tr("Website")], now, width, pal) {
             menu.pin_ui.add_from = options[i];
         }
         ui.add_space(8.0);
@@ -297,13 +298,13 @@ fn add_panel(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
 }
 
 fn add_app(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
-    ui.add(TextEdit::singleline(&mut menu.pin_ui.app_filter).hint_text("Find an app").desired_width(f32::INFINITY));
+    ui.add(TextEdit::singleline(&mut menu.pin_ui.app_filter).hint_text(tr("Find an app")).desired_width(f32::INFINITY));
     ui.add_space(4.0);
     let wanted = crate::matching::lower(menu.pin_ui.app_filter.trim());
     let apps = menu.apps.read().unwrap().clone();
     let matching: Vec<_> = apps.iter().filter(|a| wanted.is_empty() || a.lower.contains(&wanted)).take(300).collect();
     if matching.is_empty() {
-        ui.label(RichText::new("No app by that name. Try \"A file or folder\" above.").size(12.5).color(pal.sub));
+        ui.label(RichText::new(crate::trf!("No app by that name. Try \"{tab}\" above.", tab = tr("File or folder"))).size(12.5).color(pal.sub));
         return;
     }
     ScrollArea::vertical().id_salt("pin-apps").min_scrolled_height(400.0).max_height(400.0).auto_shrink([false, true]).show(ui, |ui| {
@@ -322,12 +323,12 @@ fn add_app(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
             menu.draw_icon(ui, icon, &Icon::for_target_cached(&target), &app.name, pal);
             let name = line_galley(ui, &app.name, FontId::proportional(13.5), pal.text, rect.width() - 150.0);
             ui.painter().galley(pos2(rect.left() + 42.0, rect.center().y - name.size().y / 2.0 - ink_nudge(13.5)), name, pal.text);
-            let (label, color) = if pinned { ("Pinned", pal.sub) } else { ("Pin", pal.accent) };
+            let (label, color) = if pinned { (tr("Pinned"), pal.sub) } else { (tr("Pin"), pal.accent) };
             if pinned {
                 ui.painter().text(pos2(rect.right() - 66.0, rect.center().y), Align2::RIGHT_CENTER, '\u{E73E}', icon_font(12.0), pal.sub);
             }
             ui.painter().text(pos2(rect.right() - 12.0, rect.center().y - ink_nudge(13.0)), Align2::RIGHT_CENTER, label, semibold(13.0), color);
-            if response.on_hover_text(if pinned { "Click to unpin" } else { "Click to pin" }).clicked() {
+            if response.on_hover_text(if pinned { tr("Click to unpin") } else { tr("Click to pin") }).clicked() {
                 menu.cfg.toggle_pin(&app.name, &target);
             }
         }
@@ -336,21 +337,21 @@ fn add_app(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
 
 fn add_file(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
     ui.horizontal(|ui| {
-        if pill_button(ui, "Choose a file...", pal, true).clicked() {
+        if pill_button(ui, tr("Choose a file..."), pal, true).clicked() {
             menu.ask_for_path(ui.ctx(), false, Picked::Pin);
         }
-        if pill_button(ui, "Choose a folder...", pal, true).clicked() {
+        if pill_button(ui, tr("Choose a folder..."), pal, true).clicked() {
             menu.ask_for_path(ui.ctx(), true, Picked::Pin);
         }
     });
     ui.add_space(6.0);
-    ui.label(RichText::new("Or paste where it is, like a program, a folder or a network location:").size(12.5).color(pal.sub));
+    ui.label(RichText::new(tr("Or paste where it is, like a program, a folder or a network location:")).size(12.5).color(pal.sub));
     let mut add = false;
     ui.horizontal(|ui| {
         let width = ui.available_width() - 70.0;
         let field = ui.add(TextEdit::singleline(&mut menu.pin_ui.file_path).desired_width(width).hint_text("C:\\Tools\\app.exe"));
         add = field.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
-        add |= pill_button(ui, "Add", pal, false).clicked();
+        add |= pill_button(ui, tr("Add"), pal, false).clicked();
     });
     let path = menu.pin_ui.file_path.trim().to_string();
     if add && !path.is_empty() {
@@ -368,7 +369,7 @@ fn add_website(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         let width = ui.available_width() - 70.0;
         let field = ui.add(TextEdit::singleline(&mut menu.pin_ui.website).desired_width(width).hint_text("example.com"));
         add = field.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
-        add |= pill_button(ui, "Add", pal, false).clicked();
+        add |= pill_button(ui, tr("Add"), pal, false).clicked();
     });
     if add {
         if let Some(pin) = website_pin(&menu.pin_ui.website) {

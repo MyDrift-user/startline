@@ -1,6 +1,7 @@
 //! Everything the person can customize. Saved as JSON so it survives updates and
 //! can be backed up or shared; unknown or missing fields fall back to defaults.
 
+use crate::i18n::{tr, tx};
 use crate::styles::Experience;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -12,7 +13,7 @@ pub fn data_dir() -> PathBuf {
     let base = std::env::var_os("LOCALAPPDATA")
         .map(PathBuf::from)
         .unwrap_or_else(std::env::temp_dir);
-    let dir = base.join("Startline");
+    let dir = base.join("Startline"); // i18n-ignore: folder name on disk
     let _ = std::fs::create_dir_all(&dir);
     dir
 }
@@ -28,14 +29,14 @@ pub struct Theme {
 
 pub const PRESETS: &[(&str, Theme)] = &[
     // Neutral grays with one warm accent, used sparingly: nothing here should look tinted.
-    ("Stone", Theme { bg: [27, 27, 26], surface: [39, 39, 37], text: [236, 234, 229], subtext: [148, 146, 140], accent: [217, 164, 107] }),
-    ("Graphite", Theme { bg: [20, 21, 23], surface: [33, 34, 37], text: [232, 233, 235], subtext: [142, 145, 150], accent: [120, 170, 160] }),
-    ("Moss", Theme { bg: [24, 27, 23], surface: [36, 40, 34], text: [230, 233, 224], subtext: [145, 150, 136], accent: [158, 184, 120] }),
-    ("Harbor", Theme { bg: [21, 26, 30], surface: [32, 39, 45], text: [229, 234, 237], subtext: [140, 151, 159], accent: [122, 170, 196] }),
-    ("Clay", Theme { bg: [30, 25, 23], surface: [44, 37, 34], text: [238, 231, 225], subtext: [160, 147, 138], accent: [212, 128, 96] }),
-    ("Black", Theme { bg: [0, 0, 0], surface: [24, 24, 24], text: [245, 245, 245], subtext: [140, 140, 140], accent: [245, 245, 245] }),
-    ("Daylight", Theme { bg: [244, 244, 241], surface: [255, 255, 253], text: [30, 30, 28], subtext: [108, 107, 102], accent: [168, 104, 48] }),
-    ("Paper", Theme { bg: [240, 234, 222], surface: [250, 245, 235], text: [48, 40, 30], subtext: [122, 110, 94], accent: [140, 84, 40] }),
+    (tx("Stone"), Theme { bg: [27, 27, 26], surface: [39, 39, 37], text: [236, 234, 229], subtext: [148, 146, 140], accent: [217, 164, 107] }),
+    (tx("Graphite"), Theme { bg: [20, 21, 23], surface: [33, 34, 37], text: [232, 233, 235], subtext: [142, 145, 150], accent: [120, 170, 160] }),
+    (tx("Moss"), Theme { bg: [24, 27, 23], surface: [36, 40, 34], text: [230, 233, 224], subtext: [145, 150, 136], accent: [158, 184, 120] }),
+    (tx("Harbor"), Theme { bg: [21, 26, 30], surface: [32, 39, 45], text: [229, 234, 237], subtext: [140, 151, 159], accent: [122, 170, 196] }),
+    (tx("Clay"), Theme { bg: [30, 25, 23], surface: [44, 37, 34], text: [238, 231, 225], subtext: [160, 147, 138], accent: [212, 128, 96] }),
+    (tx("Black"), Theme { bg: [0, 0, 0], surface: [24, 24, 24], text: [245, 245, 245], subtext: [140, 140, 140], accent: [245, 245, 245] }),
+    (tx("Daylight"), Theme { bg: [244, 244, 241], surface: [255, 255, 253], text: [30, 30, 28], subtext: [108, 107, 102], accent: [168, 104, 48] }),
+    (tx("Paper"), Theme { bg: [240, 234, 222], surface: [250, 245, 235], text: [48, 40, 30], subtext: [122, 110, 94], accent: [140, 84, 40] }),
 ];
 
 /// How the window's corners are shaped in the Startline look.
@@ -59,10 +60,10 @@ pub enum SectionKind { Pinned, Recent, Frequent, AllApps }
 impl SectionKind {
     pub fn label(self) -> &'static str {
         match self {
-            SectionKind::Pinned => "Pinned",
-            SectionKind::Recent => "Recent files",
-            SectionKind::Frequent => "Most used",
-            SectionKind::AllApps => "All apps",
+            SectionKind::Pinned => tr("Pinned"),
+            SectionKind::Recent => tr("Recent files"),
+            SectionKind::Frequent => tr("Most used"),
+            SectionKind::AllApps => tr("All apps"),
         }
     }
 }
@@ -126,10 +127,10 @@ impl Category {
 
     pub fn label(self) -> &'static str {
         match self {
-            Category::Apps => "Apps",
-            Category::Settings => "Settings",
-            Category::Files => "Files and folders",
-            Category::Web => "Web",
+            Category::Apps => tr("Apps"),
+            Category::Settings => tr("Settings"),
+            Category::Files => tr("Files and folders"),
+            Category::Web => tr("Web"),
         }
     }
 }
@@ -150,6 +151,11 @@ pub struct Config {
     #[serde(default)]
     pub version: u32,
     pub experience: Experience,
+    /// "system", "en", "de" or "it": see i18n::CHOICES.
+    pub language: String,
+    /// Windows 11 22H2 and later: Mica behind the menu, and a lighter Mica through the search box and the selected item.
+    pub mica: bool,
+    pub mica_light: bool,
 
     // The Startline look. The Windows looks are fixed and don't use these.
     pub preset: String,
@@ -198,8 +204,20 @@ pub struct Config {
     /// The kinds of results, in the order they're shown, each on or off.
     pub results: Vec<ResultKind>,
     pub max_files: usize,
+    pub max_apps: usize,
+    pub max_settings: usize,
     pub show_paths: bool,
     pub show_timing: bool,
+    /// The whole search is one regular expression.
+    pub regex_search: bool,
+    // Parts of the search box and results that can be hidden.
+    pub show_regex_switch: bool,
+    pub show_search_help: bool,
+    pub show_file_buttons: bool,
+    pub show_search_hints: bool,
+    /// Windows settings search can change, and its shortcuts to settings pages and tools.
+    pub search_windows_settings: bool,
+    pub search_settings_pages: bool,
     pub web_name: String,
     pub web_url: String,
 
@@ -213,6 +231,8 @@ pub struct Config {
     pub auto_update: bool,
 
     pub usage: HashMap<String, Usage>,
+    /// Settings the person changed themselves, as "/field": a default an administrator sets no longer applies to them.
+    pub chosen: Vec<String>,
 }
 
 pub fn default_roots() -> Vec<String> {
@@ -226,9 +246,9 @@ pub fn default_roots() -> Vec<String> {
 
 pub fn default_exclude() -> Vec<String> {
     [
-        "AppData", "node_modules", ".git", ".svn", "target", "__pycache__", ".cache", ".cargo", ".rustup",
-        ".npm", ".gradle", ".venv", "venv", "$Recycle.Bin", "System Volume Information", "Windows",
-        "Program Files", "Program Files (x86)", "ProgramData", "$WinREAgent", "Recovery",
+        "AppData", "node_modules", ".git", ".svn", "target", "__pycache__", ".cache", ".cargo", ".rustup", // i18n-ignore: folder names on disk
+        ".npm", ".gradle", ".venv", "venv", "$Recycle.Bin", "System Volume Information", "Windows", // i18n-ignore: folder names on disk
+        "Program Files", "Program Files (x86)", "ProgramData", "$WinREAgent", "Recovery", // i18n-ignore: folder names on disk
     ]
     .iter()
     .map(|s| s.to_string())
@@ -240,6 +260,9 @@ impl Default for Config {
         Config {
             version: CURRENT_VERSION,
             experience: Experience::default(),
+            language: "system".into(),
+            mica: false,
+            mica_light: true,
             preset: PRESETS[0].0.into(),
             theme: PRESETS[0].1,
             opacity: 0.96,
@@ -262,7 +285,7 @@ impl Default for Config {
                 Section { kind: SectionKind::Frequent, visible: false },
                 Section { kind: SectionKind::AllApps, visible: false },
             ],
-            groups: vec![PinGroup { name: "Pinned".into(), pins: Vec::new() }],
+            groups: vec![PinGroup { name: "Pinned".into(), pins: Vec::new() }],  // i18n-ignore: the first section's saved name
             pins_seeded: false,
             recent_count: 6,
             frequent_count: 6,
@@ -279,9 +302,18 @@ impl Default for Config {
             skip_patterns: Vec::new(),
             results: Category::ALL.iter().map(|&kind| ResultKind { kind, on: true }).collect(),
             max_files: 30,
+            max_apps: 8,
+            max_settings: 6,
             show_paths: true,
             show_timing: true,
-            web_name: "the web".into(),
+            regex_search: false,
+            show_regex_switch: true,
+            show_search_help: true,
+            show_file_buttons: true,
+            show_search_hints: true,
+            search_windows_settings: true,
+            search_settings_pages: true,
+            web_name: tx("the web").into(),
             web_url: "https://duckduckgo.com/?q={}".into(),
             take_over_start: true,
             take_over_search: true,
@@ -289,6 +321,7 @@ impl Default for Config {
             autostart_applied: false,
             auto_update: true,
             usage: HashMap::new(),
+            chosen: Vec::new(),
         }
     }
 }
@@ -309,7 +342,7 @@ impl Config {
     pub(crate) fn parse(bytes: &[u8]) -> Option<Config> {
         let mut saved: serde_json::Value = serde_json::from_slice(bytes).ok()?;
         if let Some(sections) = saved.get_mut("sections").and_then(|s| s.as_array_mut()) {
-            sections.retain(|s| s.get("kind").and_then(|k| k.as_str()) != Some("Quick"));
+            sections.retain(|s| s.get("kind").and_then(|k| k.as_str()) != Some("Quick")); // i18n-ignore: an old section kind
         }
         // Hidden files were once something to include, and the results an order with a separate web switch.
         if let Some(object) = saved.as_object_mut() {
@@ -318,7 +351,7 @@ impl Config {
             }
             let web = object.remove("web_search").and_then(|v| v.as_bool()).unwrap_or(true);
             if let Some(order) = object.remove("category_order").and_then(|v| v.as_array().cloned()) {
-                let results: Vec<serde_json::Value> = order.into_iter().map(|kind| serde_json::json!({ "on": web || kind != "Web", "kind": kind })).collect();
+                let results: Vec<serde_json::Value> = order.into_iter().map(|kind| serde_json::json!({ "on": web || kind != "Web", "kind": kind })).collect(); // i18n-ignore: a saved result kind
                 object.entry("results").or_insert(serde_json::json!(results));
             }
         }
@@ -342,7 +375,7 @@ impl Config {
             // Search used to default to the top; nobody had chosen that on purpose yet.
             self.search_at_bottom = true;
         }
-        if self.version < 2 && !PRESETS.iter().any(|(name, _)| *name == self.preset) && self.preset != "Custom" {
+        if self.version < 2 && !PRESETS.iter().any(|(name, _)| *name == self.preset) && self.preset != "Custom" { // i18n-ignore: saved name of an own theme
             // A color theme that no longer exists moves to the new default.
             self.preset = PRESETS[0].0.into();
             self.theme = PRESETS[0].1;
@@ -359,7 +392,7 @@ impl Config {
             }
         }
         if self.groups.is_empty() {
-            self.groups.push(PinGroup { name: "Pinned".into(), pins: Vec::new() });
+            self.groups.push(PinGroup { name: "Pinned".into(), pins: Vec::new() }); // i18n-ignore: the first section's saved name
         }
     }
 

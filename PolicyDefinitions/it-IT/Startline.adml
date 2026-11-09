@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.1" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+  <displayName>Startline</displayName>
+  <description>Impostazioni per il menu Start e la ricerca di Startline.</description>
+  <resources>
+    <stringTable>
+      <string id="Supported">Startline 0.1 e versioni successive</string>
+      <string id="Cat_Startline">Startline</string>
+      <string id="Cat_Rec_Startline">Valori predefiniti che gli utenti possono modificare</string>
+      <string id="Cat_Search">Cerca</string>
+      <string id="Cat_Appearance">Aspetto</string>
+      <string id="Cat_StartMenu">Menu Start</string>
+      <string id="Cat_Pins">App aggiunte</string>
+      <string id="Cat_SearchPlaces">Dove cercare</string>
+      <string id="Cat_SearchSkip">Mai trovati</string>
+      <string id="Cat_SearchResults">Risultati</string>
+      <string id="Cat_SearchBox">Casella di ricerca</string>
+      <string id="Cat_General">Generale</string>
+      <string id="Cat_Updates">Aggiornamenti</string>
+      <string id="Cat_Limits">Cosa possono fare gli utenti</string>
+      <string id="P_Experience">Aspetto</string>
+      <string id="E_Experience">Lo stile usato dal menu Start, dalla ricerca e dalla finestra delle impostazioni.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Experience">Lo stile usato dal menu Start, dalla ricerca e dalla finestra delle impostazioni.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="I_Experience_0">Windows 11</string>
+      <string id="I_Experience_1">Windows 10</string>
+      <string id="I_Experience_2">Windows 7</string>
+      <string id="I_Experience_3">Windows XP</string>
+      <string id="I_Experience_4">Startline</string>
+      <string id="P_Language">Lingua</string>
+      <string id="E_Language">La lingua in cui Startline mostra i testi: system segue la lingua di visualizzazione di Windows quando è inglese, tedesco o italiano, altrimenti usa l'inglese.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Language">La lingua in cui Startline mostra i testi: system segue la lingua di visualizzazione di Windows quando è inglese, tedesco o italiano, altrimenti usa l'inglese.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="I_Language_0">La lingua di visualizzazione di Windows</string>
+      <string id="I_Language_1">English</string>
+      <string id="I_Language_2">Deutsch</string>
+      <string id="I_Language_3">Italiano</string>
+      <string id="P_TextAndIconSize">Dimensione di testo e icone</string>
+      <string id="E_TextAndIconSize">In percentuale. La finestra delle impostazioni offre 90 (piccola), 100 (normale) e 115 (grande).
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_TextAndIconSize">In percentuale. La finestra delle impostazioni offre 90 (piccola), 100 (normale) e 115 (grande).
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_Mica">Mica dietro il menu Start</string>
+      <string id="E_Mica">Il materiale Mica di Windows 11 dietro il menu Start, colorato dallo sfondo del desktop, al posto del vetro smerigliato. Da Windows 11 versione 22H2; le versioni precedenti di Windows lo ignorano. Per gli stili Windows 11 e Startline.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_Mica">Il materiale Mica di Windows 11 dietro il menu Start, colorato dallo sfondo del desktop, al posto del vetro smerigliato. Da Windows 11 versione 22H2; le versioni precedenti di Windows lo ignorano. Per gli stili Windows 11 e Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_MicaLight">Mica più chiaro attraverso la casella di ricerca e l'elemento selezionato</string>
+      <string id="E_MicaLight">Con Mica attivo, lascia trasparire una sua tonalità più chiara attraverso la casella di ricerca e l'elemento selezionato invece di coprirli.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_MicaLight">Con Mica attivo, lascia trasparire una sua tonalità più chiara attraverso la casella di ricerca e l'elemento selezionato invece di coprirli.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_ColorTheme">Combinazione di colori</string>
+      <string id="E_ColorTheme">Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_ColorTheme">Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="I_ColorTheme_0">Pietra</string>
+      <string id="I_ColorTheme_1">Grafite</string>
+      <string id="I_ColorTheme_2">Muschio</string>
+      <string id="I_ColorTheme_3">Porto</string>
+      <string id="I_ColorTheme_4">Argilla</string>
+      <string id="I_ColorTheme_5">Nero</string>
+      <string id="I_ColorTheme_6">Luce del giorno</string>
+      <string id="I_ColorTheme_7">Carta</string>
+      <string id="P_Color_Background">Colore di sfondo</string>
+      <string id="E_Color_Background">Scritto come #RRGGBB. Sostituisce questo colore della combinazione. Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Color_Background">Scritto come #RRGGBB. Sostituisce questo colore della combinazione. Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_Color_Panels">Colore dei pannelli</string>
+      <string id="E_Color_Panels">Scritto come #RRGGBB. Sostituisce questo colore della combinazione. Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Color_Panels">Scritto come #RRGGBB. Sostituisce questo colore della combinazione. Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_Color_Text">Colore del testo</string>
+      <string id="E_Color_Text">Scritto come #RRGGBB. Sostituisce questo colore della combinazione. Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Color_Text">Scritto come #RRGGBB. Sostituisce questo colore della combinazione. Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_Color_QuietText">Colore del testo secondario</string>
+      <string id="E_Color_QuietText">Scritto come #RRGGBB. Sostituisce questo colore della combinazione. Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Color_QuietText">Scritto come #RRGGBB. Sostituisce questo colore della combinazione. Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_Color_Accent">Colore principale</string>
+      <string id="E_Color_Accent">Scritto come #RRGGBB. Sostituisce questo colore della combinazione. Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Color_Accent">Scritto come #RRGGBB. Sostituisce questo colore della combinazione. Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_Corners">Angoli della finestra</string>
+      <string id="E_Corners">Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Corners">Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="I_Corners_0">Arrotondati</string>
+      <string id="I_Corners_1">Poco arrotondati</string>
+      <string id="I_Corners_2">Squadrati</string>
+      <string id="P_FrostedGlass">Vetro smerigliato</string>
+      <string id="E_FrostedGlass">Sfoca ciò che sta dietro il menu. Usato solo dall'aspetto Startline.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_FrostedGlass">Sfoca ciò che sta dietro il menu. Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_Opacity">Opacità del menu</string>
+      <string id="E_Opacity">In percentuale, da 50 (il più trasparente) a 100 (opaco). Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Opacity">In percentuale, da 50 (il più trasparente) a 100 (opaco). Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_Sections">Cosa mostra il menu Start</string>
+      <string id="E_Sections">Uno per riga, nell'ordine in cui devono apparire: Pinned, Recent, Frequent, AllApps. Quelli non indicati sono nascosti.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Sections">Uno per riga, nell'ordine in cui devono apparire: Pinned, Recent, Frequent, AllApps. Quelli non indicati sono nascosti.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_RecentCount">Numero di file recenti</string>
+      <string id="E_RecentCount">Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_RecentCount">Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_FrequentCount">Numero di elementi più usati</string>
+      <string id="E_FrequentCount">Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_FrequentCount">Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchAtBottom">Barra di ricerca in basso</string>
+      <string id="E_SearchAtBottom">Usato solo dall'aspetto Startline.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchAtBottom">Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_Columns">App aggiunte per riga</string>
+      <string id="E_Columns">Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Columns">Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_TileSize">Dimensione delle app aggiunte</string>
+      <string id="E_TileSize">Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_TileSize">Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_ShowLabels">Nomi sotto le app aggiunte</string>
+      <string id="E_ShowLabels">Usato solo dall'aspetto Startline.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_ShowLabels">Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_CompactRows">Elenchi compatti</string>
+      <string id="E_CompactRows">Usato solo dall'aspetto Startline.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_CompactRows">Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_HorizontalPosition">Dove si apre in orizzontale</string>
+      <string id="E_HorizontalPosition">Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_HorizontalPosition">Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="I_HorizontalPosition_0">A sinistra</string>
+      <string id="I_HorizontalPosition_1">Al centro</string>
+      <string id="I_HorizontalPosition_2">A destra</string>
+      <string id="I_HorizontalPosition_3">Accanto al pulsante Start</string>
+      <string id="P_VerticalPosition">Dove si apre in verticale</string>
+      <string id="E_VerticalPosition">Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_VerticalPosition">Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="I_VerticalPosition_0">In alto</string>
+      <string id="I_VerticalPosition_1">Al centro</string>
+      <string id="I_VerticalPosition_2">In basso</string>
+      <string id="P_Margin">Distanza dal bordo dello schermo</string>
+      <string id="E_Margin">Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Margin">Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_Width">Larghezza del menu</string>
+      <string id="E_Width">Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Width">Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_Height">Altezza del menu</string>
+      <string id="E_Height">Usato solo dall'aspetto Startline.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Height">Usato solo dall'aspetto Startline.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_PinnedApps">App aggiunte</string>
+      <string id="E_PinnedApps">Uno per riga: Section|Name|Target oppure Section|Name|Target|Arguments. Target è un file, una cartella, un programma o un indirizzo web, oppure app:ID per un'app installata. Le variabili di ambiente come %USERPROFILE% funzionano. Come impostazione fissa sostituisce gli elementi aggiunti dell'utente e gli impedisce di modificarli; come predefinita sono gli elementi aggiunti con cui inizia.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_PinnedApps">Uno per riga: Section|Name|Target oppure Section|Name|Target|Arguments. Target è un file, una cartella, un programma o un indirizzo web, oppure app:ID per un'app installata. Le variabili di ambiente come %USERPROFILE% funzionano. Come impostazione fissa sostituisce gli elementi aggiunti dell'utente e gli impedisce di modificarli; come predefinita sono gli elementi aggiunti con cui inizia.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchFolders">Cartelle in cui cercare</string>
+      <string id="E_SearchFolders">Una cartella o unità per riga. Le variabili di ambiente come %USERPROFILE% funzionano. Sostituisce i percorsi scelti dall'utente.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchFolders">Una cartella o unità per riga. Le variabili di ambiente come %USERPROFILE% funzionano. Sostituisce i percorsi scelti dall'utente.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchNetworkDrives">Cerca nelle unità di rete</string>
+      <string id="E_SearchNetworkDrives">Include ogni unità di rete appena viene connessa. La lettura di condivisioni grandi può richiedere un po' di tempo.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchNetworkDrives">Include ogni unità di rete appena viene connessa. La lettura di condivisioni grandi può richiedere un po' di tempo.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchUsbDrives">Cerca nelle unità USB</string>
+      <string id="E_SearchUsbDrives">Include chiavette e dischi USB appena vengono collegati.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchUsbDrives">Include chiavette e dischi USB appena vengono collegati.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchSkipFolders">Cartelle mai trovate</string>
+      <string id="E_SearchSkipFolders">Una cartella per riga, ad esempio %USERPROFILE%\AppData. Nemmeno il suo contenuto viene mai trovato.
+
+Abilitato aggiunge gli elementi qui sotto a quelli degli utenti, che non possono rimuoverli. Possono comunque aggiungerne altri. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchSkipFolders">Una cartella per riga, ad esempio %USERPROFILE%\AppData. Nemmeno il suo contenuto viene mai trovato.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchSkipFolderNames">Nomi di cartelle mai trovati</string>
+      <string id="E_SearchSkipFolderNames">Un nome per riga. Una cartella con questo nome non viene mai trovata, né il suo contenuto, ovunque si trovi.
+
+Abilitato aggiunge gli elementi qui sotto a quelli degli utenti, che non possono rimuoverli. Possono comunque aggiungerne altri. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchSkipFolderNames">Un nome per riga. Una cartella con questo nome non viene mai trovata, né il suo contenuto, ovunque si trovi.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchSkipFileTypes">Tipi di file mai trovati</string>
+      <string id="E_SearchSkipFileTypes">Uno per riga, ad esempio .iso.
+
+Abilitato aggiunge gli elementi qui sotto a quelli degli utenti, che non possono rimuoverli. Possono comunque aggiungerne altri. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchSkipFileTypes">Uno per riga, ad esempio .iso.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchSkipPatterns">Percorsi mai trovati (espressioni regolari)</string>
+      <string id="E_SearchSkipPatterns">Un'espressione regolare per riga, confrontata con l'intero percorso senza distinzione tra maiuscole e minuscole. Un file o una cartella corrispondente non viene mai trovato, né il contenuto di una cartella corrispondente. Ad esempio \\Payroll(\\|$) oppure \.(key|pem|pfx)$. Un'espressione non valida viene ignorata.
+
+Abilitato aggiunge gli elementi qui sotto a quelli degli utenti, che non possono rimuoverli. Possono comunque aggiungerne altri. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchSkipPatterns">Un'espressione regolare per riga, confrontata con l'intero percorso senza distinzione tra maiuscole e minuscole. Un file o una cartella corrispondente non viene mai trovato, né il contenuto di una cartella corrispondente. Ad esempio \\Payroll(\\|$) oppure \.(key|pem|pfx)$. Un'espressione non valida viene ignorata.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchSkipHidden">File e cartelle nascosti non vengono mai trovati</string>
+      <string id="E_SearchSkipHidden">Ciò che Windows tiene nascosto. Disabilitato li trova.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchSkipHidden">Ciò che Windows tiene nascosto. Disabilitato li trova.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchSkipSystem">I file di sistema non vengono mai trovati</string>
+      <string id="E_SearchSkipSystem">File e cartelle che Windows contrassegna come parte del sistema, ad esempio desktop.ini. Disabilitato li trova.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchSkipSystem">File e cartelle che Windows contrassegna come parte del sistema, ad esempio desktop.ini. Disabilitato li trova.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchResults">Tipi di risultati</string>
+      <string id="E_SearchResults">Uno per riga, dal primo all'ultimo: Apps, Settings, Files, Web. Un tipo non indicato non viene mai mostrato.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchResults">Uno per riga, dal primo all'ultimo: Apps, Settings, Files, Web. Un tipo non indicato non viene mai mostrato.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchMaxApps">Numero massimo di app nei risultati</string>
+      <string id="E_SearchMaxApps">Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchMaxApps">Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchMaxSettings">Numero massimo di impostazioni nei risultati</string>
+      <string id="E_SearchMaxSettings">Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchMaxSettings">Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchMaxFiles">Numero massimo di file nei risultati</string>
+      <string id="E_SearchMaxFiles">Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchMaxFiles">Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchShowFolders">Mostra la cartella sotto ogni file</string>
+      <string id="E_SearchShowFolders">Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchShowFolders">Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchWebName">Nome della ricerca sul Web</string>
+      <string id="E_SearchWebName">Mostrato come: Search &lt;name&gt; for ...
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchWebName">Mostrato come: Search &lt;name&gt; for ...
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchWebAddress">Indirizzo della ricerca web</string>
+      <string id="E_SearchWebAddress">Deve iniziare con http:// o https:// e contenere {} dove vanno le parole. Qualsiasi altro valore viene ignorato.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchWebAddress">Deve iniziare con http:// o https:// e contenere {} dove vanno le parole. Qualsiasi altro valore viene ignorato.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchChangeWindowsSettings">Modifica le impostazioni di Windows dalla ricerca</string>
+      <string id="E_SearchChangeWindowsSettings">Disabilitato rimuove tutte le impostazioni di Windows che la ricerca può modificare.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchChangeWindowsSettings">Disabilitato rimuove tutte le impostazioni di Windows che la ricerca può modificare.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchWindowsSettingsPages">Collegamenti a impostazioni e strumenti di Windows</string>
+      <string id="E_SearchWindowsSettingsPages">Disabilitato rimuove i collegamenti della ricerca alle pagine di Impostazioni di Windows e agli strumenti, e i link a Pannello di controllo, stampanti e programmi predefiniti.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchWindowsSettingsPages">Disabilitato rimuove i collegamenti della ricerca alle pagine di Impostazioni di Windows e agli strumenti, e i link a Pannello di controllo, stampanti e programmi predefiniti.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchRegex">Tratta le ricerche come espressioni regolari</string>
+      <string id="E_SearchRegex">L'intera ricerca è un'espressione regolare, confrontata con i nomi senza distinzione tra maiuscole e minuscole. L'interruttore nella casella di ricerca la attiva e la disattiva.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchRegex">L'intera ricerca è un'espressione regolare, confrontata con i nomi senza distinzione tra maiuscole e minuscole. L'interruttore nella casella di ricerca la attiva e la disattiva.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchShowRegexSwitch">Interruttore delle espressioni regolari nella casella di ricerca</string>
+      <string id="E_SearchShowRegexSwitch">Disabilitato nasconde l'interruttore, e le ricerche non sono mai espressioni regolari a meno che SearchRegex sia abilitato.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchShowRegexSwitch">Disabilitato nasconde l'interruttore, e le ricerche non sono mai espressioni regolari a meno che SearchRegex sia abilitato.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchShowHelp">Pulsante della guida nella casella di ricerca</string>
+      <string id="E_SearchShowHelp">Il ? che mostra cosa si può digitare: parole, &quot;testo esatto&quot;, caratteri jolly, -senza, ext:, kind:, size:, modified: ed espressioni regolari.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchShowHelp">Il ? che mostra cosa si può digitare: parole, &quot;testo esatto&quot;, caratteri jolly, -senza, ext:, kind:, size:, modified: ed espressioni regolari.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchFileTypeButtons">Pulsanti dei tipi di file sotto la ricerca</string>
+      <string id="E_SearchFileTypeButtons">I pulsanti che limitano i risultati a un tipo di file.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchFileTypeButtons">I pulsanti che limitano i risultati a un tipo di file.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchShowTime">Mostra quanto è durata una ricerca</string>
+      <string id="E_SearchShowTime">Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchShowTime">Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchShowHints">Suggerimenti da tastiera sotto i risultati</string>
+      <string id="E_SearchShowHints">La riga che spiega cosa fanno Invio, Ctrl+Invio, Maiusc+Invio ed Esc.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchShowHints">La riga che spiega cosa fanno Invio, Ctrl+Invio, Maiusc+Invio ed Esc.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_StartWithWindows">Avvia con Windows</string>
+      <string id="E_StartWithWindows">Mantiene il menu Start funzionante dopo un riavvio.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_StartWithWindows">Mantiene il menu Start funzionante dopo un riavvio.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_TakeOverStartKey">Il tasto Windows e il pulsante Start aprono questo menu</string>
+      <string id="E_TakeOverStartKey">Maiusc + tasto Windows apre ancora il menu di Windows.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_TakeOverStartKey">Maiusc + tasto Windows apre ancora il menu di Windows.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_TakeOverSearchKey">Anche il tasto Windows + S apre questo menu</string>
+      <string id="E_TakeOverSearchKey">Le altre scelte rapide da tastiera di Windows continuano a funzionare.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_TakeOverSearchKey">Le altre scelte rapide da tastiera di Windows continuano a funzionare.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SkipWelcome">Salta il messaggio di benvenuto</string>
+      <string id="E_SkipWelcome">Abilitato nasconde il messaggio mostrato al primo avvio.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SkipWelcome">Abilitato nasconde il messaggio mostrato al primo avvio.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_AutomaticUpdates">Installa automaticamente gli aggiornamenti</string>
+      <string id="E_AutomaticUpdates">Startline installa da solo le nuove versioni e si riavvia mentre il suo menu è chiuso. In un'installazione per l'intero PC, l'attività Startline Updater le installa come SYSTEM entro un'ora. Disabilitato lascia gli aggiornamenti all'utente o, in un'installazione per l'intero PC, all'amministratore.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_AutomaticUpdates">Startline installa da solo le nuove versioni e si riavvia mentre il suo menu è chiuso. In un'installazione per l'intero PC, l'attività Startline Updater le installa come SYSTEM entro un'ora. Disabilitato lascia gli aggiornamenti all'utente o, in un'installazione per l'intero PC, all'amministratore.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_CheckForUpdates">Cerca aggiornamenti</string>
+      <string id="E_CheckForUpdates">Disabilitato impedisce del tutto a Startline di cercare nuove versioni, per le organizzazioni che le distribuiscono a modo loro.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="P_SearchSkipAppData">Mai trovato: Dati delle app</string>
+      <string id="E_SearchSkipAppData">Impostazioni e cache che i programmi tengono in AppData. Abilitato non li trova mai, Disabilitato li trova sempre.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchSkipAppData">Impostazioni e cache che i programmi tengono in AppData. Abilitato non li trova mai, Disabilitato li trova sempre.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchSkipWindows">Mai trovato: Windows e programmi installati</string>
+      <string id="E_SearchSkipWindows">Windows, Programmi e altre cartelle di sistema. Abilitato non li trova mai, Disabilitato li trova sempre.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchSkipWindows">Windows, Programmi e altre cartelle di sistema. Abilitato non li trova mai, Disabilitato li trova sempre.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchSkipDeveloperFiles">Mai trovato: File per sviluppatori</string>
+      <string id="E_SearchSkipDeveloperFiles">node_modules, .git, output di compilazione e simili. Abilitato non li trova mai, Disabilitato li trova sempre.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchSkipDeveloperFiles">node_modules, .git, output di compilazione e simili. Abilitato non li trova mai, Disabilitato li trova sempre.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchSkipCloudFolders">Mai trovato: Cartelle cloud</string>
+      <string id="E_SearchSkipCloudFolders">Cartelle di OneDrive, Dropbox e Google Drive. Abilitato non li trova mai, Disabilitato li trova sempre.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchSkipCloudFolders">Cartelle di OneDrive, Dropbox e Google Drive. Abilitato non li trova mai, Disabilitato li trova sempre.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchSkipTempFiles">Mai trovato: File temporanei e di log</string>
+      <string id="E_SearchSkipTempFiles">Avanzi come .tmp, .log e .bak. Abilitato non li trova mai, Disabilitato li trova sempre.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchSkipTempFiles">Avanzi come .tmp, .log e .bak. Abilitato non li trova mai, Disabilitato li trova sempre.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchSkipProgramParts">Mai trovato: Parti di programmi</string>
+      <string id="E_SearchSkipProgramParts">File che non apri mai tu, come .dll e .sys. Abilitato non li trova mai, Disabilitato li trova sempre.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchSkipProgramParts">File che non apri mai tu, come .dll e .sys. Abilitato non li trova mai, Disabilitato li trova sempre.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchWindowsSettings">Impostazioni di Windows che la ricerca può modificare</string>
+      <string id="E_SearchWindowsSettings">Le impostazioni non selezionate vengono rimosse dalla ricerca.
+
+Abilitato applica le selezioni qui sotto. Disabilitato o Non configurato consente tutto.</string>
+      <string id="P_Commands">Comandi che gli utenti possono usare</string>
+      <string id="E_Commands">I comandi non selezionati vengono rimossi ovunque compaiano. Rimuovendo Customize Startline si blocca anche la finestra delle impostazioni.
+
+Abilitato applica le selezioni qui sotto. Disabilitato o Non configurato consente tutto.</string>
+      <string id="P_RightClickOptions">Opzioni del menu di scelta rapida</string>
+      <string id="E_RightClickOptions">Le opzioni non selezionate vengono rimosse. Anche le loro scelte rapide da tastiera smettono di funzionare.
+
+Abilitato applica le selezioni qui sotto. Disabilitato o Non configurato consente tutto.</string>
+    </stringTable>
+    <presentationTable>
+      <presentation id="P_Experience">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Aspetto:</dropdownList>
+      </presentation>
+      <presentation id="P_Language">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Lingua:</dropdownList>
+      </presentation>
+      <presentation id="P_TextAndIconSize">
+        <decimalTextBox refId="Value" defaultValue="100">Dimensione di testo e icone:</decimalTextBox>
+      </presentation>
+      <presentation id="P_ColorTheme">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Combinazione di colori:</dropdownList>
+      </presentation>
+      <presentation id="P_Color_Background">
+        <textBox refId="Value">
+          <label>Colore di sfondo:</label>
+          <defaultValue>#1B1B1A</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Color_Panels">
+        <textBox refId="Value">
+          <label>Colore dei pannelli:</label>
+          <defaultValue>#272725</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Color_Text">
+        <textBox refId="Value">
+          <label>Colore del testo:</label>
+          <defaultValue>#ECEAE5</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Color_QuietText">
+        <textBox refId="Value">
+          <label>Colore del testo secondario:</label>
+          <defaultValue>#94928C</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Color_Accent">
+        <textBox refId="Value">
+          <label>Colore principale:</label>
+          <defaultValue>#D9A46B</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_Corners">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Angoli della finestra:</dropdownList>
+      </presentation>
+      <presentation id="P_Opacity">
+        <decimalTextBox refId="Value" defaultValue="96">Opacità del menu:</decimalTextBox>
+      </presentation>
+      <presentation id="P_Sections">
+        <listBox refId="Value">Cosa mostra il menu Start:</listBox>
+      </presentation>
+      <presentation id="P_RecentCount">
+        <decimalTextBox refId="Value" defaultValue="6">Numero di file recenti:</decimalTextBox>
+      </presentation>
+      <presentation id="P_FrequentCount">
+        <decimalTextBox refId="Value" defaultValue="6">Numero di elementi più usati:</decimalTextBox>
+      </presentation>
+      <presentation id="P_Columns">
+        <decimalTextBox refId="Value" defaultValue="6">App aggiunte per riga:</decimalTextBox>
+      </presentation>
+      <presentation id="P_TileSize">
+        <decimalTextBox refId="Value" defaultValue="84">Dimensione delle app aggiunte:</decimalTextBox>
+      </presentation>
+      <presentation id="P_HorizontalPosition">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Dove si apre in orizzontale:</dropdownList>
+      </presentation>
+      <presentation id="P_VerticalPosition">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Dove si apre in verticale:</dropdownList>
+      </presentation>
+      <presentation id="P_Margin">
+        <decimalTextBox refId="Value" defaultValue="12">Distanza dal bordo dello schermo:</decimalTextBox>
+      </presentation>
+      <presentation id="P_Width">
+        <decimalTextBox refId="Value" defaultValue="660">Larghezza del menu:</decimalTextBox>
+      </presentation>
+      <presentation id="P_Height">
+        <decimalTextBox refId="Value" defaultValue="720">Altezza del menu:</decimalTextBox>
+      </presentation>
+      <presentation id="P_PinnedApps">
+        <listBox refId="Value">App aggiunte:</listBox>
+      </presentation>
+      <presentation id="P_SearchFolders">
+        <listBox refId="Value">Cartelle in cui cercare:</listBox>
+      </presentation>
+      <presentation id="P_SearchSkipFolders">
+        <listBox refId="Value">Cartelle mai trovate:</listBox>
+      </presentation>
+      <presentation id="P_SearchSkipFolderNames">
+        <listBox refId="Value">Nomi di cartelle mai trovati:</listBox>
+      </presentation>
+      <presentation id="P_SearchSkipFileTypes">
+        <listBox refId="Value">Tipi di file mai trovati:</listBox>
+      </presentation>
+      <presentation id="P_SearchSkipPatterns">
+        <listBox refId="Value">Percorsi mai trovati (espressioni regolari):</listBox>
+      </presentation>
+      <presentation id="P_SearchResults">
+        <listBox refId="Value">Tipi di risultati:</listBox>
+      </presentation>
+      <presentation id="P_SearchMaxApps">
+        <decimalTextBox refId="Value" defaultValue="8">Numero massimo di app nei risultati:</decimalTextBox>
+      </presentation>
+      <presentation id="P_SearchMaxSettings">
+        <decimalTextBox refId="Value" defaultValue="6">Numero massimo di impostazioni nei risultati:</decimalTextBox>
+      </presentation>
+      <presentation id="P_SearchMaxFiles">
+        <decimalTextBox refId="Value" defaultValue="30">Numero massimo di file nei risultati:</decimalTextBox>
+      </presentation>
+      <presentation id="P_SearchWebName">
+        <textBox refId="Value">
+          <label>Nome della ricerca sul Web:</label>
+          <defaultValue>the web</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_SearchWebAddress">
+        <textBox refId="Value">
+          <label>Indirizzo della ricerca web:</label>
+          <defaultValue>https://duckduckgo.com/?q={}</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_SearchWindowsSettings">
+        <checkBox refId="Setting_Wifi" defaultChecked="true">Wi-Fi</checkBox>
+        <checkBox refId="Setting_Bluetooth" defaultChecked="true">Bluetooth</checkBox>
+        <checkBox refId="Setting_DarkMode" defaultChecked="true">Modalità scura</checkBox>
+        <checkBox refId="Setting_AppsDark" defaultChecked="true">Modalità scura per le app</checkBox>
+        <checkBox refId="Setting_SystemDark" defaultChecked="true">Barra delle applicazioni e Start scuri</checkBox>
+        <checkBox refId="Setting_KeepAwake" defaultChecked="true">Mantieni attivo</checkBox>
+        <checkBox refId="Setting_Mute" defaultChecked="true">Disattiva audio</checkBox>
+        <checkBox refId="Setting_MicMute" defaultChecked="true">Disattiva microfono</checkBox>
+        <checkBox refId="Setting_Transparency" defaultChecked="true">Effetti di trasparenza</checkBox>
+        <checkBox refId="Setting_AccentTaskbar" defaultChecked="true">Colore principale sulla barra delle applicazioni</checkBox>
+        <checkBox refId="Setting_AccentTitleBars" defaultChecked="true">Colore principale sulle barre del titolo</checkBox>
+        <checkBox refId="Setting_AutoHideTaskbar" defaultChecked="true">Nascondi la barra delle applicazioni</checkBox>
+        <checkBox refId="Setting_TaskbarAlign" defaultChecked="true">Allineamento della barra delle applicazioni</checkBox>
+        <checkBox refId="Setting_TaskViewButton" defaultChecked="true">Pulsante Visualizzazione attività</checkBox>
+        <checkBox refId="Setting_ClockSeconds" defaultChecked="true">Secondi nell'orologio</checkBox>
+        <checkBox refId="Setting_FileExtensions" defaultChecked="true">Estensioni nomi file</checkBox>
+        <checkBox refId="Setting_HiddenFiles" defaultChecked="true">Elementi nascosti</checkBox>
+        <checkBox refId="Setting_ItemCheckboxes" defaultChecked="true">Caselle di controllo elementi</checkBox>
+        <checkBox refId="Setting_CompactExplorer" defaultChecked="true">Visualizzazione compatta</checkBox>
+        <checkBox refId="Setting_ClipboardHistory" defaultChecked="true">Cronologia degli Appunti</checkBox>
+        <checkBox refId="Setting_GameMode" defaultChecked="true">Modalità gioco</checkBox>
+        <checkBox refId="Setting_Animations" defaultChecked="true">Effetti di animazione</checkBox>
+        <checkBox refId="Setting_SnapWindows" defaultChecked="true">Blocca finestre</checkBox>
+        <checkBox refId="Setting_DragContents" defaultChecked="true">Mostra il contenuto delle finestre durante il trascinamento</checkBox>
+        <checkBox refId="Setting_FontSmoothing" defaultChecked="true">Smussa i caratteri</checkBox>
+        <checkBox refId="Setting_WindowShadows" defaultChecked="true">Ombre delle finestre</checkBox>
+        <checkBox refId="Setting_HoverActivate" defaultChecked="true">Attiva la finestra al passaggio del mouse</checkBox>
+        <checkBox refId="Setting_ScreenSaver" defaultChecked="true">Screen saver</checkBox>
+        <checkBox refId="Setting_PointerPrecision" defaultChecked="true">Aumenta la precisione del puntatore</checkBox>
+        <checkBox refId="Setting_SwapMouseButtons" defaultChecked="true">Inverti i pulsanti del mouse</checkBox>
+        <checkBox refId="Setting_StickyKeys" defaultChecked="true">Tasti permanenti</checkBox>
+        <checkBox refId="Setting_Autostart" defaultChecked="true">Avvia Startline con Windows</checkBox>
+        <checkBox refId="Setting_Volume" defaultChecked="true">Volume</checkBox>
+        <checkBox refId="Setting_MicVolume" defaultChecked="true">Livello del microfono</checkBox>
+        <checkBox refId="Setting_Brightness" defaultChecked="true">Luminosità</checkBox>
+        <checkBox refId="Setting_MouseSpeed" defaultChecked="true">Velocità del mouse</checkBox>
+        <checkBox refId="Setting_ScrollLines" defaultChecked="true">Righe per scorrimento</checkBox>
+        <checkBox refId="Setting_DoubleClick" defaultChecked="true">Velocità doppio clic</checkBox>
+        <checkBox refId="Setting_KeyRepeatSpeed" defaultChecked="true">Velocità di ripetizione</checkBox>
+        <checkBox refId="Setting_KeyRepeatDelay" defaultChecked="true">Ritardo di ripetizione</checkBox>
+        <checkBox refId="Setting_ScreenTimeout" defaultChecked="true">Spegni lo schermo dopo</checkBox>
+        <checkBox refId="Setting_SleepTimeout" defaultChecked="true">Sospendi dopo</checkBox>
+        <checkBox refId="Setting_PowerMode" defaultChecked="true">Modalità risparmio energia</checkBox>
+      </presentation>
+      <presentation id="P_Commands">
+        <checkBox refId="Command_Lock" defaultChecked="true">Blocca schermo</checkBox>
+        <checkBox refId="Command_Sleep" defaultChecked="true">Sospendi</checkBox>
+        <checkBox refId="Command_SignOut" defaultChecked="true">Disconnetti</checkBox>
+        <checkBox refId="Command_SwitchUser" defaultChecked="true">Cambia utente</checkBox>
+        <checkBox refId="Command_Restart" defaultChecked="true">Riavvia il sistema</checkBox>
+        <checkBox refId="Command_ShutDown" defaultChecked="true">Arresta il sistema</checkBox>
+        <checkBox refId="Command_EmptyRecycleBin" defaultChecked="true">Svuota Cestino</checkBox>
+        <checkBox refId="Command_Customize" defaultChecked="true">Personalizza Startline</checkBox>
+        <checkBox refId="Command_PinPage" defaultChecked="true">Aggiungi qualcosa a Start</checkBox>
+        <checkBox refId="Command_RealStart" defaultChecked="true">Apri il menu Start di Windows</checkBox>
+        <checkBox refId="Command_Quit" defaultChecked="true">Esci da Startline</checkBox>
+        <checkBox refId="Command_SettingsFolder" defaultChecked="true">Apri la cartella delle mie impostazioni</checkBox>
+        <checkBox refId="Command_ResetSettings" defaultChecked="true">Reimposta tutte le impostazioni</checkBox>
+      </presentation>
+      <presentation id="P_RightClickOptions">
+        <checkBox refId="Menu_RunAsAdmin" defaultChecked="true">Esegui come amministratore</checkBox>
+        <checkBox refId="Menu_OpenWith" defaultChecked="true">Apri con</checkBox>
+        <checkBox refId="Menu_OpenLocation" defaultChecked="true">Apri percorso file</checkBox>
+        <checkBox refId="Menu_Copy" defaultChecked="true">Copia percorso, nome o indirizzo</checkBox>
+        <checkBox refId="Menu_Uninstall" defaultChecked="true">Disinstalla</checkBox>
+        <checkBox refId="Menu_Recycle" defaultChecked="true">Sposta nel Cestino</checkBox>
+        <checkBox refId="Menu_Properties" defaultChecked="true">Proprietà</checkBox>
+        <checkBox refId="Menu_ShellMenu" defaultChecked="true">Mostra altre opzioni (il menu di Windows)</checkBox>
+      </presentation>
+    </presentationTable>
+  </resources>
+</policyDefinitionResources>

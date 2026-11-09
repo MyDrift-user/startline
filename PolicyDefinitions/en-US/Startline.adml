@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+<policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.1" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
   <displayName>Startline</displayName>
   <description>Settings for the Startline Start menu and search.</description>
   <resources>
     <stringTable>
       <string id="Supported">Startline 0.1 and later</string>
       <string id="Cat_Startline">Startline</string>
+      <string id="Cat_Rec_Startline">Defaults people can change</string>
       <string id="Cat_Search">Search</string>
       <string id="Cat_Appearance">Appearance</string>
       <string id="Cat_StartMenu">Start menu</string>
@@ -13,6 +14,7 @@
       <string id="Cat_SearchPlaces">Where to search</string>
       <string id="Cat_SearchSkip">Never found</string>
       <string id="Cat_SearchResults">Results</string>
+      <string id="Cat_SearchBox">Search box</string>
       <string id="Cat_General">General</string>
       <string id="Cat_Updates">Updates</string>
       <string id="Cat_Limits">What people can do</string>
@@ -20,19 +22,53 @@
       <string id="E_Experience">Which look the Start menu, search and the settings window use.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Experience">Which look the Start menu, search and the settings window use.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="I_Experience_0">Windows 11</string>
       <string id="I_Experience_1">Windows 10</string>
       <string id="I_Experience_2">Windows 7</string>
       <string id="I_Experience_3">Windows XP</string>
       <string id="I_Experience_4">Startline</string>
+      <string id="P_Language">Language</string>
+      <string id="E_Language">The language Startline shows its text in: system follows the language Windows is shown in when it's English, German or Italian, and uses English otherwise.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Language">The language Startline shows its text in: system follows the language Windows is shown in when it's English, German or Italian, and uses English otherwise.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
+      <string id="I_Language_0">The language Windows is shown in</string>
+      <string id="I_Language_1">English</string>
+      <string id="I_Language_2">Deutsch</string>
+      <string id="I_Language_3">Italiano</string>
       <string id="P_TextAndIconSize">Text and icon size</string>
       <string id="E_TextAndIconSize">In percent. The settings window offers 90 (small), 100 (normal) and 115 (large).
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_TextAndIconSize">In percent. The settings window offers 90 (small), 100 (normal) and 115 (large).
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
+      <string id="P_Mica">Mica behind the Start menu</string>
+      <string id="E_Mica">Windows 11's Mica material behind the Start menu, tinted by the desktop picture, instead of frosted glass. Windows 11 version 22H2 and later; older Windows ignores it. For the Windows 11 and Startline looks.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_Mica">Windows 11's Mica material behind the Start menu, tinted by the desktop picture, instead of frosted glass. Windows 11 version 22H2 and later; older Windows ignores it. For the Windows 11 and Startline looks.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_MicaLight">Lighter Mica through the search box and the selected item</string>
+      <string id="E_MicaLight">With Mica on, lets a lighter shade of it through the search box and the selected item instead of covering them.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_MicaLight">With Mica on, lets a lighter shade of it through the search box and the selected item instead of covering them.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_ColorTheme">Color theme</string>
       <string id="E_ColorTheme">Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_ColorTheme">Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="I_ColorTheme_0">Stone</string>
       <string id="I_ColorTheme_1">Graphite</string>
       <string id="I_ColorTheme_2">Moss</string>
@@ -45,26 +81,44 @@ Enabled sets it to the value below, and people can't change it. Disabled or Not 
       <string id="E_Color_Background">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Color_Background">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_Color_Panels">Panel color</string>
       <string id="E_Color_Panels">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Color_Panels">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_Color_Text">Text color</string>
       <string id="E_Color_Text">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Color_Text">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_Color_QuietText">Quiet text color</string>
       <string id="E_Color_QuietText">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Color_QuietText">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_Color_Accent">Accent color</string>
       <string id="E_Color_Accent">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Color_Accent">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_Corners">Window corners</string>
       <string id="E_Corners">Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Corners">Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="I_Corners_0">Round</string>
       <string id="I_Corners_1">Slight</string>
       <string id="I_Corners_2">Square</string>
@@ -72,42 +126,71 @@ Enabled sets it to the value below, and people can't change it. Disabled or Not 
       <string id="E_FrostedGlass">Blurs what's behind the menu. Only the Startline look uses this.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_FrostedGlass">Blurs what's behind the menu. Only the Startline look uses this.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_Opacity">How solid the menu is</string>
       <string id="E_Opacity">In percent, from 50 (most see-through) to 100 (solid). Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Opacity">In percent, from 50 (most see-through) to 100 (solid). Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_Sections">What the Start menu shows</string>
       <string id="E_Sections">One per line, in the order they should appear: Pinned, Recent, Frequent, AllApps. Any left out are hidden.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Sections">One per line, in the order they should appear: Pinned, Recent, Frequent, AllApps. Any left out are hidden.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_RecentCount">Number of recent files</string>
       <string id="E_RecentCount">Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_RecentCount">A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_FrequentCount">Number of most-used items</string>
       <string id="E_FrequentCount">Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_FrequentCount">A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchAtBottom">Search bar at the bottom</string>
       <string id="E_SearchAtBottom">Only the Startline look uses this.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchAtBottom">Only the Startline look uses this.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_Columns">Pinned apps per row</string>
       <string id="E_Columns">Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Columns">Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_TileSize">Pinned app size</string>
       <string id="E_TileSize">Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_TileSize">Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_ShowLabels">Names under pinned apps</string>
       <string id="E_ShowLabels">Only the Startline look uses this.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_ShowLabels">Only the Startline look uses this.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_CompactRows">Compact lists</string>
       <string id="E_CompactRows">Only the Startline look uses this.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_CompactRows">Only the Startline look uses this.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_HorizontalPosition">Where it opens across the screen</string>
       <string id="E_HorizontalPosition">Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_HorizontalPosition">Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="I_HorizontalPosition_0">Left</string>
       <string id="I_HorizontalPosition_1">Center</string>
       <string id="I_HorizontalPosition_2">Right</string>
@@ -116,6 +199,9 @@ Enabled sets it to the value below, and people can't change it. Disabled or Not 
       <string id="E_VerticalPosition">Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_VerticalPosition">Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="I_VerticalPosition_0">Top</string>
       <string id="I_VerticalPosition_1">Middle</string>
       <string id="I_VerticalPosition_2">Bottom</string>
@@ -123,132 +209,259 @@ Enabled sets it to the value below, and people can't change it. Disabled or Not 
       <string id="E_Margin">Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Margin">Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_Width">Menu width</string>
       <string id="E_Width">Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Width">Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_Height">Menu height</string>
       <string id="E_Height">Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Height">Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_PinnedApps">Pinned apps</string>
-      <string id="E_PinnedApps">One per line: Section|Name|Target or Section|Name|Target|Arguments. Target is a file, folder, program or web address, or app:ID for an installed app. Environment variables such as %USERPROFILE% work. This replaces the person's pins and stops them changing pins.
+      <string id="E_PinnedApps">One per line: Section|Name|Target or Section|Name|Target|Arguments. Target is a file, folder, program or web address, or app:ID for an installed app. Environment variables such as %USERPROFILE% work. As a fixed setting this replaces the person's pins and stops them changing pins; as a default it's the pins they start with.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_PinnedApps">One per line: Section|Name|Target or Section|Name|Target|Arguments. Target is a file, folder, program or web address, or app:ID for an installed app. Environment variables such as %USERPROFILE% work. As a fixed setting this replaces the person's pins and stops them changing pins; as a default it's the pins they start with.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchFolders">Folders to search</string>
       <string id="E_SearchFolders">One folder or drive per line. Environment variables such as %USERPROFILE% work. This replaces the person's own places.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_SearchFolders">One folder or drive per line. Environment variables such as %USERPROFILE% work. This replaces the person's own places.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchNetworkDrives">Search network drives</string>
       <string id="E_SearchNetworkDrives">Includes any network drive as it gets attached. Big shares can take a while to read.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchNetworkDrives">Includes any network drive as it gets attached. Big shares can take a while to read.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_SearchUsbDrives">Search USB drives</string>
       <string id="E_SearchUsbDrives">Includes USB sticks and disks as they get plugged in.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchUsbDrives">Includes USB sticks and disks as they get plugged in.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_SearchSkipFolders">Folders never found</string>
       <string id="E_SearchSkipFolders">One folder per line, such as %USERPROFILE%\AppData. Everything inside is never found either.
 
 Enabled adds the items below to people's own, and they can't remove them. They can still add more. Disabled or Not configured leaves it to them.</string>
+      <string id="R_SearchSkipFolders">One folder per line, such as %USERPROFILE%\AppData. Everything inside is never found either.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchSkipFolderNames">Folder names never found</string>
       <string id="E_SearchSkipFolderNames">One name per line. A folder with this name is never found, nor anything in it, wherever it is.
 
 Enabled adds the items below to people's own, and they can't remove them. They can still add more. Disabled or Not configured leaves it to them.</string>
+      <string id="R_SearchSkipFolderNames">One name per line. A folder with this name is never found, nor anything in it, wherever it is.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchSkipFileTypes">File types never found</string>
       <string id="E_SearchSkipFileTypes">One per line, such as .iso.
 
 Enabled adds the items below to people's own, and they can't remove them. They can still add more. Disabled or Not configured leaves it to them.</string>
+      <string id="R_SearchSkipFileTypes">One per line, such as .iso.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchSkipPatterns">Paths never found (regular expressions)</string>
       <string id="E_SearchSkipPatterns">One regular expression per line, matched against the whole path whatever the case. A file or folder that matches is never found, nor anything in a folder that matches. For example \\Payroll(\\|$) or \.(key|pem|pfx)$. A pattern that isn't valid is ignored.
 
 Enabled adds the items below to people's own, and they can't remove them. They can still add more. Disabled or Not configured leaves it to them.</string>
+      <string id="R_SearchSkipPatterns">One regular expression per line, matched against the whole path whatever the case. A file or folder that matches is never found, nor anything in a folder that matches. For example \\Payroll(\\|$) or \.(key|pem|pfx)$. A pattern that isn't valid is ignored.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchSkipHidden">Hidden files and folders are never found</string>
       <string id="E_SearchSkipHidden">Things Windows keeps out of sight. Disabled finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchSkipHidden">Things Windows keeps out of sight. Disabled finds them.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_SearchSkipSystem">System files are never found</string>
       <string id="E_SearchSkipSystem">Files and folders Windows marks as part of the system, such as desktop.ini. Disabled finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchSkipSystem">Files and folders Windows marks as part of the system, such as desktop.ini. Disabled finds them.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_SearchResults">Kinds of results</string>
       <string id="E_SearchResults">One per line, first to last: Apps, Settings, Files, Web. A kind left out is never shown.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_SearchResults">One per line, first to last: Apps, Settings, Files, Web. A kind left out is never shown.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
+      <string id="P_SearchMaxApps">Most apps shown in the results</string>
+      <string id="E_SearchMaxApps">Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_SearchMaxApps">A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
+      <string id="P_SearchMaxSettings">Most settings shown in the results</string>
+      <string id="E_SearchMaxSettings">Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_SearchMaxSettings">A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchMaxFiles">Most files shown in the results</string>
       <string id="E_SearchMaxFiles">Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_SearchMaxFiles">A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchShowFolders">Show the folder under each file</string>
       <string id="E_SearchShowFolders">Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_SearchShowTime">Show how long a search took</string>
-      <string id="E_SearchShowTime">Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_SearchFileTypeButtons">File type buttons under search</string>
-      <string id="E_SearchFileTypeButtons">Disabled removes the buttons that narrow results to one kind of file.
-
-Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchShowFolders">A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_SearchWebName">Name of the web search</string>
       <string id="E_SearchWebName">Shown as: Search &lt;name&gt; for ...
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_SearchWebName">Shown as: Search &lt;name&gt; for ...
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchWebAddress">Web search address</string>
       <string id="E_SearchWebAddress">Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_SearchWebAddress">Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchChangeWindowsSettings">Change Windows settings from search</string>
       <string id="E_SearchChangeWindowsSettings">Disabled removes every Windows setting search can change.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchChangeWindowsSettings">Disabled removes every Windows setting search can change.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_SearchWindowsSettingsPages">Shortcuts to Windows settings and tools</string>
       <string id="E_SearchWindowsSettingsPages">Disabled removes search's shortcuts to Windows settings pages and tools, and the Control Panel, printer and default program links.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchWindowsSettingsPages">Disabled removes search's shortcuts to Windows settings pages and tools, and the Control Panel, printer and default program links.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchRegex">Treat searches as regular expressions</string>
+      <string id="E_SearchRegex">The whole search is one regular expression, matched against names whatever the case. The switch in the search box turns it on and off.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchRegex">The whole search is one regular expression, matched against names whatever the case. The switch in the search box turns it on and off.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchShowRegexSwitch">Regular expression switch in the search box</string>
+      <string id="E_SearchShowRegexSwitch">Disabled hides the switch, and searches are then never regular expressions unless SearchRegex is enabled.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchShowRegexSwitch">Disabled hides the switch, and searches are then never regular expressions unless SearchRegex is enabled.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchShowHelp">Help button in the search box</string>
+      <string id="E_SearchShowHelp">The ? that shows what can be typed: words, &quot;exact text&quot;, wildcards, -without, ext:, kind:, size:, modified: and regular expressions.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchShowHelp">The ? that shows what can be typed: words, &quot;exact text&quot;, wildcards, -without, ext:, kind:, size:, modified: and regular expressions.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchFileTypeButtons">File type buttons under search</string>
+      <string id="E_SearchFileTypeButtons">The buttons that narrow results to one kind of file.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchFileTypeButtons">The buttons that narrow results to one kind of file.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchShowTime">Show how long a search took</string>
+      <string id="E_SearchShowTime">Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchShowTime">A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchShowHints">Keyboard hints under the results</string>
+      <string id="E_SearchShowHints">The line that says what Enter, Ctrl+Enter, Shift+Enter and Esc do.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchShowHints">The line that says what Enter, Ctrl+Enter, Shift+Enter and Esc do.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_StartWithWindows">Start with Windows</string>
       <string id="E_StartWithWindows">Keeps the Start menu working after a restart.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_StartWithWindows">Keeps the Start menu working after a restart.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_TakeOverStartKey">Start key and button open this menu</string>
       <string id="E_TakeOverStartKey">Shift + Start still opens the Windows menu.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_TakeOverStartKey">Shift + Start still opens the Windows menu.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_TakeOverSearchKey">Start + S opens this menu too</string>
       <string id="E_TakeOverSearchKey">Other Windows shortcuts keep working.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_TakeOverSearchKey">Other Windows shortcuts keep working.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_SkipWelcome">Skip the welcome note</string>
       <string id="E_SkipWelcome">Enabled hides the note shown on the first run.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SkipWelcome">Enabled hides the note shown on the first run.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_AutomaticUpdates">Install updates automatically</string>
       <string id="E_AutomaticUpdates">Startline installs new versions by itself, restarting while its menu is closed. On an install for the whole PC, the Startline Updater task installs them as SYSTEM within the hour. Disabled leaves updates to the person, or on an install for the whole PC, to the administrator.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_AutomaticUpdates">Startline installs new versions by itself, restarting while its menu is closed. On an install for the whole PC, the Startline Updater task installs them as SYSTEM within the hour. Disabled leaves updates to the person, or on an install for the whole PC, to the administrator.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_CheckForUpdates">Look for updates</string>
       <string id="E_CheckForUpdates">Disabled stops Startline looking for new versions at all, for organizations that deploy them their own way.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_SearchSkipAppData">Never found: app data</string>
+      <string id="P_SearchSkipAppData">Never found: App data</string>
       <string id="E_SearchSkipAppData">Settings and caches programs keep in AppData. Enabled never finds them, disabled always finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_SearchSkipWindows">Never found: windows and installed programs</string>
+      <string id="R_SearchSkipAppData">Settings and caches programs keep in AppData. Enabled never finds them, disabled always finds them.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchSkipWindows">Never found: Windows and installed programs</string>
       <string id="E_SearchSkipWindows">Windows, Program Files and other system folders. Enabled never finds them, disabled always finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_SearchSkipDeveloperFiles">Never found: developer clutter</string>
+      <string id="R_SearchSkipWindows">Windows, Program Files and other system folders. Enabled never finds them, disabled always finds them.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchSkipDeveloperFiles">Never found: Developer clutter</string>
       <string id="E_SearchSkipDeveloperFiles">node_modules, .git, build output and similar. Enabled never finds them, disabled always finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_SearchSkipCloudFolders">Never found: cloud folders</string>
+      <string id="R_SearchSkipDeveloperFiles">node_modules, .git, build output and similar. Enabled never finds them, disabled always finds them.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchSkipCloudFolders">Never found: Cloud folders</string>
       <string id="E_SearchSkipCloudFolders">OneDrive, Dropbox and Google Drive folders. Enabled never finds them, disabled always finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_SearchSkipTempFiles">Never found: temporary and log files</string>
+      <string id="R_SearchSkipCloudFolders">OneDrive, Dropbox and Google Drive folders. Enabled never finds them, disabled always finds them.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchSkipTempFiles">Never found: Temporary and log files</string>
       <string id="E_SearchSkipTempFiles">Leftovers such as .tmp, .log and .bak. Enabled never finds them, disabled always finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="P_SearchSkipProgramParts">Never found: program parts</string>
+      <string id="R_SearchSkipTempFiles">Leftovers such as .tmp, .log and .bak. Enabled never finds them, disabled always finds them.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchSkipProgramParts">Never found: Program parts</string>
       <string id="E_SearchSkipProgramParts">Files you never open yourself, such as .dll and .sys. Enabled never finds them, disabled always finds them.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchSkipProgramParts">Files you never open yourself, such as .dll and .sys. Enabled never finds them, disabled always finds them.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_SearchWindowsSettings">Windows settings search can change</string>
       <string id="E_SearchWindowsSettings">Unticked settings are removed from search.
 
@@ -265,6 +478,9 @@ Enabled applies the ticks below. Disabled or Not configured allows everything.</
     <presentationTable>
       <presentation id="P_Experience">
         <dropdownList refId="Value" noSort="true" defaultItem="0">Look:</dropdownList>
+      </presentation>
+      <presentation id="P_Language">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Language:</dropdownList>
       </presentation>
       <presentation id="P_TextAndIconSize">
         <decimalTextBox refId="Value" defaultValue="100">Text and icon size:</decimalTextBox>
@@ -358,6 +574,12 @@ Enabled applies the ticks below. Disabled or Not configured allows everything.</
       </presentation>
       <presentation id="P_SearchResults">
         <listBox refId="Value">Kinds of results:</listBox>
+      </presentation>
+      <presentation id="P_SearchMaxApps">
+        <decimalTextBox refId="Value" defaultValue="8">Most apps shown in the results:</decimalTextBox>
+      </presentation>
+      <presentation id="P_SearchMaxSettings">
+        <decimalTextBox refId="Value" defaultValue="6">Most settings shown in the results:</decimalTextBox>
       </presentation>
       <presentation id="P_SearchMaxFiles">
         <decimalTextBox refId="Value" defaultValue="30">Most files shown in the results:</decimalTextBox>

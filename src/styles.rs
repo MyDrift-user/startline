@@ -2,6 +2,7 @@
 //! Startline has free colors, shapes and placement.
 
 use crate::config::{Config, CornerKind, HAnchor, Theme, VAnchor};
+use crate::i18n::tx;
 use crate::system::Placement;
 use serde::{Deserialize, Serialize};
 
@@ -20,21 +21,21 @@ impl Experience {
 
     pub fn label(self) -> &'static str {
         match self {
-            Experience::Windows11 => "Windows 11",
-            Experience::Windows10 => "Windows 10",
-            Experience::Windows7 => "Windows 7",
-            Experience::WindowsXp => "Windows XP",
-            Experience::Startline => "Startline",
+            Experience::Windows11 => tx("Windows 11"),
+            Experience::Windows10 => tx("Windows 10"),
+            Experience::Windows7 => tx("Windows 7"),
+            Experience::WindowsXp => tx("Windows XP"),
+            Experience::Startline => "Startline", // i18n-ignore: the app's name
         }
     }
 
     pub fn blurb(self) -> &'static str {
         match self {
-            Experience::Windows11 => "Centered and rounded, with pinned apps on top. Follows your light or dark setting.",
-            Experience::Windows10 => "App list and tiles, flush with the taskbar. Follows your light or dark setting.",
-            Experience::Windows7 => "White program list beside a glass panel.",
-            Experience::WindowsXp => "The blue and white two-column menu.",
-            Experience::Startline => "Our own look. Pick the colors, shape, size and position yourself.",
+            Experience::Windows11 => tx("Centered and rounded, with pinned apps on top. Follows your light or dark setting."),
+            Experience::Windows10 => tx("App list and tiles, flush with the taskbar. Follows your light or dark setting."),
+            Experience::Windows7 => tx("White program list beside a glass panel."),
+            Experience::WindowsXp => tx("The blue and white two-column menu."),
+            Experience::Startline => tx("Our own look. Pick the colors, shape, size and position yourself."),
         }
     }
 
@@ -113,6 +114,10 @@ pub struct Look {
     pub round_bottom: bool,
     pub native_corner: Option<NativeCorner>,
     pub ui_scale: f32,
+    /// Mica behind the menu instead of frosted glass, and whether a lighter shade of it shows through the search box
+    /// and the selected item.
+    pub mica: bool,
+    pub mica_light: bool,
 }
 
 impl Look {
@@ -135,8 +140,10 @@ pub fn look_of(cfg: &Config, system: SystemLook) -> Look {
         round_bottom: true,
         native_corner: None,
         ui_scale: cfg.ui_scale,
+        mica: false,
+        mica_light: false,
     };
-    match experience {
+    let look = match experience {
         Experience::Windows11 => Look {
             theme: if system.dark {
                 shaded([32, 32, 32], [50, 50, 50], [255, 255, 255], [171, 171, 171])
@@ -180,7 +187,12 @@ pub fn look_of(cfg: &Config, system: SystemLook) -> Look {
             },
             ..base
         },
+    };
+    // Mica is Windows 11's own, so only its look and Startline's take it, and only where Windows has it.
+    if cfg.mica && matches!(experience, Experience::Windows11 | Experience::Startline) && crate::platform::has_mica() {
+        return Look { mica: true, mica_light: cfg.mica_light, blur: false, ..look };
     }
+    look
 }
 
 /// Only for pictures of the settings pages, which are otherwise a window of their own.

@@ -3,6 +3,7 @@
 
 use crate::actions::Do;
 use crate::customize::Tab;
+use crate::i18n::{tr, tx};
 use crate::platform;
 use crate::search::{Icon, Row, RowKind};
 use crate::config::Category;
@@ -52,7 +53,7 @@ impl Menu {
 
     /// A line of text that opens something, as in the right column of the older menus.
     #[allow(clippy::too_many_arguments)]
-    fn link(&mut self, ui: &Ui, rect: Rect, label: &str, what: Do, color: Color32, hot_fill: Color32, hot_color: Color32, bold: bool) {
+    fn link(&mut self, ui: &Ui, rect: Rect, label: &'static str, what: Do, color: Color32, hot_fill: Color32, hot_color: Color32, bold: bool) {
         let id = Id::unique(("link", label));
         let response = ui.interact(rect, id, Sense::click());
         let intent = Intent::Run(what);
@@ -63,7 +64,7 @@ impl Menu {
         }
         let font = if bold { semibold(13.0) } else { FontId::proportional(13.0) };
         let text = if hot { hot_color } else { color };
-        let galley = line_galley(ui, label, font, text, rect.width() - 16.0);
+        let galley = line_galley(ui, tr(label), font, text, rect.width() - 16.0);
         ui.painter().galley(pos2(rect.left() + 8.0, rect.center().y - galley.size().y / 2.0 - ink_nudge(13.0)), galley, text);
         if response.clicked() {
             self.intents.push(intent);
@@ -108,17 +109,17 @@ impl Menu {
         }
 
         let spot = |y: f32| Rect::from_center_size(pos2(rail.center().x, y), Vec2::splat(48.0));
-        if icon_button(ui, spot(full.top() + 24.0), Id::unique("win10-all"), '\u{E700}', "All apps", self.page == Page::AllApps, pal).clicked() {
+        if icon_button(ui, spot(full.top() + 24.0), Id::unique("win10-all"), '\u{E700}', tr("All apps"), self.page == Page::AllApps, pal).clicked() {
             self.toggle_all_programs();
         }
         let mut y = full.bottom() - 24.0;
-        let power = icon_button(ui, spot(y), Id::unique("power"), '\u{E7E8}', "Power", false, pal);
+        let power = icon_button(ui, spot(y), Id::unique("power"), '\u{E7E8}', tr("Power"), false, pal);
         y -= 48.0;
-        let gear = icon_button(ui, spot(y), Id::unique("customize"), '\u{E713}', "Settings", false, pal);
+        let gear = icon_button(ui, spot(y), Id::unique("customize"), '\u{E713}', tr("Settings"), false, pal);
         y -= 48.0;
-        let pictures = icon_button(ui, spot(y), Id::unique("win10-pictures"), '\u{E8B9}', "Pictures", false, pal);
+        let pictures = icon_button(ui, spot(y), Id::unique("win10-pictures"), '\u{E8B9}', tr("Pictures"), false, pal);
         y -= 48.0;
-        let documents = icon_button(ui, spot(y), Id::unique("win10-documents"), '\u{E8A5}', "Documents", false, pal);
+        let documents = icon_button(ui, spot(y), Id::unique("win10-documents"), '\u{E8A5}', tr("Documents"), false, pal);
         y -= 48.0;
         let user = ui.interact(spot(y), Id::unique("win10-user"), Sense::click()).on_hover_text(platform::user_name());
         if user.hovered() {
@@ -186,14 +187,14 @@ impl Menu {
 
         let hot = Color32::from_rgba_unmultiplied(255, 255, 255, 50);
         let links = [
-            ("Documents", DOCUMENTS),
-            ("Pictures", PICTURES),
-            ("Music", MUSIC),
-            ("Computer", COMPUTER),
-            ("Control Panel", CONTROL_PANEL),
-            ("Devices and Printers", DEVICES),
-            ("Default Programs", DEFAULT_APPS),
-            ("Startline settings", Do::Customize),
+            (tx("Documents"), DOCUMENTS),
+            (tx("Pictures"), PICTURES),
+            (tx("Music"), MUSIC),
+            (tx("Computer"), COMPUTER),
+            (tx("Control Panel"), CONTROL_PANEL),
+            (tx("Devices and Printers"), DEVICES),
+            (tx("Default Programs"), DEFAULT_APPS),
+            (tx("Startline settings"), Do::Customize),
         ];
         let policy = self.policy.clone();
         let mut y = picture.bottom() + 10.0;
@@ -208,7 +209,7 @@ impl Menu {
         let fill = if response.hovered() { Color32::from_rgba_unmultiplied(255, 255, 255, 70) } else { Color32::from_rgba_unmultiplied(255, 255, 255, 34) };
         ui.painter().rect_filled(shut, 3, fill);
         ui.painter().rect_stroke(shut, 3, Stroke::new(1.0, Color32::from_rgba_unmultiplied(255, 255, 255, 120)), StrokeKind::Inside);
-        ui.painter().text(shut.center() - vec2(0.0, ink_nudge(13.0)), Align2::CENTER_CENTER, "Shut down", FontId::proportional(13.0), Color32::WHITE);
+        ui.painter().text(shut.center() - vec2(0.0, ink_nudge(13.0)), Align2::CENTER_CENTER, tr("Shut down"), FontId::proportional(13.0), Color32::WHITE);
         if response.clicked() {
             self.open_power_menu(shut);
         }
@@ -235,7 +236,7 @@ impl Menu {
             paint_selection(ui, rect, pal);
         }
         let text = if hot && pal.style == crate::styles::Experience::WindowsXp { pal.on_accent } else { color };
-        let label = if showing_all { "Back" } else { "All Programs" };
+        let label = if showing_all { tr("Back") } else { tr("All Programs") };
         ui.painter().text(pos2(rect.left() + 10.0, rect.center().y - ink_nudge(13.0)), Align2::LEFT_CENTER, label, semibold(13.0), text);
         let glyph = if showing_all { '\u{E76B}' } else { '\u{E76C}' };
         ui.painter().text(pos2(rect.right() - 16.0, rect.center().y), Align2::CENTER_CENTER, glyph, icon_font(12.0), text);
@@ -290,14 +291,14 @@ impl Menu {
 
             let ink = Color32::from_rgb(0, 42, 118);
             let links = [
-                ("My Documents", DOCUMENTS, true),
-                ("My Pictures", PICTURES, true),
-                ("My Music", MUSIC, true),
-                ("My Computer", COMPUTER, true),
-                ("Control Panel", CONTROL_PANEL, false),
-                ("Printers and Faxes", DEVICES, false),
-                ("Default Programs", DEFAULT_APPS, false),
-                ("Startline settings", Do::Customize, false),
+                (tx("My Documents"), DOCUMENTS, true),
+                (tx("My Pictures"), PICTURES, true),
+                (tx("My Music"), MUSIC, true),
+                (tx("My Computer"), COMPUTER, true),
+                (tx("Control Panel"), CONTROL_PANEL, false),
+                (tx("Printers and Faxes"), DEVICES, false),
+                (tx("Default Programs"), DEFAULT_APPS, false),
+                (tx("Startline settings"), Do::Customize, false),
             ];
             let policy = self.policy.clone();
             let mut y = right.top() + 8.0;
@@ -309,8 +310,12 @@ impl Menu {
         }
 
         let center = footer.center().y;
-        let off = self.xp_footer_button(ui, pos2(footer.right() - 112.0, center), "Turn Off", '\u{E7E8}', Color32::from_rgb(214, 74, 40));
-        let log = self.xp_footer_button(ui, pos2(footer.right() - 212.0, center), "Log Off", '\u{E72E}', Color32::from_rgb(232, 158, 40));
+        // Each button as wide as its words, placed from the right edge, so longer words in other languages still fit.
+        let off_width = Self::xp_footer_width(ui, tx("Turn Off"));
+        let log_width = Self::xp_footer_width(ui, tx("Log Off"));
+        let off_left = footer.right() - 12.0 - off_width;
+        let off = self.xp_footer_button(ui, pos2(off_left, center), off_width, tx("Turn Off"), '\u{E7E8}', Color32::from_rgb(214, 74, 40));
+        let log = self.xp_footer_button(ui, pos2(off_left - 6.0 - log_width, center), log_width, tx("Log Off"), '\u{E72E}', Color32::from_rgb(232, 158, 40));
         if log.clicked() {
             self.open_user_menu(log.rect);
         }
@@ -319,8 +324,14 @@ impl Menu {
         }
     }
 
-    fn xp_footer_button(&mut self, ui: &Ui, left_center: Pos2, label: &str, glyph: char, color: Color32) -> Response {
-        let rect = Rect::from_min_size(left_center - vec2(0.0, 14.0), vec2(96.0, 28.0));
+    /// The colored square, a gap, the words and a little room after them.
+    fn xp_footer_width(ui: &Ui, label: &'static str) -> f32 {
+        let words = ui.painter().layout_no_wrap(tr(label).to_string(), FontId::proportional(12.5), Color32::WHITE).size().x;
+        23.0 + 6.0 + words + 10.0
+    }
+
+    fn xp_footer_button(&mut self, ui: &Ui, left_center: Pos2, width: f32, label: &'static str, glyph: char, color: Color32) -> Response {
+        let rect = Rect::from_min_size(left_center - vec2(0.0, 14.0), vec2(width, 28.0));
         let response = ui.interact(rect, Id::unique(("xp-footer", label)), Sense::click());
         if response.hovered() {
             ui.painter().rect_filled(rect, 3, Color32::from_rgba_unmultiplied(255, 255, 255, 46));
@@ -328,7 +339,7 @@ impl Menu {
         let square = Rect::from_center_size(pos2(rect.left() + 13.0, rect.center().y), Vec2::splat(20.0));
         ui.painter().rect_filled(square, 3, color);
         ui.painter().text(square.center(), Align2::CENTER_CENTER, glyph, icon_font(12.0), Color32::WHITE);
-        ui.painter().text(pos2(square.right() + 6.0, rect.center().y - ink_nudge(12.5)), Align2::LEFT_CENTER, label, FontId::proportional(12.5), Color32::WHITE);
+        ui.painter().text(pos2(square.right() + 6.0, rect.center().y - ink_nudge(12.5)), Align2::LEFT_CENTER, tr(label), FontId::proportional(12.5), Color32::WHITE);
         response
     }
 }

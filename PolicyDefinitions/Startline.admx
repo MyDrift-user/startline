@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<policyDefinitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+<policyDefinitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.1" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
   <policyNamespaces>
     <target prefix="startline" namespace="Startline.Policies.Startline"/>
   </policyNamespaces>
-  <resources minRequiredRevision="1.0" fallbackCulture="en-us"/>
+  <resources minRequiredRevision="1.1" fallbackCulture="en-us"/>
   <supportedOn>
     <definitions>
       <definition name="SUPPORTED_Startline" displayName="$(string.Supported)"/>
     </definitions>
   </supportedOn>
   <categories>
-    <category name="Startline" displayName="$(string.Cat_Startline)"/>
+    <category name="Startline" displayName="$(string.Cat_Startline)"></category>
     <category name="Search" displayName="$(string.Cat_Search)">
       <parentCategory ref="Startline"/>
     </category>
@@ -32,6 +32,9 @@
     <category name="SearchResults" displayName="$(string.Cat_SearchResults)">
       <parentCategory ref="Search"/>
     </category>
+    <category name="SearchBox" displayName="$(string.Cat_SearchBox)">
+      <parentCategory ref="Search"/>
+    </category>
     <category name="General" displayName="$(string.Cat_General)">
       <parentCategory ref="Startline"/>
     </category>
@@ -40,6 +43,42 @@
     </category>
     <category name="Limits" displayName="$(string.Cat_Limits)">
       <parentCategory ref="Startline"/>
+    </category>
+    <category name="Rec_Startline" displayName="$(string.Cat_Rec_Startline)">
+      <parentCategory ref="Startline"/>
+    </category>
+    <category name="Rec_Search" displayName="$(string.Cat_Search)">
+      <parentCategory ref="Rec_Startline"/>
+    </category>
+    <category name="Rec_Appearance" displayName="$(string.Cat_Appearance)">
+      <parentCategory ref="Rec_Startline"/>
+    </category>
+    <category name="Rec_StartMenu" displayName="$(string.Cat_StartMenu)">
+      <parentCategory ref="Rec_Startline"/>
+    </category>
+    <category name="Rec_Pins" displayName="$(string.Cat_Pins)">
+      <parentCategory ref="Rec_Startline"/>
+    </category>
+    <category name="Rec_SearchPlaces" displayName="$(string.Cat_SearchPlaces)">
+      <parentCategory ref="Rec_Search"/>
+    </category>
+    <category name="Rec_SearchSkip" displayName="$(string.Cat_SearchSkip)">
+      <parentCategory ref="Rec_Search"/>
+    </category>
+    <category name="Rec_SearchResults" displayName="$(string.Cat_SearchResults)">
+      <parentCategory ref="Rec_Search"/>
+    </category>
+    <category name="Rec_SearchBox" displayName="$(string.Cat_SearchBox)">
+      <parentCategory ref="Rec_Search"/>
+    </category>
+    <category name="Rec_General" displayName="$(string.Cat_General)">
+      <parentCategory ref="Rec_Startline"/>
+    </category>
+    <category name="Rec_Updates" displayName="$(string.Cat_Updates)">
+      <parentCategory ref="Rec_Startline"/>
+    </category>
+    <category name="Rec_Limits" displayName="$(string.Cat_Limits)">
+      <parentCategory ref="Rec_Startline"/>
     </category>
   </categories>
   <policies>
@@ -76,6 +115,95 @@
         </enum>
       </elements>
     </policy>
+    <policy name="Rec_Experience" class="Both" displayName="$(string.P_Experience)" explainText="$(string.R_Experience)" presentation="$(presentation.P_Experience)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <enum id="Value" valueName="Experience" required="true">
+          <item displayName="$(string.I_Experience_0)">
+            <value>
+              <string>Windows11</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_Experience_1)">
+            <value>
+              <string>Windows10</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_Experience_2)">
+            <value>
+              <string>Windows7</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_Experience_3)">
+            <value>
+              <string>WindowsXp</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_Experience_4)">
+            <value>
+              <string>Startline</string>
+            </value>
+          </item>
+        </enum>
+      </elements>
+    </policy>
+    <policy name="Language" class="Both" displayName="$(string.P_Language)" explainText="$(string.E_Language)" presentation="$(presentation.P_Language)" key="Software\Policies\Startline">
+      <parentCategory ref="Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <enum id="Value" valueName="Language" required="true">
+          <item displayName="$(string.I_Language_0)">
+            <value>
+              <string>system</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_Language_1)">
+            <value>
+              <string>en</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_Language_2)">
+            <value>
+              <string>de</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_Language_3)">
+            <value>
+              <string>it</string>
+            </value>
+          </item>
+        </enum>
+      </elements>
+    </policy>
+    <policy name="Rec_Language" class="Both" displayName="$(string.P_Language)" explainText="$(string.R_Language)" presentation="$(presentation.P_Language)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <enum id="Value" valueName="Language" required="true">
+          <item displayName="$(string.I_Language_0)">
+            <value>
+              <string>system</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_Language_1)">
+            <value>
+              <string>en</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_Language_2)">
+            <value>
+              <string>de</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_Language_3)">
+            <value>
+              <string>it</string>
+            </value>
+          </item>
+        </enum>
+      </elements>
+    </policy>
     <policy name="TextAndIconSize" class="Both" displayName="$(string.P_TextAndIconSize)" explainText="$(string.E_TextAndIconSize)" presentation="$(presentation.P_TextAndIconSize)" key="Software\Policies\Startline">
       <parentCategory ref="Appearance"/>
       <supportedOn ref="SUPPORTED_Startline"/>
@@ -83,8 +211,103 @@
         <decimal id="Value" valueName="TextAndIconSize" required="true" minValue="80" maxValue="150"/>
       </elements>
     </policy>
+    <policy name="Rec_TextAndIconSize" class="Both" displayName="$(string.P_TextAndIconSize)" explainText="$(string.R_TextAndIconSize)" presentation="$(presentation.P_TextAndIconSize)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="TextAndIconSize" required="true" minValue="80" maxValue="150"/>
+      </elements>
+    </policy>
+    <policy name="Mica" class="Both" displayName="$(string.P_Mica)" explainText="$(string.E_Mica)" key="Software\Policies\Startline" valueName="Mica">
+      <parentCategory ref="Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_Mica" class="Both" displayName="$(string.P_Mica)" explainText="$(string.R_Mica)" key="Software\Policies\Startline\Recommended" valueName="Mica">
+      <parentCategory ref="Rec_Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="MicaLight" class="Both" displayName="$(string.P_MicaLight)" explainText="$(string.E_MicaLight)" key="Software\Policies\Startline" valueName="MicaLight">
+      <parentCategory ref="Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_MicaLight" class="Both" displayName="$(string.P_MicaLight)" explainText="$(string.R_MicaLight)" key="Software\Policies\Startline\Recommended" valueName="MicaLight">
+      <parentCategory ref="Rec_Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="ColorTheme" class="Both" displayName="$(string.P_ColorTheme)" explainText="$(string.E_ColorTheme)" presentation="$(presentation.P_ColorTheme)" key="Software\Policies\Startline">
       <parentCategory ref="Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <enum id="Value" valueName="ColorTheme" required="true">
+          <item displayName="$(string.I_ColorTheme_0)">
+            <value>
+              <string>Stone</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorTheme_1)">
+            <value>
+              <string>Graphite</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorTheme_2)">
+            <value>
+              <string>Moss</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorTheme_3)">
+            <value>
+              <string>Harbor</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorTheme_4)">
+            <value>
+              <string>Clay</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorTheme_5)">
+            <value>
+              <string>Black</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorTheme_6)">
+            <value>
+              <string>Daylight</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorTheme_7)">
+            <value>
+              <string>Paper</string>
+            </value>
+          </item>
+        </enum>
+      </elements>
+    </policy>
+    <policy name="Rec_ColorTheme" class="Both" displayName="$(string.P_ColorTheme)" explainText="$(string.R_ColorTheme)" presentation="$(presentation.P_ColorTheme)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Appearance"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <elements>
         <enum id="Value" valueName="ColorTheme" required="true">
@@ -138,8 +361,22 @@
         <text id="Value" valueName="Color_Background" required="true"/>
       </elements>
     </policy>
+    <policy name="Rec_Color_Background" class="Both" displayName="$(string.P_Color_Background)" explainText="$(string.R_Color_Background)" presentation="$(presentation.P_Color_Background)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <text id="Value" valueName="Color_Background" required="true"/>
+      </elements>
+    </policy>
     <policy name="Color_Panels" class="Both" displayName="$(string.P_Color_Panels)" explainText="$(string.E_Color_Panels)" presentation="$(presentation.P_Color_Panels)" key="Software\Policies\Startline">
       <parentCategory ref="Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <text id="Value" valueName="Color_Panels" required="true"/>
+      </elements>
+    </policy>
+    <policy name="Rec_Color_Panels" class="Both" displayName="$(string.P_Color_Panels)" explainText="$(string.R_Color_Panels)" presentation="$(presentation.P_Color_Panels)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Appearance"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <elements>
         <text id="Value" valueName="Color_Panels" required="true"/>
@@ -152,8 +389,22 @@
         <text id="Value" valueName="Color_Text" required="true"/>
       </elements>
     </policy>
+    <policy name="Rec_Color_Text" class="Both" displayName="$(string.P_Color_Text)" explainText="$(string.R_Color_Text)" presentation="$(presentation.P_Color_Text)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <text id="Value" valueName="Color_Text" required="true"/>
+      </elements>
+    </policy>
     <policy name="Color_QuietText" class="Both" displayName="$(string.P_Color_QuietText)" explainText="$(string.E_Color_QuietText)" presentation="$(presentation.P_Color_QuietText)" key="Software\Policies\Startline">
       <parentCategory ref="Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <text id="Value" valueName="Color_QuietText" required="true"/>
+      </elements>
+    </policy>
+    <policy name="Rec_Color_QuietText" class="Both" displayName="$(string.P_Color_QuietText)" explainText="$(string.R_Color_QuietText)" presentation="$(presentation.P_Color_QuietText)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Appearance"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <elements>
         <text id="Value" valueName="Color_QuietText" required="true"/>
@@ -166,8 +417,38 @@
         <text id="Value" valueName="Color_Accent" required="true"/>
       </elements>
     </policy>
+    <policy name="Rec_Color_Accent" class="Both" displayName="$(string.P_Color_Accent)" explainText="$(string.R_Color_Accent)" presentation="$(presentation.P_Color_Accent)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <text id="Value" valueName="Color_Accent" required="true"/>
+      </elements>
+    </policy>
     <policy name="Corners" class="Both" displayName="$(string.P_Corners)" explainText="$(string.E_Corners)" presentation="$(presentation.P_Corners)" key="Software\Policies\Startline">
       <parentCategory ref="Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <enum id="Value" valueName="Corners" required="true">
+          <item displayName="$(string.I_Corners_0)">
+            <value>
+              <string>Round</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_Corners_1)">
+            <value>
+              <string>Slight</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_Corners_2)">
+            <value>
+              <string>Square</string>
+            </value>
+          </item>
+        </enum>
+      </elements>
+    </policy>
+    <policy name="Rec_Corners" class="Both" displayName="$(string.P_Corners)" explainText="$(string.R_Corners)" presentation="$(presentation.P_Corners)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Appearance"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <elements>
         <enum id="Value" valueName="Corners" required="true">
@@ -199,8 +480,25 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="Rec_FrostedGlass" class="Both" displayName="$(string.P_FrostedGlass)" explainText="$(string.R_FrostedGlass)" key="Software\Policies\Startline\Recommended" valueName="FrostedGlass">
+      <parentCategory ref="Rec_Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="Opacity" class="Both" displayName="$(string.P_Opacity)" explainText="$(string.E_Opacity)" presentation="$(presentation.P_Opacity)" key="Software\Policies\Startline">
       <parentCategory ref="Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="Opacity" required="true" minValue="50" maxValue="100"/>
+      </elements>
+    </policy>
+    <policy name="Rec_Opacity" class="Both" displayName="$(string.P_Opacity)" explainText="$(string.R_Opacity)" presentation="$(presentation.P_Opacity)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Appearance"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <elements>
         <decimal id="Value" valueName="Opacity" required="true" minValue="50" maxValue="100"/>
@@ -219,6 +517,19 @@
         <list id="Value" key="Software\Policies\Startline\Sections" valuePrefix="" expandable="true"/>
       </elements>
     </policy>
+    <policy name="Rec_Sections" class="Both" displayName="$(string.P_Sections)" explainText="$(string.R_Sections)" presentation="$(presentation.P_Sections)" key="Software\Policies\Startline\Recommended" valueName="Sections">
+      <parentCategory ref="Rec_StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\Recommended\Sections" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
     <policy name="RecentCount" class="Both" displayName="$(string.P_RecentCount)" explainText="$(string.E_RecentCount)" presentation="$(presentation.P_RecentCount)" key="Software\Policies\Startline">
       <parentCategory ref="StartMenu"/>
       <supportedOn ref="SUPPORTED_Startline"/>
@@ -226,8 +537,22 @@
         <decimal id="Value" valueName="RecentCount" required="true" minValue="2" maxValue="20"/>
       </elements>
     </policy>
+    <policy name="Rec_RecentCount" class="Both" displayName="$(string.P_RecentCount)" explainText="$(string.R_RecentCount)" presentation="$(presentation.P_RecentCount)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="RecentCount" required="true" minValue="2" maxValue="20"/>
+      </elements>
+    </policy>
     <policy name="FrequentCount" class="Both" displayName="$(string.P_FrequentCount)" explainText="$(string.E_FrequentCount)" presentation="$(presentation.P_FrequentCount)" key="Software\Policies\Startline">
       <parentCategory ref="StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="FrequentCount" required="true" minValue="2" maxValue="20"/>
+      </elements>
+    </policy>
+    <policy name="Rec_FrequentCount" class="Both" displayName="$(string.P_FrequentCount)" explainText="$(string.R_FrequentCount)" presentation="$(presentation.P_FrequentCount)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_StartMenu"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <elements>
         <decimal id="Value" valueName="FrequentCount" required="true" minValue="2" maxValue="20"/>
@@ -243,8 +568,25 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="Rec_SearchAtBottom" class="Both" displayName="$(string.P_SearchAtBottom)" explainText="$(string.R_SearchAtBottom)" key="Software\Policies\Startline\Recommended" valueName="SearchAtBottom">
+      <parentCategory ref="Rec_StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="Columns" class="Both" displayName="$(string.P_Columns)" explainText="$(string.E_Columns)" presentation="$(presentation.P_Columns)" key="Software\Policies\Startline">
       <parentCategory ref="StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="Columns" required="true" minValue="3" maxValue="12"/>
+      </elements>
+    </policy>
+    <policy name="Rec_Columns" class="Both" displayName="$(string.P_Columns)" explainText="$(string.R_Columns)" presentation="$(presentation.P_Columns)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_StartMenu"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <elements>
         <decimal id="Value" valueName="Columns" required="true" minValue="3" maxValue="12"/>
@@ -257,8 +599,25 @@
         <decimal id="Value" valueName="TileSize" required="true" minValue="52" maxValue="132"/>
       </elements>
     </policy>
+    <policy name="Rec_TileSize" class="Both" displayName="$(string.P_TileSize)" explainText="$(string.R_TileSize)" presentation="$(presentation.P_TileSize)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="TileSize" required="true" minValue="52" maxValue="132"/>
+      </elements>
+    </policy>
     <policy name="ShowLabels" class="Both" displayName="$(string.P_ShowLabels)" explainText="$(string.E_ShowLabels)" key="Software\Policies\Startline" valueName="ShowLabels">
       <parentCategory ref="StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_ShowLabels" class="Both" displayName="$(string.P_ShowLabels)" explainText="$(string.R_ShowLabels)" key="Software\Policies\Startline\Recommended" valueName="ShowLabels">
+      <parentCategory ref="Rec_StartMenu"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -277,8 +636,46 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="Rec_CompactRows" class="Both" displayName="$(string.P_CompactRows)" explainText="$(string.R_CompactRows)" key="Software\Policies\Startline\Recommended" valueName="CompactRows">
+      <parentCategory ref="Rec_StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="HorizontalPosition" class="Both" displayName="$(string.P_HorizontalPosition)" explainText="$(string.E_HorizontalPosition)" presentation="$(presentation.P_HorizontalPosition)" key="Software\Policies\Startline">
       <parentCategory ref="StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <enum id="Value" valueName="HorizontalPosition" required="true">
+          <item displayName="$(string.I_HorizontalPosition_0)">
+            <value>
+              <string>Left</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_HorizontalPosition_1)">
+            <value>
+              <string>Center</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_HorizontalPosition_2)">
+            <value>
+              <string>Right</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_HorizontalPosition_3)">
+            <value>
+              <string>FollowStart</string>
+            </value>
+          </item>
+        </enum>
+      </elements>
+    </policy>
+    <policy name="Rec_HorizontalPosition" class="Both" displayName="$(string.P_HorizontalPosition)" explainText="$(string.R_HorizontalPosition)" presentation="$(presentation.P_HorizontalPosition)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_StartMenu"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <elements>
         <enum id="Value" valueName="HorizontalPosition" required="true">
@@ -328,8 +725,38 @@
         </enum>
       </elements>
     </policy>
+    <policy name="Rec_VerticalPosition" class="Both" displayName="$(string.P_VerticalPosition)" explainText="$(string.R_VerticalPosition)" presentation="$(presentation.P_VerticalPosition)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <enum id="Value" valueName="VerticalPosition" required="true">
+          <item displayName="$(string.I_VerticalPosition_0)">
+            <value>
+              <string>Top</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_VerticalPosition_1)">
+            <value>
+              <string>Middle</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_VerticalPosition_2)">
+            <value>
+              <string>Bottom</string>
+            </value>
+          </item>
+        </enum>
+      </elements>
+    </policy>
     <policy name="Margin" class="Both" displayName="$(string.P_Margin)" explainText="$(string.E_Margin)" presentation="$(presentation.P_Margin)" key="Software\Policies\Startline">
       <parentCategory ref="StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="Margin" required="true" minValue="0" maxValue="80"/>
+      </elements>
+    </policy>
+    <policy name="Rec_Margin" class="Both" displayName="$(string.P_Margin)" explainText="$(string.R_Margin)" presentation="$(presentation.P_Margin)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_StartMenu"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <elements>
         <decimal id="Value" valueName="Margin" required="true" minValue="0" maxValue="80"/>
@@ -342,8 +769,22 @@
         <decimal id="Value" valueName="Width" required="true" minValue="420" maxValue="1200"/>
       </elements>
     </policy>
+    <policy name="Rec_Width" class="Both" displayName="$(string.P_Width)" explainText="$(string.R_Width)" presentation="$(presentation.P_Width)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="Width" required="true" minValue="420" maxValue="1200"/>
+      </elements>
+    </policy>
     <policy name="Height" class="Both" displayName="$(string.P_Height)" explainText="$(string.E_Height)" presentation="$(presentation.P_Height)" key="Software\Policies\Startline">
       <parentCategory ref="StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="Height" required="true" minValue="420" maxValue="1100"/>
+      </elements>
+    </policy>
+    <policy name="Rec_Height" class="Both" displayName="$(string.P_Height)" explainText="$(string.R_Height)" presentation="$(presentation.P_Height)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_StartMenu"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <elements>
         <decimal id="Value" valueName="Height" required="true" minValue="420" maxValue="1100"/>
@@ -362,6 +803,19 @@
         <list id="Value" key="Software\Policies\Startline\PinnedApps" valuePrefix="" expandable="true"/>
       </elements>
     </policy>
+    <policy name="Rec_PinnedApps" class="Both" displayName="$(string.P_PinnedApps)" explainText="$(string.R_PinnedApps)" presentation="$(presentation.P_PinnedApps)" key="Software\Policies\Startline\Recommended" valueName="PinnedApps">
+      <parentCategory ref="Rec_Pins"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\Recommended\PinnedApps" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
     <policy name="SearchFolders" class="Both" displayName="$(string.P_SearchFolders)" explainText="$(string.E_SearchFolders)" presentation="$(presentation.P_SearchFolders)" key="Software\Policies\Startline" valueName="SearchFolders">
       <parentCategory ref="SearchPlaces"/>
       <supportedOn ref="SUPPORTED_Startline"/>
@@ -375,6 +829,19 @@
         <list id="Value" key="Software\Policies\Startline\SearchFolders" valuePrefix="" expandable="true"/>
       </elements>
     </policy>
+    <policy name="Rec_SearchFolders" class="Both" displayName="$(string.P_SearchFolders)" explainText="$(string.R_SearchFolders)" presentation="$(presentation.P_SearchFolders)" key="Software\Policies\Startline\Recommended" valueName="SearchFolders">
+      <parentCategory ref="Rec_SearchPlaces"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\Recommended\SearchFolders" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
     <policy name="SearchNetworkDrives" class="Both" displayName="$(string.P_SearchNetworkDrives)" explainText="$(string.E_SearchNetworkDrives)" key="Software\Policies\Startline" valueName="SearchNetworkDrives">
       <parentCategory ref="SearchPlaces"/>
       <supportedOn ref="SUPPORTED_Startline"/>
@@ -385,8 +852,28 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="Rec_SearchNetworkDrives" class="Both" displayName="$(string.P_SearchNetworkDrives)" explainText="$(string.R_SearchNetworkDrives)" key="Software\Policies\Startline\Recommended" valueName="SearchNetworkDrives">
+      <parentCategory ref="Rec_SearchPlaces"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="SearchUsbDrives" class="Both" displayName="$(string.P_SearchUsbDrives)" explainText="$(string.E_SearchUsbDrives)" key="Software\Policies\Startline" valueName="SearchUsbDrives">
       <parentCategory ref="SearchPlaces"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchUsbDrives" class="Both" displayName="$(string.P_SearchUsbDrives)" explainText="$(string.R_SearchUsbDrives)" key="Software\Policies\Startline\Recommended" valueName="SearchUsbDrives">
+      <parentCategory ref="Rec_SearchPlaces"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -408,6 +895,19 @@
         <list id="Value" key="Software\Policies\Startline\SearchSkipFolders" valuePrefix="" expandable="true"/>
       </elements>
     </policy>
+    <policy name="Rec_SearchSkipFolders" class="Both" displayName="$(string.P_SearchSkipFolders)" explainText="$(string.R_SearchSkipFolders)" presentation="$(presentation.P_SearchSkipFolders)" key="Software\Policies\Startline\Recommended" valueName="SearchSkipFolders">
+      <parentCategory ref="Rec_SearchSkip"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\Recommended\SearchSkipFolders" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
     <policy name="SearchSkipFolderNames" class="Both" displayName="$(string.P_SearchSkipFolderNames)" explainText="$(string.E_SearchSkipFolderNames)" presentation="$(presentation.P_SearchSkipFolderNames)" key="Software\Policies\Startline" valueName="SearchSkipFolderNames">
       <parentCategory ref="SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
@@ -419,6 +919,19 @@
       </disabledValue>
       <elements>
         <list id="Value" key="Software\Policies\Startline\SearchSkipFolderNames" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
+    <policy name="Rec_SearchSkipFolderNames" class="Both" displayName="$(string.P_SearchSkipFolderNames)" explainText="$(string.R_SearchSkipFolderNames)" presentation="$(presentation.P_SearchSkipFolderNames)" key="Software\Policies\Startline\Recommended" valueName="SearchSkipFolderNames">
+      <parentCategory ref="Rec_SearchSkip"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\Recommended\SearchSkipFolderNames" valuePrefix="" expandable="true"/>
       </elements>
     </policy>
     <policy name="SearchSkipFileTypes" class="Both" displayName="$(string.P_SearchSkipFileTypes)" explainText="$(string.E_SearchSkipFileTypes)" presentation="$(presentation.P_SearchSkipFileTypes)" key="Software\Policies\Startline" valueName="SearchSkipFileTypes">
@@ -434,6 +947,19 @@
         <list id="Value" key="Software\Policies\Startline\SearchSkipFileTypes" valuePrefix="" expandable="true"/>
       </elements>
     </policy>
+    <policy name="Rec_SearchSkipFileTypes" class="Both" displayName="$(string.P_SearchSkipFileTypes)" explainText="$(string.R_SearchSkipFileTypes)" presentation="$(presentation.P_SearchSkipFileTypes)" key="Software\Policies\Startline\Recommended" valueName="SearchSkipFileTypes">
+      <parentCategory ref="Rec_SearchSkip"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\Recommended\SearchSkipFileTypes" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
     <policy name="SearchSkipPatterns" class="Both" displayName="$(string.P_SearchSkipPatterns)" explainText="$(string.E_SearchSkipPatterns)" presentation="$(presentation.P_SearchSkipPatterns)" key="Software\Policies\Startline" valueName="SearchSkipPatterns">
       <parentCategory ref="SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
@@ -447,6 +973,19 @@
         <list id="Value" key="Software\Policies\Startline\SearchSkipPatterns" valuePrefix="" expandable="true"/>
       </elements>
     </policy>
+    <policy name="Rec_SearchSkipPatterns" class="Both" displayName="$(string.P_SearchSkipPatterns)" explainText="$(string.R_SearchSkipPatterns)" presentation="$(presentation.P_SearchSkipPatterns)" key="Software\Policies\Startline\Recommended" valueName="SearchSkipPatterns">
+      <parentCategory ref="Rec_SearchSkip"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\Recommended\SearchSkipPatterns" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
     <policy name="SearchSkipHidden" class="Both" displayName="$(string.P_SearchSkipHidden)" explainText="$(string.E_SearchSkipHidden)" key="Software\Policies\Startline" valueName="SearchSkipHidden">
       <parentCategory ref="SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
@@ -457,8 +996,28 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="Rec_SearchSkipHidden" class="Both" displayName="$(string.P_SearchSkipHidden)" explainText="$(string.R_SearchSkipHidden)" key="Software\Policies\Startline\Recommended" valueName="SearchSkipHidden">
+      <parentCategory ref="Rec_SearchSkip"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="SearchSkipSystem" class="Both" displayName="$(string.P_SearchSkipSystem)" explainText="$(string.E_SearchSkipSystem)" key="Software\Policies\Startline" valueName="SearchSkipSystem">
       <parentCategory ref="SearchSkip"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchSkipSystem" class="Both" displayName="$(string.P_SearchSkipSystem)" explainText="$(string.R_SearchSkipSystem)" key="Software\Policies\Startline\Recommended" valueName="SearchSkipSystem">
+      <parentCategory ref="Rec_SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -480,8 +1039,56 @@
         <list id="Value" key="Software\Policies\Startline\SearchResults" valuePrefix="" expandable="true"/>
       </elements>
     </policy>
+    <policy name="Rec_SearchResults" class="Both" displayName="$(string.P_SearchResults)" explainText="$(string.R_SearchResults)" presentation="$(presentation.P_SearchResults)" key="Software\Policies\Startline\Recommended" valueName="SearchResults">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\Recommended\SearchResults" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
+    <policy name="SearchMaxApps" class="Both" displayName="$(string.P_SearchMaxApps)" explainText="$(string.E_SearchMaxApps)" presentation="$(presentation.P_SearchMaxApps)" key="Software\Policies\Startline">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="SearchMaxApps" required="true" minValue="1" maxValue="30"/>
+      </elements>
+    </policy>
+    <policy name="Rec_SearchMaxApps" class="Both" displayName="$(string.P_SearchMaxApps)" explainText="$(string.R_SearchMaxApps)" presentation="$(presentation.P_SearchMaxApps)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="SearchMaxApps" required="true" minValue="1" maxValue="30"/>
+      </elements>
+    </policy>
+    <policy name="SearchMaxSettings" class="Both" displayName="$(string.P_SearchMaxSettings)" explainText="$(string.E_SearchMaxSettings)" presentation="$(presentation.P_SearchMaxSettings)" key="Software\Policies\Startline">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="SearchMaxSettings" required="true" minValue="1" maxValue="30"/>
+      </elements>
+    </policy>
+    <policy name="Rec_SearchMaxSettings" class="Both" displayName="$(string.P_SearchMaxSettings)" explainText="$(string.R_SearchMaxSettings)" presentation="$(presentation.P_SearchMaxSettings)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="SearchMaxSettings" required="true" minValue="1" maxValue="30"/>
+      </elements>
+    </policy>
     <policy name="SearchMaxFiles" class="Both" displayName="$(string.P_SearchMaxFiles)" explainText="$(string.E_SearchMaxFiles)" presentation="$(presentation.P_SearchMaxFiles)" key="Software\Policies\Startline">
       <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <decimal id="Value" valueName="SearchMaxFiles" required="true" minValue="5" maxValue="200"/>
+      </elements>
+    </policy>
+    <policy name="Rec_SearchMaxFiles" class="Both" displayName="$(string.P_SearchMaxFiles)" explainText="$(string.R_SearchMaxFiles)" presentation="$(presentation.P_SearchMaxFiles)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_SearchResults"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <elements>
         <decimal id="Value" valueName="SearchMaxFiles" required="true" minValue="5" maxValue="200"/>
@@ -497,18 +1104,8 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
-    <policy name="SearchShowTime" class="Both" displayName="$(string.P_SearchShowTime)" explainText="$(string.E_SearchShowTime)" key="Software\Policies\Startline" valueName="SearchShowTime">
-      <parentCategory ref="SearchResults"/>
-      <supportedOn ref="SUPPORTED_Startline"/>
-      <enabledValue>
-        <decimal value="1"/>
-      </enabledValue>
-      <disabledValue>
-        <decimal value="0"/>
-      </disabledValue>
-    </policy>
-    <policy name="SearchFileTypeButtons" class="Both" displayName="$(string.P_SearchFileTypeButtons)" explainText="$(string.E_SearchFileTypeButtons)" key="Software\Policies\Startline" valueName="SearchFileTypeButtons">
-      <parentCategory ref="SearchResults"/>
+    <policy name="Rec_SearchShowFolders" class="Both" displayName="$(string.P_SearchShowFolders)" explainText="$(string.R_SearchShowFolders)" key="Software\Policies\Startline\Recommended" valueName="SearchShowFolders">
+      <parentCategory ref="Rec_SearchResults"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -524,6 +1121,13 @@
         <text id="Value" valueName="SearchWebName" required="true"/>
       </elements>
     </policy>
+    <policy name="Rec_SearchWebName" class="Both" displayName="$(string.P_SearchWebName)" explainText="$(string.R_SearchWebName)" presentation="$(presentation.P_SearchWebName)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <text id="Value" valueName="SearchWebName" required="true"/>
+      </elements>
+    </policy>
     <policy name="SearchWebAddress" class="Both" displayName="$(string.P_SearchWebAddress)" explainText="$(string.E_SearchWebAddress)" presentation="$(presentation.P_SearchWebAddress)" key="Software\Policies\Startline">
       <parentCategory ref="SearchResults"/>
       <supportedOn ref="SUPPORTED_Startline"/>
@@ -531,8 +1135,25 @@
         <text id="Value" valueName="SearchWebAddress" required="true"/>
       </elements>
     </policy>
+    <policy name="Rec_SearchWebAddress" class="Both" displayName="$(string.P_SearchWebAddress)" explainText="$(string.R_SearchWebAddress)" presentation="$(presentation.P_SearchWebAddress)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <text id="Value" valueName="SearchWebAddress" required="true"/>
+      </elements>
+    </policy>
     <policy name="SearchChangeWindowsSettings" class="Both" displayName="$(string.P_SearchChangeWindowsSettings)" explainText="$(string.E_SearchChangeWindowsSettings)" key="Software\Policies\Startline" valueName="SearchChangeWindowsSettings">
       <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchChangeWindowsSettings" class="Both" displayName="$(string.P_SearchChangeWindowsSettings)" explainText="$(string.R_SearchChangeWindowsSettings)" key="Software\Policies\Startline\Recommended" valueName="SearchChangeWindowsSettings">
+      <parentCategory ref="Rec_SearchResults"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -551,8 +1172,148 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="Rec_SearchWindowsSettingsPages" class="Both" displayName="$(string.P_SearchWindowsSettingsPages)" explainText="$(string.R_SearchWindowsSettingsPages)" key="Software\Policies\Startline\Recommended" valueName="SearchWindowsSettingsPages">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="SearchRegex" class="Both" displayName="$(string.P_SearchRegex)" explainText="$(string.E_SearchRegex)" key="Software\Policies\Startline" valueName="SearchRegex">
+      <parentCategory ref="SearchBox"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchRegex" class="Both" displayName="$(string.P_SearchRegex)" explainText="$(string.R_SearchRegex)" key="Software\Policies\Startline\Recommended" valueName="SearchRegex">
+      <parentCategory ref="Rec_SearchBox"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="SearchShowRegexSwitch" class="Both" displayName="$(string.P_SearchShowRegexSwitch)" explainText="$(string.E_SearchShowRegexSwitch)" key="Software\Policies\Startline" valueName="SearchShowRegexSwitch">
+      <parentCategory ref="SearchBox"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchShowRegexSwitch" class="Both" displayName="$(string.P_SearchShowRegexSwitch)" explainText="$(string.R_SearchShowRegexSwitch)" key="Software\Policies\Startline\Recommended" valueName="SearchShowRegexSwitch">
+      <parentCategory ref="Rec_SearchBox"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="SearchShowHelp" class="Both" displayName="$(string.P_SearchShowHelp)" explainText="$(string.E_SearchShowHelp)" key="Software\Policies\Startline" valueName="SearchShowHelp">
+      <parentCategory ref="SearchBox"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchShowHelp" class="Both" displayName="$(string.P_SearchShowHelp)" explainText="$(string.R_SearchShowHelp)" key="Software\Policies\Startline\Recommended" valueName="SearchShowHelp">
+      <parentCategory ref="Rec_SearchBox"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="SearchFileTypeButtons" class="Both" displayName="$(string.P_SearchFileTypeButtons)" explainText="$(string.E_SearchFileTypeButtons)" key="Software\Policies\Startline" valueName="SearchFileTypeButtons">
+      <parentCategory ref="SearchBox"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchFileTypeButtons" class="Both" displayName="$(string.P_SearchFileTypeButtons)" explainText="$(string.R_SearchFileTypeButtons)" key="Software\Policies\Startline\Recommended" valueName="SearchFileTypeButtons">
+      <parentCategory ref="Rec_SearchBox"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="SearchShowTime" class="Both" displayName="$(string.P_SearchShowTime)" explainText="$(string.E_SearchShowTime)" key="Software\Policies\Startline" valueName="SearchShowTime">
+      <parentCategory ref="SearchBox"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchShowTime" class="Both" displayName="$(string.P_SearchShowTime)" explainText="$(string.R_SearchShowTime)" key="Software\Policies\Startline\Recommended" valueName="SearchShowTime">
+      <parentCategory ref="Rec_SearchBox"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="SearchShowHints" class="Both" displayName="$(string.P_SearchShowHints)" explainText="$(string.E_SearchShowHints)" key="Software\Policies\Startline" valueName="SearchShowHints">
+      <parentCategory ref="SearchBox"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchShowHints" class="Both" displayName="$(string.P_SearchShowHints)" explainText="$(string.R_SearchShowHints)" key="Software\Policies\Startline\Recommended" valueName="SearchShowHints">
+      <parentCategory ref="Rec_SearchBox"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="StartWithWindows" class="Both" displayName="$(string.P_StartWithWindows)" explainText="$(string.E_StartWithWindows)" key="Software\Policies\Startline" valueName="StartWithWindows">
       <parentCategory ref="General"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_StartWithWindows" class="Both" displayName="$(string.P_StartWithWindows)" explainText="$(string.R_StartWithWindows)" key="Software\Policies\Startline\Recommended" valueName="StartWithWindows">
+      <parentCategory ref="Rec_General"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -571,8 +1332,28 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="Rec_TakeOverStartKey" class="Both" displayName="$(string.P_TakeOverStartKey)" explainText="$(string.R_TakeOverStartKey)" key="Software\Policies\Startline\Recommended" valueName="TakeOverStartKey">
+      <parentCategory ref="Rec_General"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="TakeOverSearchKey" class="Both" displayName="$(string.P_TakeOverSearchKey)" explainText="$(string.E_TakeOverSearchKey)" key="Software\Policies\Startline" valueName="TakeOverSearchKey">
       <parentCategory ref="General"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_TakeOverSearchKey" class="Both" displayName="$(string.P_TakeOverSearchKey)" explainText="$(string.R_TakeOverSearchKey)" key="Software\Policies\Startline\Recommended" valueName="TakeOverSearchKey">
+      <parentCategory ref="Rec_General"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -591,8 +1372,28 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="Rec_SkipWelcome" class="Both" displayName="$(string.P_SkipWelcome)" explainText="$(string.R_SkipWelcome)" key="Software\Policies\Startline\Recommended" valueName="SkipWelcome">
+      <parentCategory ref="Rec_General"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="AutomaticUpdates" class="Both" displayName="$(string.P_AutomaticUpdates)" explainText="$(string.E_AutomaticUpdates)" key="Software\Policies\Startline" valueName="AutomaticUpdates">
       <parentCategory ref="Updates"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_AutomaticUpdates" class="Both" displayName="$(string.P_AutomaticUpdates)" explainText="$(string.R_AutomaticUpdates)" key="Software\Policies\Startline\Recommended" valueName="AutomaticUpdates">
+      <parentCategory ref="Rec_Updates"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -621,8 +1422,28 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="Rec_SearchSkipAppData" class="Both" displayName="$(string.P_SearchSkipAppData)" explainText="$(string.R_SearchSkipAppData)" key="Software\Policies\Startline\Recommended" valueName="SearchSkipAppData">
+      <parentCategory ref="Rec_SearchSkip"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="SearchSkipWindows" class="Both" displayName="$(string.P_SearchSkipWindows)" explainText="$(string.E_SearchSkipWindows)" key="Software\Policies\Startline" valueName="SearchSkipWindows">
       <parentCategory ref="SearchSkip"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchSkipWindows" class="Both" displayName="$(string.P_SearchSkipWindows)" explainText="$(string.R_SearchSkipWindows)" key="Software\Policies\Startline\Recommended" valueName="SearchSkipWindows">
+      <parentCategory ref="Rec_SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -641,8 +1462,28 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="Rec_SearchSkipDeveloperFiles" class="Both" displayName="$(string.P_SearchSkipDeveloperFiles)" explainText="$(string.R_SearchSkipDeveloperFiles)" key="Software\Policies\Startline\Recommended" valueName="SearchSkipDeveloperFiles">
+      <parentCategory ref="Rec_SearchSkip"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="SearchSkipCloudFolders" class="Both" displayName="$(string.P_SearchSkipCloudFolders)" explainText="$(string.E_SearchSkipCloudFolders)" key="Software\Policies\Startline" valueName="SearchSkipCloudFolders">
       <parentCategory ref="SearchSkip"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchSkipCloudFolders" class="Both" displayName="$(string.P_SearchSkipCloudFolders)" explainText="$(string.R_SearchSkipCloudFolders)" key="Software\Policies\Startline\Recommended" valueName="SearchSkipCloudFolders">
+      <parentCategory ref="Rec_SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>
@@ -661,8 +1502,28 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="Rec_SearchSkipTempFiles" class="Both" displayName="$(string.P_SearchSkipTempFiles)" explainText="$(string.R_SearchSkipTempFiles)" key="Software\Policies\Startline\Recommended" valueName="SearchSkipTempFiles">
+      <parentCategory ref="Rec_SearchSkip"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="SearchSkipProgramParts" class="Both" displayName="$(string.P_SearchSkipProgramParts)" explainText="$(string.E_SearchSkipProgramParts)" key="Software\Policies\Startline" valueName="SearchSkipProgramParts">
       <parentCategory ref="SearchSkip"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchSkipProgramParts" class="Both" displayName="$(string.P_SearchSkipProgramParts)" explainText="$(string.R_SearchSkipProgramParts)" key="Software\Policies\Startline\Recommended" valueName="SearchSkipProgramParts">
+      <parentCategory ref="Rec_SearchSkip"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>
         <decimal value="1"/>

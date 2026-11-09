@@ -3,6 +3,7 @@
 
 use crate::config::ResultKind;
 use crate::customize::{card, heading};
+use crate::i18n::tr;
 use crate::platform::{self, Drive, DriveKind};
 use crate::scope::{self, SKIP_PRESETS, Scope, Tick};
 use crate::search::Icon;
@@ -117,6 +118,26 @@ impl View {
     }
 }
 
+/// A number of results, with a slider.
+fn count_line(ui: &mut Ui, title: &str, value: &mut usize, range: std::ops::RangeInclusive<usize>, pal: Pal) {
+    ui.horizontal(|ui| {
+        ui.set_min_height(30.0);
+        let room = ui.available_width() * 0.45;
+        if ui.painter().layout_no_wrap(title.to_string(), FontId::proportional(13.5), pal.text).size().x <= room {
+            ui.label(RichText::new(title).size(13.5).color(pal.text));
+        } else {
+            ui.vertical(|ui| {
+                ui.set_max_width(room);
+                ui.add(Label::new(RichText::new(title).size(13.5).color(pal.text)).wrap());
+            });
+        }
+        ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+            ui.spacing_mut().slider_width = 130.0;
+            ui.add(Slider::new(value, range).text_color(pal.text));
+        });
+    });
+}
+
 fn switch_line(ui: &mut Ui, title: &str, about: &str, value: &mut bool, pal: Pal) {
     let width = ui.available_width();
     ui.horizontal(|ui| {
@@ -157,9 +178,9 @@ fn tree_row(menu: &mut Menu, ui: &mut Ui, view: &View, path: &str, label: &str, 
     let (tick, blocked) = view.with_scope(|scope| (scope.tick(path), scope.rule_blocks(path) && !view.all_roots.iter().any(|r| scope::same_path(r, path))));
     let tick_rect = Rect::from_center_size(pos2(left + 34.0, center), vec2(26.0, 26.0));
     let tick_response = ui.interact(tick_rect, id.with("tick"), Sense::click()).on_hover_text(match tick {
-        Tick::On => "Searched. Click to leave it out.",
-        Tick::Off => "Not searched. Click to include it.",
-        Tick::Some => "Partly searched. Click to change the whole folder.",
+        Tick::On => tr("Searched. Click to leave it out."),
+        Tick::Off => tr("Not searched. Click to include it."),
+        Tick::Some => tr("Partly searched. Click to change the whole folder."),
     });
     draw_tick(ui, tick_rect, tick, pal);
     if glyph == FOLDER {
@@ -173,9 +194,9 @@ fn tree_row(menu: &mut Menu, ui: &mut Ui, view: &View, path: &str, label: &str, 
     let right_text = if !detail.is_empty() {
         detail.to_string()
     } else if blocked && tick == Tick::Off {
-        "Skipped by a rule".to_string()
+        tr("Skipped by a rule").to_string()
     } else if let Some((_, count)) = view.counts.iter().find(|(root, _)| scope::same_path(root, path)) {
-        format!("{} items", thousands(*count))
+        crate::trn!(*count, "{n} item", "{n} items")
     } else {
         String::new()
     };
@@ -200,7 +221,7 @@ fn tree_row(menu: &mut Menu, ui: &mut Ui, view: &View, path: &str, label: &str, 
     if open {
         match known {
             None => {
-                ui.label(RichText::new("    Reading...").size(12.0).color(pal.sub));
+                ui.label(RichText::new(format!("    {}", tr("Reading…"))).size(12.0).color(pal.sub));
             }
             Some(children) => {
                 for (child, _) in children {
@@ -215,9 +236,9 @@ fn tree_row(menu: &mut Menu, ui: &mut Ui, view: &View, path: &str, label: &str, 
 fn drive_title(drive: &Drive) -> String {
     let letter = drive.root.trim_end_matches('\\');
     let kind = match drive.kind {
-        DriveKind::Fixed => "Local drive",
-        DriveKind::Network => "Network drive",
-        DriveKind::Removable => "USB drive",
+        DriveKind::Fixed => tr("Local Disk"),
+        DriveKind::Network => tr("Network Drive"),
+        DriveKind::Removable => tr("USB Drive"),
     };
     if drive.label.is_empty() { format!("{kind} ({letter})") } else { format!("{} ({letter})", drive.label) }
 }
@@ -251,9 +272,9 @@ fn tag_list(ui: &mut Ui, list: &mut Vec<String>, locked: &[String], problem: imp
                 ui.painter().text(pos2(response.rect.left() + 16.0, response.rect.center().y), Align2::CENTER_CENTER, glyph, icon_font(11.0), color);
             }
             let response = match (theirs, trouble) {
-                (true, _) => response.on_hover_text("Set by your organization"),
-                (false, Some(why)) => response.on_hover_text(format!("{why}\nIgnored until it's fixed. Click to remove it.")),
-                (false, None) => response.on_hover_text("Click to remove this rule"),
+                (true, _) => response.on_hover_text(tr("Set by your organization")),
+                (false, Some(why)) => response.on_hover_text(crate::trf!("{why}\nIgnored until it's fixed. Click to remove it.", why = why)),
+                (false, None) => response.on_hover_text(tr("Click to remove this rule")),
             };
             if !theirs && response.clicked() {
                 remove = Some(index);
@@ -270,7 +291,7 @@ fn add_rule_field(ui: &mut Ui, text: &mut String, hint: &str, pal: Pal) -> bool 
     ui.horizontal(|ui| {
         // Built from the right, so the button ends on the card's edge and the box fills the rest.
         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-            add = pill_button(ui, "Add", pal, false).clicked();
+            add = pill_button(ui, tr("Add"), pal, false).clicked();
             let field = ui.add(TextEdit::singleline(text).desired_width(f32::INFINITY).hint_text(hint));
             add |= field.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
         });
@@ -282,15 +303,15 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
     menu.scope_ui.refresh(&menu.index, ui.ctx());
     let ctx = ui.ctx().clone();
 
-    crate::customize::page_header(ui, "Search", "Where search looks, what it leaves out and how results are shown.", pal);
+    crate::customize::page_header(ui, tr("Search"), tr("Where search looks, what it leaves out and how results are shown."), pal);
 
     // How things stand right now.
     let status = menu.index.status.clone();
     let line = if status.walking.load(Ordering::Relaxed) {
         ctx.request_repaint_after(Duration::from_millis(300));
-        format!("Reading your folders... {} so far", thousands(status.walked.load(Ordering::Relaxed)))
+        crate::trf!("Reading your folders… {count} so far", count = crate::i18n::fmt_count(status.walked.load(Ordering::Relaxed)))
     } else {
-        format!("{} files and folders ready to search", thousands(menu.file_count()))
+        crate::trn!(menu.file_count(), "{n} file or folder ready to search", "{n} files and folders ready to search")
     };
     ui.label(RichText::new(line).size(13.0).color(pal.text));
     ui.add_space(8.0);
@@ -309,14 +330,15 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
 
     let home = home_folder();
     let policy = menu.policy.clone();
-    const WHERE: [&str; 2] = ["SearchFolders", "ExcludedFolders"];
+    // The administrator's folders never found only add to people's own: they can still untick folders.
+    const WHERE: [&str; 1] = ["SearchFolders"];
     two_columns(menu, ui, |menu, ui| {
-    heading(ui, "Where to search", pal);
-    ui.label(RichText::new("Tick what you want searched. Open a folder with its arrow to leave out what's inside.").size(12.5).color(pal.sub));
+    heading(ui, tr("Where to search"), pal);
+    ui.label(RichText::new(tr("Tick what you want searched. Open a folder with its arrow to leave out what's inside.")).size(12.5).color(pal.sub));
     ui.add_space(3.0);
     policy.lock(ui, &WHERE, |ui| card(ui, pal, |ui| {
         if let Some(home) = &home {
-            tree_row(menu, ui, &view, home, "Your home folder", "", '\u{E80F}', 0, pal);
+            tree_row(menu, ui, &view, home, tr("Your home folder"), "", '\u{E80F}', 0, pal);
         }
         for drive in drives.iter().filter(|d| d.kind == DriveKind::Fixed) {
             tree_row(menu, ui, &view, &drive.root, &drive_title(drive), "", '\u{EDA2}', 0, pal);
@@ -333,11 +355,11 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
             tree_row(menu, ui, &view, extra, extra, "", FOLDER, 0, pal);
         }
         ui.horizontal(|ui| {
-            if pill_button(ui, "Add a folder...", pal, false).clicked() {
+            if pill_button(ui, tr("Add a folder…"), pal, false).clicked() {
                 menu.ask_for_path(&ctx, true, Picked::SearchFolder);
             }
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                let clicked = pill_button(ui, "Add", pal, false).clicked();
+                let clicked = pill_button(ui, tr("Add"), pal, false).clicked();
                 let field = ui.add(TextEdit::singleline(&mut menu.scope_ui.new_place).desired_width(f32::INFINITY).hint_text("\\\\server\\share"));
                 let enter = field.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
                 if (clicked || enter) && !menu.scope_ui.new_place.trim().is_empty() {
@@ -351,55 +373,55 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         menu.scope_ui.new_place.clear();
     }
 
-    heading(ui, "Network and USB drives", pal);
+    heading(ui, tr("Network and USB drives"), pal);
     card(ui, pal, |ui| {
-        policy.lock(ui, &["SearchNetworkDrives"], |ui| switch_line(ui, "Search network drives", "Includes any network drive as it gets attached. Big shares can take a while to read.", &mut menu.cfg.auto_network, pal));
-        policy.lock(ui, &["SearchUsbDrives"], |ui| switch_line(ui, "Search USB drives", "Includes USB sticks and disks as they get plugged in.", &mut menu.cfg.auto_removable, pal));
+        policy.lock(ui, &["SearchNetworkDrives"], |ui| switch_line(ui, tr("Search network drives"), tr("Includes any network drive as it gets attached. Big shares can take a while to read."), &mut menu.cfg.auto_network, pal));
+        policy.lock(ui, &["SearchUsbDrives"], |ui| switch_line(ui, tr("Search USB drives"), tr("Includes USB sticks and disks as they get plugged in."), &mut menu.cfg.auto_removable, pal));
         let attached: Vec<&Drive> = drives.iter().filter(|d| d.kind != DriveKind::Fixed).collect();
         if attached.is_empty() {
-            ui.label(RichText::new("None attached right now.").size(12.5).color(pal.sub));
+            ui.label(RichText::new(tr("None attached right now.")).size(12.5).color(pal.sub));
         } else {
             ui.add_space(2.0);
             ui.separator();
             for drive in attached {
                 let glyph = if drive.kind == DriveKind::Network { '\u{E8CE}' } else { '\u{E88E}' };
                 let where_to = if drive.kind == DriveKind::Network { drive.label.as_str() } else { "" };
-                let title = if drive.kind == DriveKind::Network { format!("Network drive ({})", drive.root.trim_end_matches('\\')) } else { drive_title(drive) };
+                let title = if drive.kind == DriveKind::Network { crate::trf!("Network Drive ({letter})", letter = drive.root.trim_end_matches('\\')) } else { drive_title(drive) };
                 tree_row(menu, ui, &view, &drive.root, &title, where_to, glyph, 0, pal);
             }
         }
     });
     }, |menu, ui| {
-    heading(ui, "Never found", pal);
+    heading(ui, tr("Never found"), pal);
     card(ui, pal, |ui| {
         for preset in SKIP_PRESETS {
             let mut on = preset.is_on(&menu.cfg);
             let before = on;
-            policy.lock(ui, &[preset.key], |ui| switch_line(ui, preset.title, preset.about, &mut on, pal));
+            policy.lock(ui, &[preset.key], |ui| switch_line(ui, tr(preset.title), tr(preset.about), &mut on, pal));
             if on != before {
                 preset.set(&mut menu.cfg, on);
             }
         }
-        policy.lock(ui, &["SearchSkipHidden"], |ui| switch_line(ui, "Hidden files and folders", "Things Windows keeps out of sight.", &mut menu.cfg.skip_hidden, pal));
-        policy.lock(ui, &["SearchSkipSystem"], |ui| switch_line(ui, "System files", "What Windows marks as part of the system, such as desktop.ini.", &mut menu.cfg.skip_system, pal));
+        policy.lock(ui, &["SearchSkipHidden"], |ui| switch_line(ui, tr("Hidden files and folders"), tr("Things Windows keeps out of sight."), &mut menu.cfg.skip_hidden, pal));
+        policy.lock(ui, &["SearchSkipSystem"], |ui| switch_line(ui, tr("System files"), tr("What Windows marks as part of the system, such as desktop.ini."), &mut menu.cfg.skip_system, pal));
     });
     let no_problem = |_: &str| None;
     card(ui, pal, |ui| {
         if menu.cfg.excluded_paths.iter().any(|p| !p.is_empty()) {
-            ui.label(RichText::new("Folders").size(13.5).color(pal.text));
+            ui.label(RichText::new(tr("Folders")).size(13.5).color(pal.text));
             tag_list(ui, &mut menu.cfg.excluded_paths, policy.added("/excluded_paths"), no_problem, pal);
             ui.add_space(6.0);
         }
-        ui.label(RichText::new("Folders named").size(13.5).color(pal.text));
+        ui.label(RichText::new(tr("Folders named")).size(13.5).color(pal.text));
         tag_list(ui, &mut menu.cfg.exclude, policy.added("/exclude"), no_problem, pal);
         let mut text = std::mem::take(&mut menu.scope_ui.new_name);
-        if add_rule_field(ui, &mut text, "A folder name, wherever it appears", pal) {
+        if add_rule_field(ui, &mut text, tr("A folder name, wherever it appears"), pal) {
             menu.cfg.exclude.push(text.trim().to_string());
             text.clear();
         }
         menu.scope_ui.new_name = text;
         ui.add_space(6.0);
-        ui.label(RichText::new("File types").size(13.5).color(pal.text));
+        ui.label(RichText::new(tr("File types")).size(13.5).color(pal.text));
         tag_list(ui, &mut menu.cfg.excluded_exts, policy.added("/excluded_exts"), no_problem, pal);
         let mut text = std::mem::take(&mut menu.scope_ui.new_ext);
         if add_rule_field(ui, &mut text, ".iso", pal) {
@@ -411,9 +433,9 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         }
         menu.scope_ui.new_ext = text;
         ui.add_space(6.0);
-        ui.label(RichText::new("Paths matching").size(13.5).color(pal.text));
-        ui.label(RichText::new("Regular expressions, checked against the whole path in any case.").size(12.0).color(pal.sub));
-        let problem = |p: &str| crate::index::pattern(p).err().map(|e| e.to_string().lines().last().unwrap_or("Not a valid pattern").trim().to_string());
+        ui.label(RichText::new(tr("Paths matching")).size(13.5).color(pal.text));
+        ui.label(RichText::new(tr("Regular expressions, checked against the whole path in any case.")).size(12.0).color(pal.sub));
+        let problem = |p: &str| crate::index::pattern(p).err().map(|e| e.to_string().lines().last().unwrap_or(tr("Not a valid pattern")).trim().to_string());
         tag_list(ui, &mut menu.cfg.skip_patterns, policy.added("/skip_patterns"), problem, pal);
         let mut text = std::mem::take(&mut menu.scope_ui.new_pattern);
         if add_rule_field(ui, &mut text, r"\\Payroll(\\|$)", pal) {
@@ -425,10 +447,10 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         menu.scope_ui.new_pattern = text;
     });
 
-    heading(ui, "Results", pal);
+    heading(ui, tr("Results"), pal);
     card(ui, pal, |ui| {
         policy.lock(ui, &["SearchResults"], |ui| {
-            ui.label(RichText::new("Drag to choose what comes first").size(13.5).color(pal.text));
+            ui.label(RichText::new(tr("Drag to choose what comes first")).size(13.5).color(pal.text));
             drag_rows(ui, Id::unique("result-order"), &mut menu.cfg.results, 34.0, pal, |ui, result: &mut ResultKind| {
                 ui.label(RichText::new(result.kind.label()).size(13.5).color(if result.on { pal.text } else { pal.sub }));
                 ui.with_layout(Layout::right_to_left(Align::Center), |ui| switch(ui, &mut result.on, pal));
@@ -436,11 +458,33 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         });
         ui.add_space(4.0);
         ui.separator();
-        policy.lock(ui, &["SearchShowFolders"], |ui| switch_line(ui, "Show the folder under each file", "", &mut menu.cfg.show_paths, pal));
+        policy.lock(ui, &["SearchMaxApps"], |ui| count_line(ui, tr("Most apps"), &mut menu.cfg.max_apps, 1..=30, pal));
+        policy.lock(ui, &["SearchMaxSettings"], |ui| count_line(ui, tr("Most settings"), &mut menu.cfg.max_settings, 1..=30, pal));
+        policy.lock(ui, &["SearchMaxFiles"], |ui| count_line(ui, tr("Most files and folders"), &mut menu.cfg.max_files, 5..=200, pal));
+        ui.separator();
+        policy.lock(ui, &["SearchShowFolders"], |ui| switch_line(ui, tr("Show the folder under each file"), "", &mut menu.cfg.show_paths, pal));
+        policy.lock(ui, &["SearchChangeWindowsSettings"], |ui| switch_line(ui, tr("Change Windows settings from search"), tr("Dark mode, volume, Wi-Fi and the other switches and sliders."), &mut menu.cfg.search_windows_settings, pal));
+        policy.lock(ui, &["SearchWindowsSettingsPages"], |ui| switch_line(ui, tr("Shortcuts to Windows settings and tools"), tr("Pages of Windows Settings, and tools such as Task Manager."), &mut menu.cfg.search_settings_pages, pal));
+        policy.lock(ui, &["SearchWebName"], |ui| ui.horizontal(|ui| {
+            ui.label(RichText::new(tr("Name of the web search")).size(13.5).color(pal.text));
+            ui.add(TextEdit::singleline(&mut menu.cfg.web_name).desired_width(ui.available_width()));
+        }));
         policy.lock(ui, &["SearchWebAddress"], |ui| ui.horizontal(|ui| {
-            ui.label(RichText::new("Web search with").size(13.5).color(pal.text));
+            ui.label(RichText::new(tr("Web search with")).size(13.5).color(pal.text));
             ui.add(TextEdit::singleline(&mut menu.cfg.web_url).desired_width(ui.available_width()));
         }));
+    });
+
+    heading(ui, tr("Search box"), pal);
+    card(ui, pal, |ui| {
+        policy.lock(ui, &["SearchRegex"], |ui| switch_line(ui, tr("Treat searches as regular expressions"), tr("The whole search is one pattern, matched against names whatever the case."), &mut menu.cfg.regex_search, pal));
+        policy.lock(ui, &["SearchShowRegexSwitch"], |ui| {
+            ui.indent("regex-switch", |ui| switch_line(ui, tr("Its switch in the search box"), tr("Hidden, searches are never regular expressions."), &mut menu.cfg.show_regex_switch, pal))
+        });
+        policy.lock(ui, &["SearchShowHelp"], |ui| switch_line(ui, tr("Help button (?) in the search box"), tr("Shows what you can type: \"exact text\", wildcards, -without, ext:, kind:, size:, modified: and regular expressions."), &mut menu.cfg.show_search_help, pal));
+        policy.lock(ui, &["SearchFileTypeButtons"], |ui| switch_line(ui, tr("File type buttons"), tr("Narrow the results to one kind of file."), &mut menu.cfg.show_file_buttons, pal));
+        policy.lock(ui, &["SearchShowTime"], |ui| switch_line(ui, tr("How long a search took"), "", &mut menu.cfg.show_timing, pal));
+        policy.lock(ui, &["SearchShowHints"], |ui| switch_line(ui, tr("Keyboard hints under the results"), "", &mut menu.cfg.show_search_hints, pal));
     });
     });
 
