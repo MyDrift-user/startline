@@ -177,12 +177,16 @@ pub(crate) fn card(ui: &mut Ui, pal: Pal, add: impl FnOnce(&mut Ui)) {
 
 /// What a setting is and what it does on the left, its control on the right.
 fn row<R>(ui: &mut Ui, title: &str, about: &str, pal: Pal, control: impl FnOnce(&mut Ui) -> R) -> R {
-    let width = ui.available_width();
+    let room = ui.available_width() * 0.45;
+    row_with_room(ui, title, about, room, pal, control)
+}
+
+/// `room` is how wide the words may get before they wrap.
+fn row_with_room<R>(ui: &mut Ui, title: &str, about: &str, room: f32, pal: Pal, control: impl FnOnce(&mut Ui) -> R) -> R {
     ui.horizontal(|ui| {
         ui.set_min_height(34.0);
         // The words keep to their side and wrap there, so a long title in German or Italian never runs under the control.
         // A short title on its own stays one line, centered beside the control.
-        let room = width * 0.45;
         let fits = ui.painter().layout_no_wrap(title.to_string(), FontId::proportional(13.5), pal.text).size().x <= room;
         if about.is_empty() && fits {
             ui.label(RichText::new(title).size(13.5).color(pal.text));
@@ -201,8 +205,10 @@ fn row<R>(ui: &mut Ui, title: &str, about: &str, pal: Pal, control: impl FnOnce(
     .inner
 }
 
+/// A switch is small, so its words may use the row up to it.
 fn switch_row(ui: &mut Ui, title: &str, about: &str, value: &mut bool, pal: Pal) -> bool {
-    row(ui, title, about, pal, |ui| switch(ui, value, pal).changed())
+    let room = ui.available_width() - 70.0;
+    row_with_room(ui, title, about, room, pal, |ui| switch(ui, value, pal).changed())
 }
 
 fn slider(ui: &mut Ui, title: &str, about: &str, value: &mut f32, range: std::ops::RangeInclusive<f32>, pal: Pal) {

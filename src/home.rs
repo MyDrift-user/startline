@@ -780,8 +780,25 @@ impl Menu {
         let shown_name = if confirming { crate::trf!("Press again to confirm: {name}", name = row.name) } else { row.name.clone() };
         let name_color = if confirming && !lit { pal.accent } else { name_ink };
         let mark = if lit && pal.style == Experience::WindowsXp { pal.on_accent } else { pal.accent };
-        let name = highlighted_galley(ui, &shown_name, &self.tokens, FontId::proportional(14.0), name_color, mark, text_width);
-        if two_lines {
+        // Compact rows have no second line, so a file's folder follows its name: files of the same name stay told apart.
+        let folder_after = compact && show_detail && row.path.is_some() && !row.detail.is_empty();
+        let gap = 10.0;
+        let name_room = if folder_after {
+            let folder_width = ui.painter().layout_no_wrap(row.detail.clone(), FontId::proportional(12.0), sub_ink).size().x;
+            (text_width - gap - folder_width.min(text_width * 0.45)).max(text_width * 0.5)
+        } else {
+            text_width
+        };
+        let name = highlighted_galley(ui, &shown_name, &self.tokens, FontId::proportional(14.0), name_color, mark, name_room);
+        if folder_after {
+            let left = text_width - name.size().x - gap;
+            if left >= 40.0 {
+                let folder = path_galley(ui, &row.detail, FontId::proportional(12.0), sub_ink, left);
+                let y = rect.center().y - folder.size().y / 2.0 - ink_nudge(12.0);
+                ui.painter().galley(pos2(text_left + name.size().x + gap, y), folder, sub_ink);
+            }
+            ui.painter().galley(pos2(text_left, rect.center().y - name.size().y / 2.0 - ink_nudge(14.0)), name, name_ink);
+        } else if two_lines {
             let detail = path_galley(ui, &row.detail, FontId::proportional(12.0), sub_ink, text_width);
             let total = name.size().y + detail.size().y + 1.0;
             let top = rect.center().y - total / 2.0;
