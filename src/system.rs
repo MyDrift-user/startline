@@ -421,6 +421,7 @@ pub struct WinKeyMachine {
     native: bool,
     /// The press already did its job, so the release should do nothing more.
     consumed: bool,
+    /// A key whose press was held back, so its release is held back too. Only that one release.
     swallow_up: Option<u16>,
     last_win_event: u32,
 }
@@ -482,10 +483,13 @@ impl WinKeyMachine {
             }
             return decision;
         }
-        if !down && self.swallow_up == Some(vk) {
+        if self.swallow_up == Some(vk) {
+            // Its own release, or a new press of it that wasn't held back: either way the old press is over.
             self.swallow_up = None;
-            decision.swallow = true;
-            return decision;
+            if !down {
+                decision.swallow = true;
+                return decision;
+            }
         }
         if self.win_down && !self.told_windows && down {
             if time.wrapping_sub(self.last_win_event) > WIN_KEY_STALE_MS {
@@ -515,6 +519,12 @@ impl WinKeyMachine {
         decision
     }
 
+    /// The screen went to the lock screen, a UAC prompt or Ctrl+Alt+Del. Keys let go there never
+    /// reach the hook, so nothing held before can be trusted to still be down.
+    pub fn forget_held_keys(&mut self) {
+        *self = WinKeyMachine::default();
+    }
+
     /// A mouse button or wheel used with Start, as in Start + scroll. True if Windows should
     /// now be told the Start key is down.
     pub fn on_mouse(&mut self) -> bool {
@@ -533,6 +543,24 @@ static MACHINE: Mutex<Option<WinKeyMachine>> = Mutex::new(None);
 static START_CLICK_SWALLOWED: AtomicBool = AtomicBool::new(false);
 static LAST_WIN_KEY: AtomicU16 = AtomicU16::new(VK_LWIN.0);
 static SYSTEM_WINDOW: AtomicIsize = AtomicIsize::new(0);
+/// Set when the screen goes to the lock screen, a UAC prompt or Ctrl+Alt+Del. Windows doesn't show a
+/// Start key held back by the hook as down to GetAsyncKeyState, so this is how the hook learns that a
+/// release may have happened where it couldn't see it.
+static DESKTOP_SWITCHED: AtomicBool = AtomicBool::new(false);
+
+/// The Start key state, with anything held before a desktop switch forgotten.
+fn machine() -> std::sync::MutexGuard<'static, Option<WinKeyMachine>> {
+    let mut guard = MACHINE.lock().unwrap();
+    let machine = guard.get_or_insert_with(WinKeyMachine::default);
+    if DESKTOP_SWITCHED.swap(false, Ordering::SeqCst) {
+        machine.forget_held_keys();
+    }
+    guard
+}
+
+unsafe extern "system" fn desktop_switched(_: HWINEVENTHOOK, _: u32, _: HWND, _: i32, _: i32, _: u32, _: u32) {
+    DESKTOP_SWITCHED.store(true, Ordering::SeqCst);
+}
 
 const WM_APP_OPEN_MENU: u32 = WM_APP + 1;
 const WM_APP_TRAY: u32 = WM_APP + 3;
@@ -569,7 +597,7 @@ unsafe extern "system" fn keyboard_proc(code: i32, wparam: WPARAM, lparam: LPARA
                     let down = wparam.0 as u32 == WM_KEYDOWN || wparam.0 as u32 == WM_SYSKEYDOWN;
                     let held = |vk: VIRTUAL_KEY| GetAsyncKeyState(vk.0 as i32) as u16 & 0x8000 != 0;
                     let vk = info.vkCode as u16;
-                    let decision = MACHINE.lock().unwrap().get_or_insert_with(WinKeyMachine::default).on_key(
+                    let decision = machine().as_mut().unwrap().on_key(
                         vk,
                         down,
                         held(VK_SHIFT),
@@ -622,7 +650,7 @@ unsafe extern "system" fn mouse_proc(code: i32, wparam: WPARAM, lparam: LPARAM) 
         if code as u32 == HC_ACTION {
             let message = wparam.0 as u32;
             if matches!(message, WM_LBUTTONDOWN | WM_RBUTTONDOWN | WM_MBUTTONDOWN | WM_MOUSEWHEEL | WM_MOUSEHWHEEL)
-                && MACHINE.lock().unwrap().as_mut().is_some_and(|machine| machine.on_mouse())
+                && machine().as_mut().is_some_and(|machine| machine.on_mouse())
             {
                 press_keys(&[(LAST_WIN_KEY.load(Ordering::Relaxed), false)]);
             }
@@ -737,6 +765,11 @@ unsafe extern "system" fn system_wndproc(hwnd: HWND, message: u32, wparam: WPARA
     unsafe {
         let shared = SHARED.get();
         match message {
+            // Locked, unlocked, or another account switched to: keys let go meanwhile never reached the hook.
+            WM_WTSSESSION_CHANGE => {
+                DESKTOP_SWITCHED.store(true, Ordering::SeqCst);
+                return LRESULT(0);
+            }
             // Sent by a second launch of the program.
             WM_APP_OPEN_MENU => {
                 send_job(Job::Toggle);
@@ -972,6 +1005,10 @@ pub fn start(shared: Arc<Shared>, hooks: bool) {
                 // Our own windows count too: clicking the settings window closes the menu.
                 WINEVENT_OUTOFCONTEXT,
             );
+            if hooks {
+                let _ = SetWinEventHook(EVENT_SYSTEM_DESKTOPSWITCH, EVENT_SYSTEM_DESKTOPSWITCH, None, Some(desktop_switched), 0, 0, WINEVENT_OUTOFCONTEXT);
+                let _ = windows::Win32::System::RemoteDesktop::WTSRegisterSessionNotification(window, windows::Win32::System::RemoteDesktop::NOTIFY_FOR_THIS_SESSION);
+            }
             let mut message = MSG::default();
             while GetMessageW(&mut message, None, 0, 0).as_bool() {
                 let _ = TranslateMessage(&message);
@@ -1248,6 +1285,51 @@ mod tests {
         assert_eq!(m.on_key(E, true, false, false, true, true, 90_000), KeyDecision::default());
         assert_eq!(m.on_key(WIN, true, false, false, true, true, 91_000).swallow, true);
         assert_eq!(m.on_key(WIN, false, false, false, true, true, 91_050).open, Some(Opened::Menu));
+    }
+
+    #[test]
+    fn plain_keys_after_a_release_on_the_lock_screen_are_plain() {
+        let mut m = WinKeyMachine::default();
+        m.on_key(WIN, true, false, false, true, true, 1000);
+        // Let go on the lock screen, a UAC prompt or Ctrl+Alt+Del: the release never arrives, but the switch is seen.
+        m.forget_held_keys();
+        for (vk, time) in [(E, 1200), (VK_L, 1300), (VK_S, 1400)] {
+            assert_eq!(m.on_key(vk, true, false, false, true, true, time), KeyDecision::default(), "typing {vk:#x} must not be a shortcut");
+            assert_eq!(m.on_key(vk, false, false, false, true, true, time + 50), KeyDecision::default());
+        }
+    }
+
+    #[test]
+    fn the_l_release_after_start_plus_l_is_only_held_back_once() {
+        // The lock screen takes the release of L, so it never arrives.
+        let mut m = WinKeyMachine::default();
+        tap(&mut m, WIN, true);
+        assert!(tap(&mut m, VK_L, true).lock);
+        m.forget_held_keys();
+        assert_eq!(tap(&mut m, VK_L, true), KeyDecision::default(), "the next L is typed");
+        assert_eq!(tap(&mut m, VK_L, false), KeyDecision::default(), "and its release reaches the app");
+
+        // Even when the switch went unnoticed, a new press of L that goes through ends the old one.
+        let mut m = WinKeyMachine::default();
+        tap(&mut m, WIN, true);
+        assert!(tap(&mut m, VK_L, true).lock);
+        tap(&mut m, WIN, false);
+        assert_eq!(tap(&mut m, VK_L, true), KeyDecision::default());
+        assert_eq!(tap(&mut m, VK_L, false), KeyDecision::default());
+    }
+
+    #[test]
+    fn start_alone_and_start_shortcuts_still_work_after_a_switch() {
+        let mut m = WinKeyMachine::default();
+        tap(&mut m, WIN, true);
+        m.forget_held_keys();
+        assert!(tap(&mut m, WIN, true).swallow);
+        assert_eq!(tap(&mut m, WIN, false).open, Some(Opened::Menu), "Start alone opens the menu");
+        tap(&mut m, WIN, true);
+        let e = tap(&mut m, E, true);
+        assert_eq!(e.shortcut_key, Some(E), "Start + E still reaches Windows");
+        assert_eq!(tap(&mut m, E, false), KeyDecision::default());
+        assert_eq!(tap(&mut m, WIN, false), KeyDecision::default());
     }
 
     #[test]

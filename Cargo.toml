@@ -17,7 +17,7 @@ winresource = "0.1"
 [dependencies]
 ed25519-dalek = { version = "2", default-features = false, features = ["std"] }
 sha2 = "0.10"
-eframe = { version = "0.37.0", default-features = false, features = ["glow", "default_fonts"] }
+eframe = { version = "0.37.0", default-features = false, features = ["glow", "default_fonts", "clipboard"] }
 egui = "0.37.0"
 memchr = "2.8.3"
 png = "0.18.1"

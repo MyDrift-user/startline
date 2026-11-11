@@ -204,15 +204,21 @@ impl PlaceKind {
 
 /// What a folder or drive sits on. Network paths are known by their form; a local drive is asked whether it's
 /// removable, on USB, and whether it has a seek penalty, which only spinning disks have.
+/// USB hard disks and SSDs in an enclosure say they're fixed drives, so it's their bus that makes them USB, for the
+/// "Index USB drives" switch as much as for how gently they're read.
 pub fn place_kind(path: &str) -> PlaceKind {
     let drive = drive_kind_of(path);
     if drive != PlaceKind::Hdd {
         return drive;
     }
-    let letter = path.chars().next().unwrap_or('C').to_ascii_uppercase();
-    match storage_of(letter) {
-        Some((usb, _)) if usb => PlaceKind::Usb,
-        Some((_, false)) => PlaceKind::Ssd,
+    kind_of_fixed(storage_of(path.chars().next().unwrap_or('C')))
+}
+
+/// A fixed drive, from what its storage driver says: (on USB, has a seek penalty).
+pub fn kind_of_fixed(storage: Option<(bool, bool)>) -> PlaceKind {
+    match storage {
+        Some((true, _)) => PlaceKind::Usb,
+        Some((false, false)) => PlaceKind::Ssd,
         // Unknown counts as a hard disk: the gentler choice.
         _ => PlaceKind::Hdd,
     }
@@ -237,8 +243,22 @@ pub fn drive_kind_of(path: &str) -> PlaceKind {
     }
 }
 
-/// (on USB, has a seek penalty) for a drive letter, from the storage driver.
+/// (on USB, has a seek penalty) for a drive letter, from the storage driver. The driver answers without reading the
+/// disk; the answer is kept for half a minute, as drive lists are drawn often.
 fn storage_of(letter: char) -> Option<(bool, bool)> {
+    static ASKED: std::sync::Mutex<Vec<(char, std::time::Instant, Option<(bool, bool)>)>> = std::sync::Mutex::new(Vec::new());
+    let letter = letter.to_ascii_uppercase();
+    let mut asked = ASKED.lock().unwrap();
+    asked.retain(|(_, at, _)| at.elapsed() < std::time::Duration::from_secs(30));
+    if let Some((_, _, answer)) = asked.iter().find(|(l, _, _)| *l == letter) {
+        return *answer;
+    }
+    let answer = ask_storage(letter);
+    asked.push((letter, std::time::Instant::now(), answer));
+    answer
+}
+
+fn ask_storage(letter: char) -> Option<(bool, bool)> {
     use windows::Win32::System::IO::DeviceIoControl;
     use windows::Win32::System::Ioctl::*;
     let volume = wide(&format!("\\\\.\\{letter}:"));
@@ -291,11 +311,25 @@ pub fn other_fixed_drives() -> Vec<String> {
     (0..26u8)
         .filter(|i| mask & (1 << i) != 0)
         .map(|i| format!("{}:\\", (b'A' + i) as char))
+        .filter(|root| !root.starts_with(&system))
         .filter(|root| {
             let w = wide(root);
-            !root.starts_with(&system) && unsafe { GetDriveTypeW(PCWSTR(w.as_ptr())) } == DRIVE_FIXED
+            (unsafe { GetDriveTypeW(PCWSTR(w.as_ptr())) }) == DRIVE_FIXED
         })
+        // A disk in a USB enclosure is a USB drive, with its own switch.
+        .filter(|root| kind_of_fixed(storage_of(root.chars().next().unwrap_or('C'))) != PlaceKind::Usb)
         .collect()
+}
+
+/// How a drive is listed, from its Windows drive type and whether it sits on USB.
+pub fn listed_kind(drive_type: u32, on_usb: bool) -> Option<DriveKind> {
+    match drive_type {
+        DRIVE_FIXED if on_usb => Some(DriveKind::Removable),
+        DRIVE_FIXED => Some(DriveKind::Fixed),
+        DRIVE_REMOTE => Some(DriveKind::Network),
+        DRIVE_REMOVABLE => Some(DriveKind::Removable),
+        _ => None,
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Debug)]
@@ -314,21 +348,19 @@ pub struct Drive {
     pub label: String,
 }
 
-/// Which drives are attached and of what kind. Quick: it doesn't touch the drives themselves.
+/// Which drives are attached and of what kind, a disk in a USB enclosure among the USB drives. Quick: only the
+/// storage driver of a fixed drive is asked, never the disk itself.
 pub fn attached_drives() -> Vec<(String, DriveKind)> {
     let mask = unsafe { GetLogicalDrives() };
     (0..26u8)
         .filter(|i| mask & (1 << i) != 0)
         .filter_map(|i| {
-            let root = format!("{}:\\", (b'A' + i) as char);
+            let letter = (b'A' + i) as char;
+            let root = format!("{letter}:\\");
             let w = wide(&root);
-            let kind = match unsafe { GetDriveTypeW(PCWSTR(w.as_ptr())) } {
-                DRIVE_FIXED => DriveKind::Fixed,
-                DRIVE_REMOTE => DriveKind::Network,
-                DRIVE_REMOVABLE => DriveKind::Removable,
-                _ => return None,
-            };
-            Some((root, kind))
+            let drive_type = unsafe { GetDriveTypeW(PCWSTR(w.as_ptr())) };
+            let on_usb = drive_type == DRIVE_FIXED && kind_of_fixed(storage_of(letter)) == PlaceKind::Usb;
+            listed_kind(drive_type, on_usb).map(|kind| (root, kind))
         })
         .collect()
 }
@@ -802,6 +834,23 @@ pub fn message_box_error(text: &str) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_disk_in_a_usb_enclosure_counts_as_usb() {
+        // Its drive type says fixed; its bus says USB.
+        assert_eq!(kind_of_fixed(Some((true, false))), PlaceKind::Usb, "a USB SSD");
+        assert_eq!(kind_of_fixed(Some((true, true))), PlaceKind::Usb, "a USB hard disk");
+        assert_eq!(kind_of_fixed(Some((false, false))), PlaceKind::Ssd);
+        assert_eq!(kind_of_fixed(Some((false, true))), PlaceKind::Hdd);
+        assert_eq!(kind_of_fixed(None), PlaceKind::Hdd, "unknown is read as gently as a hard disk");
+        assert_eq!(listed_kind(DRIVE_FIXED, true), Some(DriveKind::Removable), "listed with the USB drives");
+        assert_eq!(listed_kind(DRIVE_FIXED, false), Some(DriveKind::Fixed));
+        assert_eq!(listed_kind(DRIVE_REMOVABLE, false), Some(DriveKind::Removable));
+        assert_eq!(listed_kind(DRIVE_REMOTE, false), Some(DriveKind::Network));
+        let cfg = crate::config::Config::default();
+        assert!(!cfg.indexes(kind_of_fixed(Some((true, false)))), "with Index USB drives off, it isn't read");
+        assert!(cfg.indexes(kind_of_fixed(Some((false, false)))));
+    }
 
     /// Run from an elevated prompt: cargo test --release -- --ignored opens_with_normal_rights
     #[test]

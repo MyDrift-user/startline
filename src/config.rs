@@ -383,7 +383,7 @@ impl Config {
 
     /// Bring lists up to date after an update added a new section, setting or category.
     fn repair(&mut self) {
-        self.repair_with(&crate::platform::drive_kind_of)
+        self.repair_with(&crate::platform::place_kind)
     }
 
     /// `kind_of` tells what a place sits on, without touching the disk.

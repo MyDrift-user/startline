@@ -68,7 +68,7 @@ fn index_params_of(cfg: &Config) -> IndexParams {
     IndexParams {
         // Only the kinds of drive that are switched on are read or watched at all: local drives, network drives
         // (manually added \\server\share places among them) and USB drives.
-        roots: scope.places_to_read().into_iter().filter(|place| cfg.indexes(platform::drive_kind_of(place))).collect(),
+        roots: scope.places_to_read().into_iter().filter(|place| cfg.indexes(platform::place_kind(place))).collect(),
         exclude: cfg.exclude.clone(),
         exclude_paths: cfg.excluded_paths.clone(),
         exclude_exts: cfg.excluded_exts.clone(),
@@ -164,7 +164,7 @@ pub struct Menu {
     /// The person chose to update now, rather than when the menu is next out of sight.
     pub(crate) update_requested: bool,
 
-    options: Options,
+    pub(crate) options: Options,
     frames: u64,
     started: Instant,
     shot_requested: bool,
@@ -332,7 +332,7 @@ impl Menu {
         });
     }
 
-    fn is_shot(&self) -> bool {
+    pub(crate) fn is_shot(&self) -> bool {
         self.options.screenshot.is_some()
     }
 
@@ -861,7 +861,7 @@ impl Menu {
     // ---- Keyboard ----
 
     fn handle_keys(&mut self, ctx: &Context) {
-        if self.popup_keys(ctx) {
+        if self.popup_keys(ctx) || crate::widgets::text_menu_open(ctx) {
             return;
         }
         let in_customize = matches!(self.page, Page::Customize(_));

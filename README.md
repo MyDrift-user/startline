@@ -51,7 +51,7 @@ Type what you want and act on it from the result: "dark mode", "volume 40", "lou
 ### 🏢 Ready for IT departments
 Every setting can be fixed, or given as a default people can change, by **Group Policy** or straight in the Registry (`Software\Policies\Startline` and its `Recommended` subkey, under HKLM or HKCU), for computers or users. ADMX templates come with ADML in English, German and Italian. Pins and their sections, the layout and size, what the menu shows, how search behaves and whether updates install by themselves can all be deployed this way, without copying `start2.bin` around. Fixed settings show greyed out with "Managed by your organization", and running copies pick up changes within a minute. [`PolicyDefinitions/README.txt`](PolicyDefinitions/README.txt) lists every value.
 
-**What it reads from disks.** Startline reads only the names, sizes and dates of files and folders, never what's in them. Out of the box it indexes the PC's own drives; network and USB drives are off. Reading runs in Windows's background mode, one folder at a time on hard disks, and waits while the PC is on battery or a full-screen app is in front. After the first run it trusts its saved index and Windows's change notices, and reads a drive again only when the search places change, Windows loses track, or the index is more than a day old. Network shares, when switched on, are read at most once a day while the PC is idle, at most 20 folders a second, with no watch on the server. The policies **SearchLocalDrives**, **SearchNetworkDrives** and **SearchUsbDrives** turn each kind on or off.
+**What it reads from disks.** Startline reads only the names, sizes and dates of files and folders, never what's in them. Out of the box it indexes the PC's own drives; network and USB drives are off. Reading runs in Windows's background mode, one folder at a time on hard disks, and waits while a full-screen app is in front and for the first ten minutes on battery. Disks in a USB enclosure count as USB drives. After the first run it trusts its saved index and Windows's change notices, and reads a drive again only when the search places change, Windows loses track, or the index is more than a day old. Network shares, when switched on, are read at most once a day while the PC is idle, at most 20 folders a second, with no watch on the server. The policies **SearchLocalDrives**, **SearchNetworkDrives** and **SearchUsbDrives** turn each kind on or off.
 
 ## ⌨️ Keyboard
 
@@ -75,22 +75,22 @@ Download what you need from **[Releases](../../releases)**, for Windows 10 or 11
 
 | File | What it is |
 |---|---|
-| `...-windows-x64-setup.exe` | Installer, for this PC or just your account |
-| `...-windows-x64.msi` | MSI installer with a setup wizard, or silent for managed deployment |
-| `...-windows-x64-portable.exe` | Portable, runs without installing |
-| `...-windows-x64.zip` | The same portable program, zipped |
-| `...-policy-definitions.zip` | Group Policy templates |
+| `startline-v<version>-windows-x64-setup.exe` | Installer, for this PC or just your account |
+| `startline-v<version>-windows-x64.msi` | MSI installer with a setup wizard, or silent for managed deployment |
+| `startline-v<version>-windows-x64-portable.exe` | Portable, runs without installing |
+| `startline-v<version>-windows-x64.zip` | The same portable program, zipped |
+| `startline-v<version>-policy-definitions.zip` | Group Policy templates |
 
-Both installers can install for this PC or for just your account. To install without any screens:
+Both installers can install for this PC or for just your account. To install without any screens, here for version 0.0.1:
 
 ```bat
 :: For this PC, from an administrator prompt. The folder is optional.
-msiexec /i startline-windows-x64.msi /qn ALLUSERS=1 APPLICATIONFOLDER="D:\Apps\Startline"
-startline-windows-x64-setup.exe /VERYSILENT /ALLUSERS /DIR="D:\Apps\Startline"
+msiexec /i startline-v0.0.1-windows-x64.msi /qn ALLUSERS=1 APPLICATIONFOLDER="D:\Apps\Startline"
+startline-v0.0.1-windows-x64-setup.exe /VERYSILENT /ALLUSERS /DIR="D:\Apps\Startline"
 
 :: For one account, without admin rights.
-msiexec /i startline-windows-x64.msi /qn ALLUSERS=2 MSIINSTALLPERUSER=1
-startline-windows-x64-setup.exe /VERYSILENT /CURRENTUSER
+msiexec /i startline-v0.0.1-windows-x64.msi /qn ALLUSERS=2 MSIINSTALLPERUSER=1
+startline-v0.0.1-windows-x64-setup.exe /VERYSILENT /CURRENTUSER
 ```
 
 Nothing is signed by a known publisher, so SmartScreen may show a warning. Uninstalling closes Startline and removes its Start with Windows entry.
@@ -127,7 +127,7 @@ The program ends up in `target/release/startline.exe`. Its icon and version need
 
 Every push is built and tested by the CI workflow, which also checks that `PolicyDefinitions` matches what the program writes with `startline.exe --write-policy-templates PolicyDefinitions`. Releases only start by hand:
 
-1. Raise `version` in `Cargo.toml` and push. A version can't change once it's released, because updates go by the number.
+1. Raise `version` in `Cargo.toml`, add a `## <version>` section to [`CHANGELOG.md`](CHANGELOG.md) saying what changed for people, and push. A version can't change once it's released, because updates go by the number. The section becomes the release notes, and the workflow stops before building when it's missing.
 2. Go to **Actions > Release > Run workflow**. Turning off **Publish** only builds and tests, leaving the files on the run.
 
 Publishing waits for an approval on GitHub, as the signing key is a secret of the protected `release` environment. If that key is lost or leaks, a release signed with the offline backup key can still reach every copy, and replace it.

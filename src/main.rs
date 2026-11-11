@@ -45,6 +45,8 @@ pub struct Options {
     pub experience: Option<String>,
     /// For pictures of Settings: open the folder tree and a pin, and make the window tall.
     pub demo_open: bool,
+    /// For a picture of the search box's right-click menu: its text selected and the menu open.
+    pub demo_text_menu: bool,
     /// For a picture of what policies do: read them from this file instead of the Registry.
     pub test_policies: Option<PathBuf>,
 }
@@ -72,6 +74,7 @@ fn parse_options() -> (Options, Option<PathBuf>, Option<PathBuf>) {
             "--preset" => options.preset = args.next(),
             "--experience" => options.experience = args.next(),
             "--demo-open" => options.demo_open = true,
+            "--demo-text-menu" => options.demo_text_menu = true,
             "--test-policies" => options.test_policies = args.next().map(PathBuf::from),
             "--write-policy-templates" => {
                 let folder = args.next().map_or_else(|| PathBuf::from("PolicyDefinitions"), PathBuf::from);

@@ -180,7 +180,16 @@ impl Menu {
             .font(font)
             .text_color(pal.text)
             .desired_width(edit_rect.width());
-        let response = ui.put(edit_rect, edit);
+        let response = text_box(ui, Some(edit_rect), edit);
+        if self.options.demo_text_menu && self.is_shot() {
+            let menu_id = response.id.with("popup");
+            if !Popup::is_id_open(ui.ctx(), menu_id) {
+                let mut state = TextEdit::load_state(ui.ctx(), response.id).unwrap_or_default();
+                state.cursor.set_char_range(Some(text::CCursorRange::select_all_str(&self.query)));
+                TextEdit::store_state(ui.ctx(), response.id, state);
+                Popup::open_id(ui.ctx(), menu_id);
+            }
+        }
         if self.popup.is_none() && (self.focus_search || !response.has_focus()) {
             response.request_focus();
             self.focus_search = false;

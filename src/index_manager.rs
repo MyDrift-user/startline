@@ -1,6 +1,6 @@
 //! Keeping the index fresh, gently. The saved index answers searches from the first moment; a place is read again
-//! from disk only when it has to be, in Windows's background mode, with as few threads as its disk takes, and never
-//! while on battery or while a full-screen app is in front. Network shares get no watch on them and are read at most
+//! from disk only when it has to be, in Windows's background mode, with as few threads as its disk takes, never while
+//! a full-screen app is in front, and only after the first ten minutes on battery. Network shares get no watch on them and are read at most
 //! once a day, only while the PC is idle, at a slow and steady pace.
 
 use super::*;
@@ -76,6 +76,15 @@ fn now_secs() -> u64 {
     std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.as_secs())
 }
 
+/// How long a walk waits after the PC goes on battery. A laptop that stays on battery for good still gets its index
+/// read, in background mode as always.
+const BATTERY_WAIT: Duration = Duration::from_secs(10 * 60);
+
+/// Whether a walk should wait now: while a full-screen app is in front, and for the first minutes on battery.
+pub fn waits(on_battery: bool, battery_for: Duration, full_screen: bool) -> bool {
+    full_screen || (on_battery && battery_for < BATTERY_WAIT)
+}
+
 /// Waits before each folder listing while it's no time to read the disk, and keeps a slow place to its pace.
 pub struct Gate {
     /// Wait while on battery or while a full-screen app is in front.
@@ -98,15 +107,27 @@ impl Gate {
         Gate { pause: true, per_second, last: Mutex::new(None), checked: Mutex::new(None) }
     }
 
-    /// Whether it's a bad moment to read the disk: on battery, or a full-screen app in front.
+    /// Whether it's a bad moment to read the disk: just gone on battery, or a full-screen app in front.
     fn busy(&self) -> bool {
+        // Since when the PC has been on battery, for every place being read.
+        static ON_BATTERY_SINCE: Mutex<Option<Instant>> = Mutex::new(None);
         let mut checked = self.checked.lock().unwrap();
         if let Some((at, busy)) = *checked {
             if at.elapsed() < Duration::from_secs(3) {
                 return busy;
             }
         }
-        let busy = platform::on_battery() || platform::full_screen_in_front();
+        let on_battery = platform::on_battery();
+        let battery_for = {
+            let mut since = ON_BATTERY_SINCE.lock().unwrap();
+            match (on_battery, *since) {
+                (false, _) => *since = None,
+                (true, None) => *since = Some(Instant::now()),
+                (true, Some(_)) => {}
+            }
+            since.map_or(Duration::ZERO, |at| at.elapsed())
+        };
+        let busy = waits(on_battery, battery_for, platform::full_screen_in_front());
         *checked = Some((Instant::now(), busy));
         busy
     }
@@ -511,6 +532,18 @@ mod tests {
             free.before_listing();
         }
         assert!(started.elapsed() < Duration::from_millis(50));
+    }
+
+    #[test]
+    fn a_walk_waits_on_battery_only_for_a_while() {
+        let minutes = |m: u64| Duration::from_secs(m * 60);
+        assert!(!waits(false, Duration::ZERO, false), "on mains with nothing in front, it reads");
+        assert!(waits(true, Duration::ZERO, false), "just gone on battery: it waits");
+        assert!(waits(true, minutes(9), false));
+        assert!(!waits(true, minutes(10), false), "ten minutes on battery: it carries on");
+        assert!(!waits(true, minutes(120), false));
+        assert!(waits(false, Duration::ZERO, true), "a full-screen app in front: it waits");
+        assert!(waits(true, minutes(120), true), "for as long as it's in front, battery or not");
     }
 
     #[test]

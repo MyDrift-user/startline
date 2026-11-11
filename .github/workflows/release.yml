@@ -37,6 +37,11 @@ jobs:
           "version=$v" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "VERSION=$v" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+      # The release notes are this version's section of CHANGELOG.md, so it has to be there before anything is built.
+      - name: Check the release notes
+        shell: bash
+        run: bash .github/release-notes.sh "$VERSION" > "$RUNNER_TEMP/notes.md"
+
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
 
@@ -211,6 +216,11 @@ jobs:
       run:
         shell: bash
     steps:
+      - uses: actions/checkout@v7
+
+      - name: Release notes
+        run: bash .github/release-notes.sh "$VERSION" > "$RUNNER_TEMP/notes.md"
+
       - uses: actions/download-artifact@v8
         with:
           path: dist
@@ -252,7 +262,7 @@ jobs:
           [ "$PRERELEASE" = "true" ] && flags+=(--prerelease)
           # An upload can fail while GitHub is having trouble, so start over from a clean slate a few times.
           for attempt in 1 2 3 4; do
-            gh release create "v$VERSION" dist/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Startline v$VERSION" --generate-notes "${flags[@]}" && exit 0
+            gh release create "v$VERSION" dist/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Startline v$VERSION" --notes-file "$RUNNER_TEMP/notes.md" "${flags[@]}" && exit 0
             sleep 60
             gh release delete "v$VERSION" --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes || true
           done

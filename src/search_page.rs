@@ -292,7 +292,7 @@ fn add_rule_field(ui: &mut Ui, text: &mut String, hint: &str, pal: Pal) -> bool 
         // Built from the right, so the button ends on the card's edge and the box fills the rest.
         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
             add = pill_button(ui, tr("Add"), pal, false).clicked();
-            let field = ui.add(TextEdit::singleline(text).desired_width(f32::INFINITY).hint_text(hint));
+            let field = text_box(ui, None, TextEdit::singleline(text).desired_width(f32::INFINITY).hint_text(hint));
             add |= field.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
         });
     });
@@ -360,7 +360,7 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
             }
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                 let clicked = pill_button(ui, tr("Add"), pal, false).clicked();
-                let field = ui.add(TextEdit::singleline(&mut menu.scope_ui.new_place).desired_width(f32::INFINITY).hint_text("\\\\server\\share"));
+                let field = text_box(ui, None, TextEdit::singleline(&mut menu.scope_ui.new_place).desired_width(f32::INFINITY).hint_text("\\\\server\\share"));
                 let enter = field.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
                 if (clicked || enter) && !menu.scope_ui.new_place.trim().is_empty() {
                     added_place = Some(menu.scope_ui.new_place.trim().to_string());
@@ -469,11 +469,11 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         policy.lock(ui, &["SearchWindowsSettingsPages"], |ui| switch_line(ui, tr("Shortcuts to Windows settings and tools"), tr("Pages of Windows Settings, and tools such as Task Manager."), &mut menu.cfg.search_settings_pages, pal));
         policy.lock(ui, &["SearchWebName"], |ui| ui.horizontal(|ui| {
             ui.label(RichText::new(tr("Name of the web search")).size(13.5).color(pal.text));
-            ui.add(TextEdit::singleline(&mut menu.cfg.web_name).desired_width(ui.available_width()));
+            text_box(ui, None, TextEdit::singleline(&mut menu.cfg.web_name).desired_width(ui.available_width()));
         }));
         policy.lock(ui, &["SearchWebAddress"], |ui| ui.horizontal(|ui| {
             ui.label(RichText::new(tr("Web search with")).size(13.5).color(pal.text));
-            ui.add(TextEdit::singleline(&mut menu.cfg.web_url).desired_width(ui.available_width()));
+            text_box(ui, None, TextEdit::singleline(&mut menu.cfg.web_url).desired_width(ui.available_width()));
         }));
     });
 

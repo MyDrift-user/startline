@@ -1,4 +1,9 @@
 pub const T: &[(&str, &str)] = &[
+    // widgets.rs: the right-click menu of text boxes
+    ("Cut", "Ausschneiden"),
+    ("Copy", "Kopieren"),
+    ("Paste", "Einfügen"),
+    ("Select all", "Alles auswählen"),
     // home.rs
     ("Search for apps, settings, and documents", "Nach Apps, Einstellungen und Dokumenten suchen"),
     ("Type here to search", "Zur Suche Text hier eingeben"),

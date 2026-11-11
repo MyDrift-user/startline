@@ -251,7 +251,7 @@ fn pin_details(menu: &mut Menu, ui: &mut Ui, g: usize, p: usize, pal: Pal) {
         let pin = &mut menu.cfg.groups[g].pins[p];
         ui.horizontal(|ui| {
             ui.label(RichText::new(tr("Name")).size(13.0).color(pal.sub));
-            ui.add(TextEdit::singleline(&mut pin.name).desired_width(280.0));
+            text_box(ui, None, TextEdit::singleline(&mut pin.name).desired_width(280.0));
         });
         match &mut pin.target {
             Target::App(_) => {
@@ -260,13 +260,13 @@ fn pin_details(menu: &mut Menu, ui: &mut Ui, g: usize, p: usize, pal: Pal) {
             Target::Path { path, args } => {
                 ui.horizontal(|ui| {
                     ui.label(RichText::new(tr("Opens")).size(13.0).color(pal.sub));
-                    ui.add(TextEdit::singleline(path).desired_width(ui.available_width()));
+                    text_box(ui, None, TextEdit::singleline(path).desired_width(ui.available_width()));
                 });
                 let is_web = path.contains("://");
                 if !is_web {
                     ui.horizontal(|ui| {
                         ui.label(RichText::new(tr("Options")).size(13.0).color(pal.sub));
-                        ui.add(TextEdit::singleline(args).desired_width(280.0).hint_text(tr("Only if a program needs them")));
+                        text_box(ui, None, TextEdit::singleline(args).desired_width(280.0).hint_text(tr("Only if a program needs them")));
                     });
                 }
             }
@@ -298,7 +298,7 @@ fn add_panel(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
 }
 
 fn add_app(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
-    ui.add(TextEdit::singleline(&mut menu.pin_ui.app_filter).hint_text(tr("Find an app")).desired_width(f32::INFINITY));
+    text_box(ui, None, TextEdit::singleline(&mut menu.pin_ui.app_filter).hint_text(tr("Find an app")).desired_width(f32::INFINITY));
     ui.add_space(4.0);
     let wanted = crate::matching::lower(menu.pin_ui.app_filter.trim());
     let apps = menu.apps.read().unwrap().clone();
@@ -349,7 +349,7 @@ fn add_file(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
     let mut add = false;
     ui.horizontal(|ui| {
         let width = ui.available_width() - 70.0;
-        let field = ui.add(TextEdit::singleline(&mut menu.pin_ui.file_path).desired_width(width).hint_text("C:\\Tools\\app.exe"));
+        let field = text_box(ui, None, TextEdit::singleline(&mut menu.pin_ui.file_path).desired_width(width).hint_text("C:\\Tools\\app.exe"));
         add = field.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
         add |= pill_button(ui, tr("Add"), pal, false).clicked();
     });
@@ -367,7 +367,7 @@ fn add_website(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
     let mut add = false;
     ui.horizontal(|ui| {
         let width = ui.available_width() - 70.0;
-        let field = ui.add(TextEdit::singleline(&mut menu.pin_ui.website).desired_width(width).hint_text("example.com"));
+        let field = text_box(ui, None, TextEdit::singleline(&mut menu.pin_ui.website).desired_width(width).hint_text("example.com"));
         add = field.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
         add |= pill_button(ui, tr("Add"), pal, false).clicked();
     });

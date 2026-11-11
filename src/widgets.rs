@@ -125,6 +125,97 @@ fn one_line(max_width: f32) -> text::TextWrapping {
     }
 }
 
+/// The text box whose right-click menu is open, if any.
+fn text_menu_owner(ctx: &Context) -> Option<Id> {
+    ctx.data(|d| d.get_temp(Id::unique("text-menu-owner")))
+}
+
+/// While a text box's right-click menu is open, keys belong to the menu: Esc closes it and nothing else.
+pub fn text_menu_open(ctx: &Context) -> bool {
+    text_menu_owner(ctx).is_some()
+}
+
+/// A text box with Cut, Copy, Paste and Select all on a right click, placed in `rect` or where the layout puts it.
+/// The box keeps its focus and selection while the menu is open, so the menu acts on what was selected.
+pub fn text_box(ui: &mut Ui, rect: Option<Rect>, edit: TextEdit<'_>) -> Response {
+    let ctx = ui.ctx().clone();
+    // A click in the menu would otherwise take the focus away from the box first, and its selection with it.
+    let keep_focus = text_menu_open(&ctx);
+    let before = ctx.options(|o| o.input_options.surrender_focus_on);
+    if keep_focus {
+        ctx.options_mut(|o| o.input_options.surrender_focus_on = SurrenderFocusOn::Never);
+    }
+    let output = match rect {
+        Some(rect) => ui.scope_builder(UiBuilder::new().max_rect(rect).layout(Layout::centered_and_justified(Direction::TopDown)), |ui| edit.show(ui)).inner,
+        None => edit.show(ui),
+    };
+    if keep_focus {
+        ctx.options_mut(|o| o.input_options.surrender_focus_on = before);
+    }
+    let response = output.response.response;
+    let id = response.id;
+    let text = output.galley.text().to_string();
+    // egui moves the cursor on any press, the right button's too: the selection from before the right click comes back.
+    let memo = id.with("selection-before");
+    let right_press = ctx.input(|i| i.pointer.button_pressed(PointerButton::Secondary));
+    if right_press && response.hovered() {
+        if let Some(before) = ctx.data(|d| d.get_temp::<text::CCursorRange>(memo)) {
+            let mut state = TextEdit::load_state(&ctx, id).unwrap_or_default();
+            state.cursor.set_char_range(Some(before));
+            TextEdit::store_state(&ctx, id, state);
+            ctx.request_repaint();
+        }
+    } else if let Some(range) = TextEdit::load_state(&ctx, id).and_then(|s| s.cursor.char_range()) {
+        ctx.data_mut(|d| d.insert_temp(memo, range));
+    }
+    // Where the right click was; a menu opened any other way sits under the box.
+    let mut menu = Popup::context_menu(&response);
+    if Popup::position_of_id(&ctx, Popup::default_response_id(&response)).is_none() {
+        menu = menu.at_position(response.rect.left_bottom());
+    }
+    menu.show(|ui| {
+        let selected = TextEdit::load_state(ui.ctx(), id).and_then(|s| s.cursor.char_range()).is_some_and(|r| !r.is_empty());
+        let command = |ui: &Ui, cmd: ViewportCommand| {
+            ui.memory_mut(|m| m.request_focus(id));
+            ui.ctx().send_viewport_cmd(cmd);
+        };
+        if ui.add_enabled(selected, Button::new(crate::i18n::tr("Cut"))).clicked() {
+            command(ui, ViewportCommand::RequestCut);
+            ui.close();
+        }
+        if ui.add_enabled(selected, Button::new(crate::i18n::tr("Copy"))).clicked() {
+            command(ui, ViewportCommand::RequestCopy);
+            ui.close();
+        }
+        if ui.button(crate::i18n::tr("Paste")).clicked() {
+            command(ui, ViewportCommand::RequestPaste);
+            ui.close();
+        }
+        if ui.add_enabled(!text.is_empty(), Button::new(crate::i18n::tr("Select all"))).clicked() {
+            let mut state = TextEdit::load_state(ui.ctx(), id).unwrap_or_default();
+            state.cursor.set_char_range(Some(text::CCursorRange::select_all_str(&text)));
+            TextEdit::store_state(ui.ctx(), id, state);
+            ui.memory_mut(|m| m.request_focus(id));
+            ui.close();
+        }
+    });
+    let open = response.context_menu_opened();
+    ctx.data_mut(|d| {
+        let key = Id::unique("text-menu-owner");
+        match d.get_temp::<Id>(key) {
+            _ if open => {
+                d.insert_temp(key, id);
+            }
+            Some(owner) if owner == id => d.remove::<Id>(key),
+            _ => {}
+        }
+    });
+    if open {
+        ui.memory_mut(|m| m.request_focus(id));
+    }
+    response
+}
+
 pub fn line_galley(ui: &Ui, text: &str, font: FontId, color: Color32, max_width: f32) -> Arc<Galley> {
     let mut job = LayoutJob::simple_singleline(text.to_string(), font, color);
     job.wrap = one_line(max_width);
