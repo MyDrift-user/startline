@@ -12,6 +12,8 @@ Set-Content target\license.rtf ('{\rtf1\ansi\deff0{\fonttbl{\f0 Consolas;}}\f0\f
 # three: Windows then applies the one for its own language. Done through Windows Installer itself, as Microsoft's
 # WiSubStg.vbs and WiLangId.vbs do, so nothing beyond WiX is needed.
 $msiDir = 'target\msi'
+# empty, as Windows Installer won't write a transform over one a build before left here (the update test packages twice)
+Remove-Item -Recurse -Force $msiDir -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force $msiDir | Out-Null
 $productCode = "{$([guid]::NewGuid().ToString().ToUpper())}"
 $languages = [ordered]@{ 'en-US' = 1033; 'de-DE' = 1031; 'it-IT' = 1040 }
