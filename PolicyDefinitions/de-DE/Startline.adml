@@ -322,18 +322,32 @@ Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unte
       <string id="P_SearchShowFolders">Ordner unter jeder Datei anzeigen</string>
       <string id="E_SearchShowFolders">Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
       <string id="R_SearchShowFolders">Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchBestMatch">Höchste Übereinstimmung zuoberst</string>
+      <string id="E_SearchBestMatch">Das Ergebnis, dessen Name am besten zur Eingabe passt, kommt zuerst, egal welcher Art es ist.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchBestMatch">Das Ergebnis, dessen Name am besten zur Eingabe passt, kommt zuerst, egal welcher Art es ist.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchWebUseAddress">Im Web mit einer festen Adresse suchen</string>
+      <string id="E_SearchWebUseAddress">Aktiviert öffnen Websuchen die Adresse der Websuche. Deaktiviert oder nicht konfiguriert gehen sie an den Standardbrowser und die dort eingestellte Suchmaschine.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchWebUseAddress">Aktiviert öffnen Websuchen die Adresse der Websuche. Deaktiviert oder nicht konfiguriert gehen sie an den Standardbrowser und die dort eingestellte Suchmaschine.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_SearchWebName">Name der Websuche</string>
-      <string id="E_SearchWebName">Angezeigt als: Search &lt;name&gt; for ...
+      <string id="E_SearchWebName">Angezeigt als: Search &lt;name&gt; for ..., wenn die Adresse der Websuche verwendet wird.
 
 Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
-      <string id="R_SearchWebName">Angezeigt als: Search &lt;name&gt; for ...
+      <string id="R_SearchWebName">Angezeigt als: Search &lt;name&gt; for ..., wenn die Adresse der Websuche verwendet wird.
 
 Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_SearchWebAddress">Adresse der Websuche</string>
-      <string id="E_SearchWebAddress">Muss mit http:// oder https:// beginnen und {} dort enthalten, wo die Suchbegriffe stehen. Alles andere wird ignoriert.
+      <string id="E_SearchWebAddress">Wird verwendet, wenn SearchWebUseAddress aktiviert ist und wenn Startline den Standardbrowser nicht ansprechen kann. Muss mit http:// oder https:// beginnen und {} dort enthalten, wo die Suchbegriffe stehen. Alles andere wird ignoriert.
 
 Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
-      <string id="R_SearchWebAddress">Muss mit http:// oder https:// beginnen und {} dort enthalten, wo die Suchbegriffe stehen. Alles andere wird ignoriert.
+      <string id="R_SearchWebAddress">Wird verwendet, wenn SearchWebUseAddress aktiviert ist und wenn Startline den Standardbrowser nicht ansprechen kann. Muss mit http:// oder https:// beginnen und {} dort enthalten, wo die Suchbegriffe stehen. Alles andere wird ignoriert.
 
 Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_SearchChangeWindowsSettings">Windows-Einstellungen über die Suche ändern</string>

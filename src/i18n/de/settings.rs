@@ -178,7 +178,6 @@ pub const T: &[(&str, &str)] = &[
     ("Shortcuts to Windows settings and tools", "Verknüpfungen zu Windows-Einstellungen und -Tools"),
     ("Pages of Windows Settings, and tools such as Task Manager.", "Seiten der Windows-Einstellungen und Tools wie der Task-Manager."),
     ("Name of the web search", "Name der Websuche"),
-    ("Web search with", "Im Web suchen mit"),
     ("Search box", "Suchfeld"),
     ("Treat searches as regular expressions", "Suchen als reguläre Ausdrücke behandeln"),
     ("The whole search is one pattern, matched against names whatever the case.", "Die ganze Suche ist ein Muster, das ohne Rücksicht auf Groß- und Kleinschreibung mit Namen verglichen wird."),
@@ -229,4 +228,8 @@ pub const T: &[(&str, &str)] = &[
     ("Index USB drives", "USB-Laufwerke indizieren"),
     ("USB sticks, disks and memory cards, as they get plugged in.", "USB-Sticks, -Festplatten und Speicherkarten, sobald sie angeschlossen werden."),
     ("Startline reads only the names and dates of files and folders, never what's in them. Apps and settings are found whatever is switched off here.", "Startline liest nur Namen und Datumsangaben von Dateien und Ordnern, nie deren Inhalt. Apps und Einstellungen werden gefunden, egal was hier ausgeschaltet ist."),
+    ("Best match at the top", "Höchste Übereinstimmung zuoberst"),
+    ("The one result whose name fits what was typed best, whatever its kind, comes first.", "Das Ergebnis, dessen Name am besten zur Eingabe passt, kommt zuerst, egal welcher Art es ist."),
+    ("Search the web with a fixed address", "Im Web mit einer festen Adresse suchen"),
+    ("Off, web searches open your default browser with the search engine you set up there. The address below then only serves when Startline doesn't know your browser.", "Aus: Websuchen öffnen Ihren Standardbrowser mit der Suchmaschine, die Sie dort eingestellt haben. Die Adresse unten dient dann nur, wenn Startline Ihren Browser nicht kennt."),
 ];

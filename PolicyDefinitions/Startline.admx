@@ -1134,6 +1134,46 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="SearchBestMatch" class="Both" displayName="$(string.P_SearchBestMatch)" explainText="$(string.E_SearchBestMatch)" key="Software\Policies\Startline" valueName="SearchBestMatch">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchBestMatch" class="Both" displayName="$(string.P_SearchBestMatch)" explainText="$(string.R_SearchBestMatch)" key="Software\Policies\Startline\Recommended" valueName="SearchBestMatch">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="SearchWebUseAddress" class="Both" displayName="$(string.P_SearchWebUseAddress)" explainText="$(string.E_SearchWebUseAddress)" key="Software\Policies\Startline" valueName="SearchWebUseAddress">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchWebUseAddress" class="Both" displayName="$(string.P_SearchWebUseAddress)" explainText="$(string.R_SearchWebUseAddress)" key="Software\Policies\Startline\Recommended" valueName="SearchWebUseAddress">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="SearchWebName" class="Both" displayName="$(string.P_SearchWebName)" explainText="$(string.E_SearchWebName)" presentation="$(presentation.P_SearchWebName)" key="Software\Policies\Startline">
       <parentCategory ref="SearchResults"/>
       <supportedOn ref="SUPPORTED_Startline"/>

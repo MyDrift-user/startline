@@ -32,7 +32,9 @@ While Startline runs, the Start key and the Start button open it instead of the 
 - A search language: `"exact text"`, wildcards (`*.pdf`, `img_??.png`), `-word` to leave out, `ext:pdf,docx`, `kind:picture`, `size:>10mb`, `modified:today` or `date:2025-03`, and regular expressions with `re:` or `/…/`, or a switch that makes the whole search one. The `?` in the search box lists it all
 - Choose where to search, with a switch each for the PC's own drives, network drives and USB drives, and what's never found: ready-made groups, hidden and system files, folders, file types and regular expressions
 - Choose which kinds of results show, in which order and how many of each, and hide the parts of the search box you don't use
-- A web search for what you typed
+- A Best match at the top: the one result whose name fits what you typed best, whatever its kind, so Enter opens the folder or file you named even when apps come first
+- A web search for what you typed, in your default browser with the search engine you set up there, or at a fixed address if you'd rather
+- New apps show up in the list and search within seconds of being installed, and removed ones go
 
 ### 🎚️ Settings right in the search
 Type what you want and act on it from the result: "dark mode", "volume 40", "louder", "bluetooth off", "wlan aus". There are dozens of switches and sliders, from dark mode, Wi-Fi, Bluetooth, volume and brightness to file extensions, hidden files, the clock's seconds, Game Mode and keeping the PC awake. Nothing changes until you act on the row.

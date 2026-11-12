@@ -145,4 +145,5 @@ pub const T: &[(&str, &str)] = &[
     ("Choose a file...", "Scegli un file..."),
     ("Choose a folder...", "Scegli una cartella..."),
     ("Or paste where it is, like a program, a folder or a network location:", "Oppure incolla dove si trova, ad esempio un programma, una cartella o un percorso di rete:"),
+    ("Best match", "Corrispondenza migliore"),
 ];

@@ -464,17 +464,23 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         policy.lock(ui, &["SearchMaxSettings"], |ui| count_line(ui, tr("Most settings"), &mut menu.cfg.max_settings, 1..=30, pal));
         policy.lock(ui, &["SearchMaxFiles"], |ui| count_line(ui, tr("Most files and folders"), &mut menu.cfg.max_files, 5..=200, pal));
         ui.separator();
+        policy.lock(ui, &["SearchBestMatch"], |ui| switch_line(ui, tr("Best match at the top"), tr("The one result whose name fits what was typed best, whatever its kind, comes first."), &mut menu.cfg.best_match, pal));
         policy.lock(ui, &["SearchShowFolders"], |ui| switch_line(ui, tr("Show the folder under each file"), "", &mut menu.cfg.show_paths, pal));
         policy.lock(ui, &["SearchChangeWindowsSettings"], |ui| switch_line(ui, tr("Change Windows settings from search"), tr("Dark mode, volume, Wi-Fi and the other switches and sliders."), &mut menu.cfg.search_windows_settings, pal));
         policy.lock(ui, &["SearchWindowsSettingsPages"], |ui| switch_line(ui, tr("Shortcuts to Windows settings and tools"), tr("Pages of Windows Settings, and tools such as Task Manager."), &mut menu.cfg.search_settings_pages, pal));
-        policy.lock(ui, &["SearchWebName"], |ui| ui.horizontal(|ui| {
-            ui.label(RichText::new(tr("Name of the web search")).size(13.5).color(pal.text));
-            text_box(ui, None, TextEdit::singleline(&mut menu.cfg.web_name).desired_width(ui.available_width()));
-        }));
-        policy.lock(ui, &["SearchWebAddress"], |ui| ui.horizontal(|ui| {
-            ui.label(RichText::new(tr("Web search with")).size(13.5).color(pal.text));
-            text_box(ui, None, TextEdit::singleline(&mut menu.cfg.web_url).desired_width(ui.available_width()));
-        }));
+        ui.separator();
+        policy.lock(ui, &["SearchWebUseAddress"], |ui| switch_line(ui, tr("Search the web with a fixed address"), tr("Off, web searches open your default browser with the search engine you set up there. The address below then only serves when Startline doesn't know your browser."), &mut menu.cfg.web_fixed, pal));
+        let fixed = menu.cfg.web_fixed;
+        ui.indent("web-address", |ui| {
+            policy.lock(ui, &["SearchWebName"], |ui| ui.add_enabled_ui(fixed, |ui| ui.horizontal(|ui| {
+                ui.label(RichText::new(tr("Name of the web search")).size(13.5).color(pal.text));
+                text_box(ui, None, TextEdit::singleline(&mut menu.cfg.web_name).desired_width(ui.available_width()));
+            })));
+            policy.lock(ui, &["SearchWebAddress"], |ui| ui.horizontal(|ui| {
+                ui.label(RichText::new(tr("Web search address")).size(13.5).color(pal.text));
+                text_box(ui, None, TextEdit::singleline(&mut menu.cfg.web_url).desired_width(ui.available_width()));
+            }));
+        });
     });
 
     heading(ui, tr("Search box"), pal);

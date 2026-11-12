@@ -322,18 +322,32 @@ Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta su
       <string id="P_SearchShowFolders">Mostra la cartella sotto ogni file</string>
       <string id="E_SearchShowFolders">Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
       <string id="R_SearchShowFolders">Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchBestMatch">Corrispondenza migliore in cima</string>
+      <string id="E_SearchBestMatch">Il risultato il cui nome corrisponde meglio a ciò che è stato digitato viene per primo, di qualunque tipo sia.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchBestMatch">Il risultato il cui nome corrisponde meglio a ciò che è stato digitato viene per primo, di qualunque tipo sia.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchWebUseAddress">Cerca sul Web con un indirizzo fisso</string>
+      <string id="E_SearchWebUseAddress">Attivato, le ricerche web aprono l'indirizzo della ricerca web. Disattivato o non configurato, vanno al browser predefinito e al motore di ricerca impostato lì.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchWebUseAddress">Attivato, le ricerche web aprono l'indirizzo della ricerca web. Disattivato o non configurato, vanno al browser predefinito e al motore di ricerca impostato lì.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_SearchWebName">Nome della ricerca sul Web</string>
-      <string id="E_SearchWebName">Mostrato come: Search &lt;name&gt; for ...
+      <string id="E_SearchWebName">Mostrato come: Search &lt;name&gt; for ..., quando si usa l'indirizzo della ricerca web.
 
 Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
-      <string id="R_SearchWebName">Mostrato come: Search &lt;name&gt; for ...
+      <string id="R_SearchWebName">Mostrato come: Search &lt;name&gt; for ..., quando si usa l'indirizzo della ricerca web.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_SearchWebAddress">Indirizzo della ricerca web</string>
-      <string id="E_SearchWebAddress">Deve iniziare con http:// o https:// e contenere {} dove vanno le parole. Qualsiasi altro valore viene ignorato.
+      <string id="E_SearchWebAddress">Usato quando SearchWebUseAddress è attivato e quando Startline non sa come interpellare il browser predefinito. Deve iniziare con http:// o https:// e contenere {} dove vanno le parole. Qualsiasi altro valore viene ignorato.
 
 Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
-      <string id="R_SearchWebAddress">Deve iniziare con http:// o https:// e contenere {} dove vanno le parole. Qualsiasi altro valore viene ignorato.
+      <string id="R_SearchWebAddress">Usato quando SearchWebUseAddress è attivato e quando Startline non sa come interpellare il browser predefinito. Deve iniziare con http:// o https:// e contenere {} dove vanno le parole. Qualsiasi altro valore viene ignorato.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_SearchChangeWindowsSettings">Modifica le impostazioni di Windows dalla ricerca</string>

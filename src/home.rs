@@ -726,8 +726,12 @@ impl Menu {
             });
         }
         let mut last = None;
-        for row in &rows {
-            if last != Some(row.category) {
+        for (at, row) in rows.iter().enumerate() {
+            if self.best_at == Some(at) {
+                // The rows after it start their own section, even one of the same kind.
+                last = None;
+                section_title(ui, tr("Best match"), pal);
+            } else if last != Some(row.category) {
                 last = Some(row.category);
                 section_title(ui, tr(row.category.label()), pal);
             }

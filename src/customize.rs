@@ -121,7 +121,11 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, tab: Tab) {
     let body = Rect::from_min_max(pos2(sidebar.right() + 1.0, full.top()), full.max);
     let mut body_ui = ui.new_child(UiBuilder::new().max_rect(body).layout(Layout::top_down(Align::Min)));
     body_ui.set_clip_rect(body);
-    ScrollArea::vertical().id_salt(("settings", tab as u8)).auto_shrink([false, false]).show(&mut body_ui, |ui| {
+    let mut scroll = ScrollArea::vertical().id_salt(("settings", tab as u8)).auto_shrink([false, false]);
+    if let (Some(down), true) = (menu.options.demo_scroll, menu.is_shot()) {
+        scroll = scroll.vertical_scroll_offset(down);
+    }
+    scroll.show(&mut body_ui, |ui| {
         // Comfortable margins, and no lines stretching across a huge window.
         let room = ui.available_width();
         let width = (room - 56.0).clamp(380.0, 1120.0);

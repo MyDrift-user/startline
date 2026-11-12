@@ -173,7 +173,6 @@ pub const T: &[(&str, &str)] = &[
     ("Show the folder under each file", "Mostra la cartella sotto ogni file"),
     ("Dark mode, volume, Wi-Fi and the other switches and sliders.", "Modalità scura, volume, Wi-Fi e gli altri interruttori e dispositivi di scorrimento."),
     ("Pages of Windows Settings, and tools such as Task Manager.", "Pagine delle Impostazioni di Windows e strumenti come Gestione attività."),
-    ("Web search with", "Cerca sul Web con"),
     ("Search box", "Casella di ricerca"),
     ("Treat searches as regular expressions", "Tratta le ricerche come espressioni regolari"),
     ("The whole search is one pattern, matched against names whatever the case.", "L'intera ricerca è un modello, confrontato con i nomi senza distinguere maiuscole e minuscole."),
@@ -229,4 +228,8 @@ pub const T: &[(&str, &str)] = &[
     ("Index USB drives", "Indicizza le unità USB"),
     ("USB sticks, disks and memory cards, as they get plugged in.", "Chiavette, dischi USB e schede di memoria, appena vengono collegati."),
     ("Startline reads only the names and dates of files and folders, never what's in them. Apps and settings are found whatever is switched off here.", "Startline legge solo nomi e date di file e cartelle, mai il loro contenuto. App e impostazioni vengono trovate qualunque cosa sia disattivata qui."),
+    ("Best match at the top", "Corrispondenza migliore in cima"),
+    ("The one result whose name fits what was typed best, whatever its kind, comes first.", "Il risultato il cui nome corrisponde meglio a ciò che è stato digitato viene per primo, di qualunque tipo sia."),
+    ("Search the web with a fixed address", "Cerca sul Web con un indirizzo fisso"),
+    ("Off, web searches open your default browser with the search engine you set up there. The address below then only serves when Startline doesn't know your browser.", "Disattivato: le ricerche sul Web aprono il browser predefinito con il motore di ricerca impostato lì. L'indirizzo qui sotto serve allora solo quando Startline non conosce il browser."),
 ];

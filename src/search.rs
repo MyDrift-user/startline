@@ -94,6 +94,7 @@ pub enum RowKind {
     Open(Target),
     Run(Do),
     Quick(QuickId, Want),
+    /// A web search for these words.
     Web(String),
 }
 
@@ -243,8 +244,8 @@ pub fn web_row(query: &str, cfg: &Config) -> Option<Row> {
         return None;
     }
     // Startline's own default has a whole sentence of its own in each language; a name the person or an administrator
-    // chose stays as they wrote it.
-    let name = if cfg.web_name == "the web" { // i18n-ignore: the saved default
+    // chose for a fixed address stays as they wrote it. The browser's own engine has no name here.
+    let name = if !cfg.web_fixed || cfg.web_name == "the web" { // i18n-ignore: the saved default
         crate::trf!("Search the web for \"{query}\"", query = query.trim())
     } else {
         crate::trf!("Search {name} for \"{query}\"", name = cfg.web_name, query = query.trim())
@@ -254,9 +255,54 @@ pub fn web_row(query: &str, cfg: &Config) -> Option<Row> {
         name,
         detail: String::new(),
         icon: Icon::Glyph('\u{E774}'),
-        kind: RowKind::Web(cfg.web_url.replace("{}", &percent_encode(query.trim()))),
+        kind: RowKind::Web(query.trim().to_string()),
         path: None,
     })
+}
+
+/// How well a name fits what was typed: 4 the whole name (a file's name without its type counts too), 3 the name
+/// starts with it, 2 a word in the name starts with it, 1 it's somewhere in the name, 0 not at all.
+pub fn name_fit(name: &str, typed: &str) -> u8 {
+    let typed = matching::lower(typed.trim());
+    if typed.is_empty() {
+        return 0;
+    }
+    let name = matching::lower(name.trim());
+    let stem = name.rsplit_once('.').map_or("", |(stem, _)| stem);
+    if name == typed || stem == typed {
+        4
+    } else if name.starts_with(&typed) {
+        3
+    } else if name.match_indices(&typed).any(|(at, _)| name[..at].chars().next_back().is_some_and(|c| !c.is_alphanumeric())) {
+        2
+    } else if name.contains(&typed) {
+        1
+    } else {
+        0
+    }
+}
+
+/// Which of these rows is the best match for what was typed, by how well its name fits, or one of its `other_names`
+/// (an app's program and package names, which find "Editor" by "notepad"). Ties go to the kind shown first, then to
+/// what was opened most often (`uses`), then to the row that came first. Web searches and rows whose name doesn't hold
+/// the text at all never are.
+pub fn best_match(rows: &[Row], typed: &str, kind_order: &[Category], other_names: impl Fn(&Row) -> String, uses: impl Fn(&Row) -> u32) -> Option<usize> {
+    let fit = |row: &Row| {
+        let others = other_names(row);
+        std::iter::once(name_fit(&row.name, typed)).chain(others.split_whitespace().map(|other| name_fit(other, typed))).max().unwrap_or(0)
+    };
+    rows.iter()
+        .enumerate()
+        .filter(|(_, row)| row.category != Category::Web)
+        .map(|(at, row)| (at, fit(row), kind_order.iter().position(|k| *k == row.category).unwrap_or(usize::MAX), uses(row)))
+        .filter(|(_, fit, _, _)| *fit > 0)
+        .max_by(|a, b| a.1.cmp(&b.1).then(b.2.cmp(&a.2)).then(a.3.cmp(&b.3)).then(b.0.cmp(&a.0)))
+        .map(|(at, ..)| at)
+}
+
+/// The search address with the words in it, for a fixed address or a browser that can't be asked.
+pub fn web_address(cfg: &Config, query: &str) -> String {
+    cfg.web_url.replace("{}", &percent_encode(query.trim()))
 }
 
 /// A typed path or web address opens directly.
@@ -369,12 +415,50 @@ mod tests {
         assert!(!Do::Lock.needs_confirm());
     }
 
+    fn row(category: Category, name: &str) -> Row {
+        Row { category, name: name.into(), detail: String::new(), icon: Icon::Glyph(' '), kind: RowKind::Open(Target::path(format!("C:\\{name}"))), path: None }
+    }
+
+    #[test]
+    fn names_fit_whole_then_start_then_word_then_anywhere() {
+        assert_eq!(name_fit("Projects", "projects"), 4);
+        assert_eq!(name_fit("report.pdf", "Report"), 4, "a file's name without its type counts as whole");
+        assert_eq!(name_fit("Project Plan", "proj"), 3);
+        assert_eq!(name_fit("Old Projects", "proj"), 2);
+        assert_eq!(name_fit("my_projects", "proj"), 2, "after an underscore is a word too");
+        assert_eq!(name_fit("Subprojects", "proj"), 1);
+        assert_eq!(name_fit("Notepad", "xyz"), 0);
+        assert_eq!(name_fit("Notepad", "  "), 0);
+    }
+
+    #[test]
+    fn the_best_match_is_the_best_name_whatever_its_kind() {
+        let order = [Category::Apps, Category::Settings, Category::Files, Category::Web];
+        // Apps come first, but the folder typed in full is the best match.
+        let rows = [row(Category::Apps, "Microsoft Teams Meetings"), row(Category::Apps, "Team Viewer"), row(Category::Files, "Teams"), row(Category::Web, "Search the web for \"teams\"")];
+        assert_eq!(best_match(&rows, "teams", &order, |_| String::new(), |_| 0), Some(2));
+        // The same fit: the kind shown first wins, then the one opened most.
+        let rows = [row(Category::Files, "notepad.exe"), row(Category::Apps, "Notepad")];
+        assert_eq!(best_match(&rows, "notepad", &order, |_| String::new(), |_| 0), Some(1));
+        let rows = [row(Category::Files, "Budget"), row(Category::Files, "budget.xlsx")];
+        assert_eq!(best_match(&rows, "budget", &order, |_| String::new(), |r| u32::from(r.name == "budget.xlsx") * 5), Some(1));
+        assert_eq!(best_match(&rows, "budget", &order, |_| String::new(), |_| 0), Some(0), "else the one listed first");
+        // Nothing whose name holds the text: no best match. A web search never is one.
+        assert_eq!(best_match(&rows, "zzz", &order, |_| String::new(), |_| 0), None);
+        assert_eq!(best_match(&[row(Category::Web, "teams")], "teams", &order, |_| String::new(), |_| 0), None);
+        // On German Windows Notepad is called Editor; its program name still makes it the best match for "notepad".
+        let rows = [row(Category::Files, "notepad-repl.man"), row(Category::Apps, "Editor")];
+        let alias = |r: &Row| if r.name == "Editor" { "notepad notepad".to_string() } else { String::new() };
+        assert_eq!(best_match(&rows, "notepad", &order, alias, |_| 0), Some(1));
+    }
+
     #[test]
     fn web_addresses_and_queries_are_encoded() {
         assert_eq!(percent_encode("a b&c"), "a%20b%26c");
         let cfg = Config { roots: vec![], ..Default::default() };
-        let row = web_row("rust lang", &cfg).unwrap();
-        assert_eq!(row.kind, RowKind::Web("https://duckduckgo.com/?q=rust%20lang".into()));
+        let row = web_row(" rust lang ", &cfg).unwrap();
+        assert_eq!(row.kind, RowKind::Web("rust lang".into()), "the words go to the browser's own search engine");
+        assert_eq!(web_address(&cfg, "rust lang"), "https://duckduckgo.com/?q=rust%20lang", "or to the address, when it's asked for or the browser is unknown");
         assert!(matches!(direct_row("https://example.com").unwrap().kind, RowKind::Open(_)));
         assert_eq!(direct_row("not a url"), None);
     }

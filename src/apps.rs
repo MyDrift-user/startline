@@ -5,7 +5,9 @@ use crate::matching;
 use crate::platform;
 use serde::{Deserialize, Serialize};
 use std::ffi::c_void;
+use std::sync::mpsc::{self, Receiver, RecvTimeoutError, Sender};
 use std::sync::{Arc, RwLock};
+use std::time::{Duration, Instant};
 use windows::Win32::Foundation::PROPERTYKEY;
 use windows::Win32::System::Com::*;
 use windows::Win32::UI::Shell::*;
@@ -47,7 +49,7 @@ fn cache_path() -> std::path::PathBuf {
     crate::config::data_dir().join("apps.json")
 }
 
-/// Starts with the saved list so the menu is complete at once, then refreshes it.
+/// Starts with the saved list so the menu is complete at once, then keeps it up to date as apps come and go.
 pub fn start(ctx: egui::Context) -> Arc<RwLock<Vec<App>>> {
     let mut cached: Vec<App> = std::fs::read(cache_path())
         .ok()
@@ -55,27 +57,124 @@ pub fn start(ctx: egui::Context) -> Arc<RwLock<Vec<App>>> {
         .unwrap_or_default();
     cached.iter_mut().for_each(App::prepare);
     let list = Arc::new(RwLock::new(cached));
-    let shared = list.clone();
+    let (tx, rx) = mpsc::channel();
+    watch_packages(tx.clone());
+    keep_fresh(list.clone(), programs_folders(), tx, rx, enumerate, move |fresh: &[App]| {
+        if let Ok(bytes) = serde_json::to_vec(fresh) {
+            let _ = std::fs::write(cache_path(), bytes);
+        }
+        ctx.request_repaint();
+    });
+    list
+}
+
+/// The Start menu's Programs folders, for everyone on the PC and for this account, where installers put shortcuts.
+fn programs_folders() -> Vec<String> {
+    [("ProgramData", "Microsoft\\Windows\\Start Menu\\Programs"), ("APPDATA", "Microsoft\\Windows\\Start Menu\\Programs")]
+        .iter()
+        .filter_map(|(var, rest)| std::env::var(var).ok().map(|base| format!("{base}\\{rest}")))
+        .collect()
+}
+
+/// After a change, the list is read again this soon, and a few more times a little later, as Windows's own app list
+/// takes about three seconds to catch up with a new or removed shortcut.
+const AFTER_CHANGE: [Duration; 5] = [Duration::from_millis(500), Duration::from_millis(1500), Duration::from_millis(3000), Duration::from_millis(4500), Duration::from_secs(15)];
+/// Read again now and then anyway, in case a change went unseen.
+const ANYWAY: Duration = Duration::from_secs(300);
+
+/// Reads the list now, again shortly after anything changes in `folders` or a message comes on `rx`, and every few
+/// minutes anyway. `read` gives the list, `done` hears about each new one. Watching runs whether or not files and
+/// folders are indexed.
+fn keep_fresh(
+    list: Arc<RwLock<Vec<App>>>,
+    folders: Vec<String>,
+    tx: Sender<()>,
+    rx: Receiver<()>,
+    read: impl Fn() -> Option<Vec<App>> + Send + 'static,
+    done: impl Fn(&[App]) + Send + 'static,
+) {
     std::thread::Builder::new()
         .name("apps".into())
         .spawn(move || {
             platform::com_init();
+            // Kept for as long as the thread runs.
+            let _watchers: Vec<platform::DirWatcher> = folders
+                .iter()
+                .filter_map(|folder| {
+                    let tx = tx.clone();
+                    platform::DirWatcher::start(folder, move |_| {
+                        let _ = tx.send(());
+                    })
+                })
+                .collect();
+            let mut again: Vec<Instant> = vec![Instant::now()];
             loop {
-                if let Some(fresh) = enumerate() {
-                    if let Ok(bytes) = serde_json::to_vec(&fresh) {
-                        let _ = std::fs::write(cache_path(), bytes);
+                let next = again.iter().min().copied().unwrap_or_else(|| Instant::now() + ANYWAY);
+                match rx.recv_timeout(next.saturating_duration_since(Instant::now())) {
+                    Ok(()) => {
+                        // A burst of changes, as while an installer runs, counts from its last change.
+                        let now = Instant::now();
+                        again = AFTER_CHANGE.iter().map(|d| now + *d).collect();
+                        continue;
                     }
-                    if let Ok(mut current) = shared.write() {
-                        *current = fresh;
-                    }
-                    ctx.request_repaint();
+                    Err(RecvTimeoutError::Timeout) => {}
+                    Err(RecvTimeoutError::Disconnected) => return,
                 }
-                // New installs show up within a few minutes without any polling cost worth noticing.
-                std::thread::sleep(std::time::Duration::from_secs(300));
+                let now = Instant::now();
+                again.retain(|at| *at > now);
+                if let Some(fresh) = read() {
+                    let changed = list.read().map(|current| *current != fresh).unwrap_or(true);
+                    if changed {
+                        if let Ok(mut current) = list.write() {
+                            *current = fresh.clone();
+                        }
+                        done(&fresh);
+                    }
+                }
             }
         })
         .expect("apps thread");
-    list
+}
+
+/// Store and other packaged apps don't put shortcuts in the Programs folders: Windows says when one is installed,
+/// updated or removed.
+fn watch_packages(tx: Sender<()>) {
+    use windows::ApplicationModel::*;
+    use windows::Foundation::TypedEventHandler;
+    let _ = std::thread::Builder::new().name("app-packages".into()).spawn(move || {
+        let _ = unsafe { CoInitializeEx(None, COINIT_MULTITHREADED) };
+        let Ok(catalog) = PackageCatalog::OpenForCurrentUser() else { return };
+        let ping = |tx: &Sender<()>| {
+            let _ = tx.send(());
+        };
+        let (a, b, c, d) = (tx.clone(), tx.clone(), tx.clone(), tx);
+        let _ = catalog.PackageInstalling(&TypedEventHandler::new(move |_, args: Ref<PackageInstallingEventArgs>| {
+            if args.as_ref().is_some_and(|e| e.IsComplete().unwrap_or(true)) {
+                ping(&a);
+            }
+            Ok(())
+        }));
+        let _ = catalog.PackageUninstalling(&TypedEventHandler::new(move |_, args: Ref<PackageUninstallingEventArgs>| {
+            if args.as_ref().is_some_and(|e| e.IsComplete().unwrap_or(true)) {
+                ping(&b);
+            }
+            Ok(())
+        }));
+        let _ = catalog.PackageUpdating(&TypedEventHandler::new(move |_, args: Ref<PackageUpdatingEventArgs>| {
+            if args.as_ref().is_some_and(|e| e.IsComplete().unwrap_or(true)) {
+                ping(&c);
+            }
+            Ok(())
+        }));
+        let _ = catalog.PackageStatusChanged(&TypedEventHandler::new(move |_, _: Ref<PackageStatusChangedEventArgs>| {
+            ping(&d);
+            Ok(())
+        }));
+        // The catalog has to stay alive for its events to keep coming.
+        loop {
+            std::thread::park();
+        }
+    });
 }
 
 pub fn enumerate() -> Option<Vec<App>> {
@@ -146,6 +245,56 @@ mod tests {
         assert_eq!(package_name("Microsoft.WindowsNotepad_8wekyb3d8bbwe!App"), "Notepad");
         assert_eq!(package_name("Microsoft.WindowsCalculator_8wekyb3d8bbwe!App"), "Calculator");
         assert_eq!(package_name("Microsoft.Paint_8wekyb3d8bbwe!App"), "Paint");
+    }
+
+    #[test]
+    fn a_shortcut_added_to_a_watched_programs_folder_shows_up_without_a_restart() {
+        let folder = std::env::temp_dir().join(format!("startline-programs-{}", std::process::id()));
+        std::fs::create_dir_all(folder.join("Tools")).unwrap();
+        let dir = folder.to_string_lossy().to_string();
+        // Stands in for Windows's app list: every shortcut in the folder and the ones inside it.
+        let shortcuts = dir.clone();
+        let read = move || {
+            let mut apps = Vec::new();
+            for sub in ["", "Tools"] {
+                for entry in std::fs::read_dir(std::path::Path::new(&shortcuts).join(sub)).ok()?.flatten() {
+                    let name = entry.file_name().to_string_lossy().to_string();
+                    if let Some(stem) = name.strip_suffix(".lnk") {
+                        let mut app = App { name: stem.into(), id: name.clone(), path: String::new(), lower: String::new(), alias: String::new() };
+                        app.prepare();
+                        apps.push(app);
+                    }
+                }
+            }
+            apps.sort_by(|a, b| a.lower.cmp(&b.lower));
+            Some(apps)
+        };
+        let list = Arc::new(RwLock::new(Vec::new()));
+        let (tx, rx) = mpsc::channel();
+        keep_fresh(list.clone(), vec![dir.clone()], tx, rx, read, |_| {});
+        let names = || list.read().unwrap().iter().map(|a| a.name.clone()).collect::<Vec<_>>();
+        let wait_for = |want: &dyn Fn(&[String]) -> bool| {
+            let started = Instant::now();
+            while started.elapsed() < Duration::from_secs(5) {
+                if want(&names()) {
+                    return started.elapsed();
+                }
+                std::thread::sleep(Duration::from_millis(50));
+            }
+            panic!("the list is still {:?}", names());
+        };
+        std::thread::sleep(Duration::from_millis(300));
+
+        std::fs::write(folder.join("CaptureCraft.lnk"), b"").unwrap();
+        let took = wait_for(&|n| n.iter().any(|a| a == "CaptureCraft"));
+        assert!(took < Duration::from_secs(2), "it should take a second or two, not {took:?}");
+        std::fs::write(folder.join("Tools").join("Helper.lnk"), b"").unwrap();
+        wait_for(&|n| n.iter().any(|a| a == "Helper"));
+        std::fs::rename(folder.join("CaptureCraft.lnk"), folder.join("CaptureCraft 2.lnk")).unwrap();
+        wait_for(&|n| n.iter().any(|a| a == "CaptureCraft 2") && !n.iter().any(|a| a == "CaptureCraft"));
+        std::fs::remove_file(folder.join("CaptureCraft 2.lnk")).unwrap();
+        wait_for(&|n| !n.iter().any(|a| a.starts_with("CaptureCraft")));
+        let _ = std::fs::remove_dir_all(&folder);
     }
 
     #[test]

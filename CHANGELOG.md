@@ -2,6 +2,12 @@
 
 What changed for people using Startline, compared with the version before. A release's notes on GitHub are its section here.
 
+## Unreleased
+
+- A Best match at the top of the results: the one result whose name fits what you typed best, whatever its kind, so typing a folder's name and pressing Enter opens that folder. It can be turned off, also by policy
+- Web searches open your default browser with the search engine you set up there, instead of a fixed address. A fixed address is still there as a setting and a policy
+- Newly installed apps show up in the list and in search within seconds, and uninstalled ones go, Store apps included, without restarting Startline
+
 ## 0.0.1
 
 ### Start menu

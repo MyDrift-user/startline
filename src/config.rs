@@ -220,6 +220,11 @@ pub struct Config {
     /// Windows settings search can change, and its shortcuts to settings pages and tools.
     pub search_windows_settings: bool,
     pub search_settings_pages: bool,
+    /// The one result whose name fits the search best comes first, in a section of its own.
+    pub best_match: bool,
+    /// Web searches open `web_url`. Off, they go to the default browser and the search engine set up there, and
+    /// `web_url` only serves when that browser isn't one Startline knows how to ask.
+    pub web_fixed: bool,
     pub web_name: String,
     pub web_url: String,
 
@@ -316,6 +321,8 @@ impl Default for Config {
             show_search_hints: true,
             search_windows_settings: true,
             search_settings_pages: true,
+            best_match: true,
+            web_fixed: false,
             web_name: tx("the web").into(),
             web_url: "https://duckduckgo.com/?q={}".into(),
             take_over_start: true,
@@ -519,6 +526,16 @@ mod tests {
         assert!(!cfg.indexes(PlaceKind::Network) && !cfg.indexes(PlaceKind::Usb));
         let off = Config { index_local: false, auto_network: true, ..Config::default() };
         assert!(!off.indexes(PlaceKind::Ssd) && off.indexes(PlaceKind::Network) && !off.indexes(PlaceKind::Usb));
+    }
+
+    #[test]
+    fn best_match_is_on_and_the_browser_picks_the_search_engine_at_first() {
+        let cfg = Config::default();
+        assert!(cfg.best_match);
+        assert!(!cfg.web_fixed, "the browser's own search engine, not a fixed address");
+        let older = Config::parse(br#"{"version": 3, "web_url": "https://example.com/?q={}"}"#).unwrap();
+        assert!(older.best_match && !older.web_fixed, "settings saved before keep the new defaults");
+        assert_eq!(older.web_url, "https://example.com/?q={}", "an address set before is kept, for when it's switched on");
     }
 
     #[test]

@@ -214,8 +214,10 @@ fn build(lang: Lang) -> Vec<Policy> {
         number("SearchMaxSettings", "/max_settings", SearchResults, t(tx("Most settings shown in the results")), "", 1, 30, 6),
         number("SearchMaxFiles", "/max_files", SearchResults, t(tx("Most files shown in the results")), "", 5, 200, 30),
         switch("SearchShowFolders", "/show_paths", SearchResults, t(tx("Show the folder under each file")), ""),
-        entry("SearchWebName", "/web_name", SearchResults, t(tx("Name of the web search")), t(tx("Shown as: Search <name> for ...")), Kind::Text("the web")), // i18n-ignore: the default as it is stored
-        entry("SearchWebAddress", "/web_url", SearchResults, t(tx("Web search address")), t(tx("Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.")), Kind::Text("https://duckduckgo.com/?q={}")),
+        switch("SearchBestMatch", "/best_match", SearchResults, t(tx("Best match at the top")), t(tx("The one result whose name fits what was typed best, whatever its kind, comes first."))),
+        switch("SearchWebUseAddress", "/web_fixed", SearchResults, t(tx("Search the web with a fixed address")), t(tx("Enabled, web searches open the web search address. Disabled or not set, they go to the default browser and the search engine set up there."))),
+        entry("SearchWebName", "/web_name", SearchResults, t(tx("Name of the web search")), t(tx("Shown as: Search <name> for ..., when the web search address is used.")), Kind::Text("the web")), // i18n-ignore: the default as it is stored
+        entry("SearchWebAddress", "/web_url", SearchResults, t(tx("Web search address")), t(tx("Used when SearchWebUseAddress is enabled, and when the default browser isn't one Startline knows how to ask. Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.")), Kind::Text("https://duckduckgo.com/?q={}")),
         switch(WINDOWS_SETTINGS, "/search_windows_settings", SearchResults, t(tx("Change Windows settings from search")), t(tx("Disabled removes every Windows setting search can change."))),
         switch(PAGES, "/search_settings_pages", SearchResults, t(tx("Shortcuts to Windows settings and tools")), t(tx("Disabled removes search's shortcuts to Windows settings pages and tools, and the Control Panel, printer and default program links."))),
         // Search: the search box

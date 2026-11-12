@@ -2,6 +2,7 @@
 
 mod actions;
 mod apps;
+mod browser;
 mod classic;
 mod config;
 mod customize;
@@ -47,6 +48,8 @@ pub struct Options {
     pub demo_open: bool,
     /// For a picture of the search box's right-click menu: its text selected and the menu open.
     pub demo_text_menu: bool,
+    /// For a picture of a lower part of a Settings page: scrolled down this far.
+    pub demo_scroll: Option<f32>,
     /// For a picture of what policies do: read them from this file instead of the Registry.
     pub test_policies: Option<PathBuf>,
 }
@@ -75,6 +78,7 @@ fn parse_options() -> (Options, Option<PathBuf>, Option<PathBuf>) {
             "--experience" => options.experience = args.next(),
             "--demo-open" => options.demo_open = true,
             "--demo-text-menu" => options.demo_text_menu = true,
+            "--demo-scroll" => options.demo_scroll = args.next().and_then(|p| p.parse().ok()),
             "--test-policies" => options.test_policies = args.next().map(PathBuf::from),
             "--write-policy-templates" => {
                 let folder = args.next().map_or_else(|| PathBuf::from("PolicyDefinitions"), PathBuf::from);

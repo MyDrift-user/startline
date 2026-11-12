@@ -127,6 +127,8 @@ pub struct Menu {
     pub(crate) fast_micros: u64,
     waiting_generation: u64,
     pub(crate) rows: Vec<Row>,
+    /// Which of `rows` is the best match, shown first under a heading of its own.
+    pub(crate) best_at: Option<usize>,
     /// Why a regular expression in the search couldn't be used.
     pub(crate) search_error: Option<String>,
     /// The panel that shows what can be typed in the search box.
@@ -265,6 +267,7 @@ impl Menu {
             fast_micros: 0,
             waiting_generation: 0,
             rows: Vec::new(),
+            best_at: None,
             search_error: None,
             help_open: false,
             selected: None,
@@ -472,6 +475,7 @@ impl Menu {
         let direct = search::direct_row(&self.query);
         let web = search::web_row(&self.query, &self.cfg);
         let mut rows: Vec<Row> = Vec::with_capacity(self.fast_rows.len() + file_rows.len() + 2);
+        self.best_at = None;
         rows.extend(direct);
         // A file type filter means the person is after files: nothing else belongs in the list.
         if self.filtering() {
@@ -481,19 +485,38 @@ impl Menu {
             self.rows = rows;
             return;
         }
-        if self.settings_lead && self.cfg.shows(Category::Settings) {
-            rows.extend(self.fast_rows.iter().filter(|r| r.category == Category::Settings).cloned());
-        }
-        for category in self.cfg.results.iter().filter(|r| r.on).map(|r| r.kind) {
+        let lead = self.settings_lead && self.cfg.shows(Category::Settings);
+        let mut order: Vec<Category> = if lead { vec![Category::Settings] } else { Vec::new() };
+        order.extend(self.cfg.results.iter().filter(|r| r.on).map(|r| r.kind).filter(|k| !(lead && *k == Category::Settings)));
+        let mut listed: Vec<Row> = Vec::new();
+        for &category in &order {
             match category {
-                Category::Settings if self.settings_lead => {}
                 Category::Apps | Category::Settings => {
-                    rows.extend(self.fast_rows.iter().filter(|r| r.category == category).cloned());
+                    listed.extend(self.fast_rows.iter().filter(|r| r.category == category).cloned());
                 }
-                Category::Files => rows.extend(file_rows.iter().cloned()),
-                Category::Web => rows.extend(web.iter().cloned()),
+                Category::Files => listed.extend(file_rows.iter().cloned()),
+                Category::Web => listed.extend(web.iter().cloned()),
             }
         }
+        // The one result whose name fits best goes first, whatever its kind, and isn't listed again below.
+        if self.cfg.best_match && !self.regex_on() {
+            let uses = |row: &Row| match &row.kind {
+                RowKind::Open(target) => self.cfg.usage.get(&target.key()).map_or(0, |u| u.count),
+                _ => 0,
+            };
+            let apps = self.apps.read().unwrap();
+            let other_names = |row: &Row| match &row.kind {
+                RowKind::Open(Target::App(id)) => apps.iter().find(|app| &app.id == id).map(|app| app.alias.clone()).unwrap_or_default(),
+                _ => String::new(),
+            };
+            let best = search::best_match(&listed, &self.query, &order, other_names, uses);
+            drop(apps);
+            if let Some(at) = best {
+                self.best_at = Some(rows.len());
+                rows.push(listed.remove(at));
+            }
+        }
+        rows.extend(listed);
         self.rows = rows;
     }
 
@@ -517,8 +540,13 @@ impl Menu {
                 let _ = platform::copy_text(&text);
             }
             Intent::TogglePin { name, target } => self.cfg.toggle_pin(&name, &target),
-            Intent::Web(url) => {
-                platform::open_async("", url, String::new());
+            Intent::Web(words) => {
+                let address = search::web_address(&self.cfg, &words);
+                if self.cfg.web_fixed {
+                    platform::open_async("", address, String::new());
+                } else {
+                    crate::browser::search(words, address);
+                }
                 self.close_for_launch();
             }
             Intent::Show(Page::Customize(tab)) if !self.is_shot() => self.open_settings(tab),

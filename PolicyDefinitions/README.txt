@@ -89,8 +89,13 @@ The search policies are under Startline > Search, in four parts:
                     expressions. Fixed, the lists add to what people leave out themselves: they see your items with a
                     lock and can't remove them, but can still add their own.
   Results           which kinds of results show, in what order and how many of each (SearchResults: Apps, Settings,
-                    Files, Web, one per line; a kind left out is never shown), and how they look.
+                    Files, Web, one per line; a kind left out is never shown), the Best match at the top
+                    (SearchBestMatch), and how they look.
   Search box        regular expression mode, and which parts of the search box and results show.
+Web searches go to the default browser and the search engine set up there, so Startline picks no engine. To send them
+to one fixed address instead, enable SearchWebUseAddress and set SearchWebAddress. That address is also used when the
+default browser isn't one Startline knows how to ask (Chromium browsers such as Chrome, Edge, Brave, Vivaldi and Opera,
+and Firefox and its forks).
 SearchSkipPatterns are regular expressions matched against the whole path, whatever the case. A file or folder that
 matches is never found, nor anything in a folder that matches. For example:
     \\Payroll(\\|$)                    the Payroll folder and everything in it, wherever it is
@@ -315,14 +320,22 @@ SearchMaxFiles
 SearchShowFolders
     Show the folder under each file
     REG_DWORD, 1 on, 0 off
+SearchBestMatch
+    Best match at the top
+    REG_DWORD, 1 on, 0 off
+    The one result whose name fits what was typed best, whatever its kind, comes first.
+SearchWebUseAddress
+    Search the web with a fixed address
+    REG_DWORD, 1 on, 0 off
+    Enabled, web searches open the web search address. Disabled or not set, they go to the default browser and the search engine set up there.
 SearchWebName
     Name of the web search
     REG_SZ
-    Shown as: Search <name> for ...
+    Shown as: Search <name> for ..., when the web search address is used.
 SearchWebAddress
     Web search address
     REG_SZ
-    Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.
+    Used when SearchWebUseAddress is enabled, and when the default browser isn't one Startline knows how to ask. Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.
 SearchChangeWindowsSettings
     Change Windows settings from search
     REG_DWORD, 1 on, 0 off

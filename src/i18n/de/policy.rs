@@ -86,9 +86,7 @@ pub const T: &[(&str, &str)] = &[
     ("Most files shown in the results", "Höchstzahl angezeigter Dateien"),
     ("Show the folder under each file", "Ordner unter jeder Datei anzeigen"),
     ("Name of the web search", "Name der Websuche"),
-    ("Shown as: Search <name> for ...", "Angezeigt als: Search <name> for ..."),
     ("Web search address", "Adresse der Websuche"),
-    ("Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.", "Muss mit http:// oder https:// beginnen und {} dort enthalten, wo die Suchbegriffe stehen. Alles andere wird ignoriert."),
     ("Disabled removes every Windows setting search can change.", "Deaktiviert entfernt alle Windows-Einstellungen, die die Suche ändern kann."),
     ("Shortcuts to Windows settings and tools", "Verknüpfungen zu Windows-Einstellungen und -Tools"),
     ("Disabled removes search's shortcuts to Windows settings pages and tools, and the Control Panel, printer and default program links.", "Deaktiviert entfernt die Verknüpfungen der Suche zu Seiten der Windows-Einstellungen und zu Tools sowie die Links zu Systemsteuerung, Druckern und Standardprogrammen."),
@@ -150,4 +148,7 @@ pub const T: &[(&str, &str)] = &[
     ("Search", "Suchen"),
     ("{name}:", "{name}:"),
     ("Settings for the Startline Start menu and search.", "Einstellungen für das Startmenü und die Suche von Startline."),
+    ("Enabled, web searches open the web search address. Disabled or not set, they go to the default browser and the search engine set up there.", "Aktiviert öffnen Websuchen die Adresse der Websuche. Deaktiviert oder nicht konfiguriert gehen sie an den Standardbrowser und die dort eingestellte Suchmaschine."),
+    ("Shown as: Search <name> for ..., when the web search address is used.", "Angezeigt als: Search <name> for ..., wenn die Adresse der Websuche verwendet wird."),
+    ("Used when SearchWebUseAddress is enabled, and when the default browser isn't one Startline knows how to ask. Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.", "Wird verwendet, wenn SearchWebUseAddress aktiviert ist und wenn Startline den Standardbrowser nicht ansprechen kann. Muss mit http:// oder https:// beginnen und {} dort enthalten, wo die Suchbegriffe stehen. Alles andere wird ignoriert."),
 ];

@@ -322,18 +322,32 @@ A default people can change: Enabled sets it to the value below until they chang
       <string id="P_SearchShowFolders">Show the folder under each file</string>
       <string id="E_SearchShowFolders">Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
       <string id="R_SearchShowFolders">A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchBestMatch">Best match at the top</string>
+      <string id="E_SearchBestMatch">The one result whose name fits what was typed best, whatever its kind, comes first.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchBestMatch">The one result whose name fits what was typed best, whatever its kind, comes first.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchWebUseAddress">Search the web with a fixed address</string>
+      <string id="E_SearchWebUseAddress">Enabled, web searches open the web search address. Disabled or not set, they go to the default browser and the search engine set up there.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchWebUseAddress">Enabled, web searches open the web search address. Disabled or not set, they go to the default browser and the search engine set up there.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_SearchWebName">Name of the web search</string>
-      <string id="E_SearchWebName">Shown as: Search &lt;name&gt; for ...
+      <string id="E_SearchWebName">Shown as: Search &lt;name&gt; for ..., when the web search address is used.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
-      <string id="R_SearchWebName">Shown as: Search &lt;name&gt; for ...
+      <string id="R_SearchWebName">Shown as: Search &lt;name&gt; for ..., when the web search address is used.
 
 A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchWebAddress">Web search address</string>
-      <string id="E_SearchWebAddress">Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.
+      <string id="E_SearchWebAddress">Used when SearchWebUseAddress is enabled, and when the default browser isn't one Startline knows how to ask. Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
-      <string id="R_SearchWebAddress">Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.
+      <string id="R_SearchWebAddress">Used when SearchWebUseAddress is enabled, and when the default browser isn't one Startline knows how to ask. Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.
 
 A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchChangeWindowsSettings">Change Windows settings from search</string>

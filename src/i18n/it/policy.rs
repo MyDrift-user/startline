@@ -83,9 +83,7 @@ pub const T: &[(&str, &str)] = &[
     ("Most settings shown in the results", "Numero massimo di impostazioni nei risultati"),
     ("Most files shown in the results", "Numero massimo di file nei risultati"),
     ("Show the folder under each file", "Mostra la cartella sotto ogni file"),
-    ("Shown as: Search <name> for ...", "Mostrato come: Search <name> for ..."),
     ("Web search address", "Indirizzo della ricerca web"),
-    ("Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.", "Deve iniziare con http:// o https:// e contenere {} dove vanno le parole. Qualsiasi altro valore viene ignorato."),
     ("Disabled removes every Windows setting search can change.", "Disabilitato rimuove tutte le impostazioni di Windows che la ricerca può modificare."),
     ("Disabled removes search's shortcuts to Windows settings pages and tools, and the Control Panel, printer and default program links.", "Disabilitato rimuove i collegamenti della ricerca alle pagine di Impostazioni di Windows e agli strumenti, e i link a Pannello di controllo, stampanti e programmi predefiniti."),
     // policy.rs: search box
@@ -143,4 +141,7 @@ pub const T: &[(&str, &str)] = &[
     ("Search", "Cerca"),
     ("{name}:", "{name}:"),
     ("Settings for the Startline Start menu and search.", "Impostazioni per il menu Start e la ricerca di Startline."),
+    ("Enabled, web searches open the web search address. Disabled or not set, they go to the default browser and the search engine set up there.", "Attivato, le ricerche web aprono l'indirizzo della ricerca web. Disattivato o non configurato, vanno al browser predefinito e al motore di ricerca impostato lì."),
+    ("Shown as: Search <name> for ..., when the web search address is used.", "Mostrato come: Search <name> for ..., quando si usa l'indirizzo della ricerca web."),
+    ("Used when SearchWebUseAddress is enabled, and when the default browser isn't one Startline knows how to ask. Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.", "Usato quando SearchWebUseAddress è attivato e quando Startline non sa come interpellare il browser predefinito. Deve iniziare con http:// o https:// e contenere {} dove vanno le parole. Qualsiasi altro valore viene ignorato."),
 ];
