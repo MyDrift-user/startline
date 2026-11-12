@@ -128,7 +128,14 @@ fn verified_manifest(text: &[u8], sig: &[u8]) -> Result<Manifest, String> {
 fn sha256_of(path: &Path) -> Option<String> {
     let mut file = std::fs::File::open(path).ok()?;
     let mut hasher = Sha256::new();
-    std::io::copy(&mut file, &mut hasher).ok()?;
+    let mut buf = vec![0u8; 64 * 1024];
+    loop {
+        let n = std::io::Read::read(&mut file, &mut buf).ok()?;
+        if n == 0 {
+            break;
+        }
+        hasher.update(&buf[..n]);
+    }
     Some(hasher.finalize().iter().map(|b| format!("{b:02x}")).collect())
 }
 
@@ -852,6 +859,33 @@ mod tests {
         assert!(!signature_ok(&KEY, &[0x72], &bad), "a changed signature");
         assert!(!signature_ok(&KEY, &[0x72], &SIG[..63]), "a short signature");
         assert!(!signature_ok(&PUBLIC_KEY, &[0x72], &SIG), "another key");
+    }
+
+    /// A list made exactly as the release workflow makes latest.json (sha256sum, then `openssl pkeyutl -sign -rawin`),
+    /// with a throwaway key, so a newer signature or hash library is known to read what releases already carry.
+    #[test]
+    fn a_list_signed_the_way_releases_are_still_verifies() {
+        const PUBLIC: [u8; 32] = [
+            0x60, 0xff, 0x04, 0x99, 0x6d, 0xcf, 0x47, 0xf0, 0x4b, 0x3b, 0xca, 0x0c, 0x2c, 0x4d, 0xdf, 0x13, 0x34, 0xfd, 0x09, 0x3e, 0xe7, 0x0c, 0xcc, 0x47, 0x7e, 0x88, 0x7b, 0x3d, 0x25, 0x33, 0x15, 0xfa,
+        ];
+        const SIGNED: [u8; 64] = [
+            0x9c, 0x6d, 0xa4, 0x94, 0x77, 0x41, 0xfb, 0xa9, 0x8e, 0x38, 0x89, 0xee, 0x43, 0xe4, 0xc4, 0x0f, 0x2d, 0xaf, 0x59, 0x42, 0x8c, 0x31, 0x7f, 0x12, 0x73, 0xaf, 0x31, 0x9c, 0x76, 0xc6, 0x9a, 0xc4,
+            0x12, 0xc1, 0x07, 0xda, 0x39, 0x25, 0x50, 0x57, 0x5c, 0x61, 0x4f, 0xf8, 0xb1, 0xd1, 0x8b, 0xeb, 0x36, 0xa1, 0x0c, 0x52, 0x66, 0x50, 0xaa, 0x46, 0xce, 0x13, 0x13, 0x5a, 0x2d, 0x0c, 0xc9, 0x0e,
+        ];
+        let list = "version 9.9.9\n\
+                    file fe73ab0701b49f1dc9f890e524bc825d221d94b7f42d68b214a3292f5b132619 latest.json\n\
+                    file 3ef305106cceca4b2bef242b58569e59ea8e3b7407b755f5c13fe8e4aa80a018 startline-v9.9.9-windows-x64.zip\n";
+        assert!(signature_ok(&PUBLIC, list.as_bytes(), &SIGNED));
+        assert!(!signature_ok(&PUBLIC, list.replace("9.9.9", "9.9.8").as_bytes(), &SIGNED), "a changed list");
+        assert!(!signature_ok(&PUBLIC_KEY, list.as_bytes(), &SIGNED), "the real key didn't sign it");
+        let manifest = parse_manifest(list).unwrap();
+        assert_eq!(manifest.version, "9.9.9");
+        // The file's hash, as this program works it out, is the one sha256sum wrote into the list.
+        let file = std::env::temp_dir().join(format!("startline-hash-{}.zip", std::process::id()));
+        std::fs::write(&file, "tiny release file\n").unwrap();
+        let hash = sha256_of(&file);
+        let _ = std::fs::remove_file(&file);
+        assert_eq!(hash.as_deref(), manifest.files.iter().find(|(name, _)| name == "startline-v9.9.9-windows-x64.zip").map(|(_, h)| h.as_str()));
     }
 
     #[test]
