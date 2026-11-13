@@ -63,6 +63,11 @@ impl Menu {
             self.m365 = Session::open(&self.cfg, Store::app()).map(Arc::new);
             self.calendar = super::panel::Calendar::default();
             self.m365_ui.asked_for = None;
+            // What was typed before the account was ready is looked for among people and mail now.
+            if self.m365.is_some() && !self.query.trim().is_empty() {
+                self.ask_providers(Some(crate::config::Category::People));
+                self.ask_providers(Some(crate::config::Category::Mail));
+            }
         } else if !wanted && self.m365.is_some() {
             self.m365 = None;
             self.calendar = super::panel::Calendar::default();
@@ -84,6 +89,9 @@ impl Menu {
             if let Some(answer) = self.m365_ui.who.lock().unwrap().take() {
                 if answer == Err(GraphError::AdminConsent) {
                     self.m365_ui.problem = Some(Problem::AdminConsent);
+                } else if answer.is_ok() && self.m365_ui.problem == Some(Problem::AdminConsent) {
+                    // Approved since: the page no longer waits for it.
+                    self.m365_ui.problem = None;
                 }
                 self.m365_ui.shown = Some(answer);
             }
@@ -155,10 +163,14 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         }
         ui.separator();
         let signed_in = super::signed_in(&menu.cfg);
+        // Signed in or not, nothing works until the organization approves Startline: the page says that, not "Signed in".
+        let waiting = menu.m365_ui.problem == Some(Problem::AdminConsent) && !menu.m365_ui.signing_in;
         ui.horizontal(|ui| {
             ui.set_min_height(34.0);
             let status = if menu.m365_ui.signing_in {
                 tr("Signing in... Finish in the window that opened.").to_string()
+            } else if waiting {
+                tr("Waiting for your organization's approval").to_string()
             } else if signed_in {
                 match &menu.m365_ui.shown {
                     Some(Ok(me)) if !me.mail.is_empty() => crate::trf!("Signed in as {name} ({mail})", name = me.name, mail = me.mail),
@@ -170,7 +182,16 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
             };
             ui.label(RichText::new(status).size(13.5).color(pal.text));
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                if signed_in {
+                if waiting {
+                    // Cancel forgets the attempt and any account; signing in again is for once it's approved.
+                    let cancel = ui.button(tr("Cancel")).clicked();
+                    let again = ui.button(tr("Sign in again")).clicked();
+                    if cancel {
+                        menu.m365_sign_out();
+                    } else if again {
+                        menu.m365_sign_in(&ctx);
+                    }
+                } else if signed_in {
                     if ui.button(tr("Sign out")).clicked() {
                         menu.m365_sign_out();
                     }

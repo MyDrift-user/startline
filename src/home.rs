@@ -764,7 +764,7 @@ impl Menu {
             38.0
         };
         let (rect, _) = ui.allocate_exact_size(vec2(width, height), Sense::hover());
-        let id = Id::unique(("row", &row.name, &row.kind_key()));
+        let id = row.nav_id();
         let response = ui.interact(rect, id, Sense::click());
         let intent = match &row.kind {
             RowKind::Open(target) => Some(Intent::Open { name: row.name.clone(), target: target.clone(), admin: false }),
@@ -907,8 +907,17 @@ impl Menu {
                 return;
             }
             let on_setting = self.selected_entry().is_some_and(|e| matches!(e.kind, NavKind::Quick(..)));
+            // What Enter would open: the selected result, or the first one when none is.
+            let target = self.selected.or_else(|| self.nav.first().map(|n| n.id));
+            let current = target.and_then(|id| self.rows.iter().find(|row| row.nav_id() == id)).map(|row| &row.kind);
             let hint = if on_setting {
                 tr("Enter applies, Down, then left and right adjusts, Right-click for more, Esc clears")
+            } else if matches!(current, Some(RowKind::Person(_))) {
+                tr("Enter starts a Teams chat, Esc clears")
+            } else if matches!(current, Some(RowKind::Link(_))) {
+                tr("Enter opens the message, Esc clears")
+            } else if matches!(current, Some(RowKind::Web(_) | RowKind::Run(_))) {
+                tr("Enter opens, Esc clears")
             } else {
                 match (self.policy.allows("Menu_RunAsAdmin"), self.policy.allows("Menu_OpenLocation")) {
                     (true, true) => tr("Enter opens, Ctrl+Enter as admin, Shift+Enter shows in folder, Esc clears"),

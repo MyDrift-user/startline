@@ -188,4 +188,7 @@ pub const T: &[(&str, &str)] = &[
     ("Lunch with Sam", "Pranzo con Sam"),
     ("Budget call", "Chiamata sul budget"),
     ("Focus time", "Tempo per concentrarsi"),
+    ("Answer the invitation", "Rispondi all'invito"),
+    ("Enter starts a Teams chat, Esc clears", "Invio avvia una chat di Teams, Esc cancella"),
+    ("Enter opens the message, Esc clears", "Invio apre il messaggio, Esc cancella"),
 ];

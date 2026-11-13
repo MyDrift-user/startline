@@ -272,4 +272,5 @@ pub const T: &[(&str, &str)] = &[
     ("Set by the installer", "Impostato dal programma di installazione"),
     ("Built in", "Integrato"),
     ("No Microsoft 365 app registration is set. It can be built in, given when installing (M365CLIENTID), or set by an organization with the M365ClientId policy.", "Non è impostata alcuna registrazione dell'app per Microsoft 365. Può essere integrata, indicata durante l'installazione (M365CLIENTID) o impostata da un'organizzazione con il criterio M365ClientId."),
+    ("Waiting for your organization's approval", "In attesa dell'approvazione della tua organizzazione"),
 ];

@@ -14,6 +14,11 @@ What changed for people using Startline, compared with the version before. A rel
 - Startline asks Microsoft only for what's switched on, talks to nothing but Microsoft's sign-in and Graph, and signing out forgets the account, its tokens and the cached calendar
 - Where an organization doesn't let people approve apps themselves, Startline says so and copies the approval link for the administrator. Organizations can switch the account and each part on or off by policy
 - An organization's own app registration and tenant can be given by Group Policy, when installing (M365CLIENTID and M365TENANTID for the MSI and setup.exe, kept by upgrades), or when building; Settings says which one is in use
+- Only one copy of Startline runs per user session: copies started together, by two autostart entries at logon, by several clicks, or the installed copy beside another build, used to all keep running. A second copy now opens the running one's menu and ends; one started at logon just ends
+- An invitation squeezed beside another event in the calendar can still be answered: a button opens Accept, Tentative and Decline as a menu, and a right click on any invitation does too
+- People and mail are looked for in what you typed before your Microsoft 365 account was ready, as soon as it is
+- The keyboard hint under the results fits the result: Enter starts a Teams chat for a person and opens the message for mail, instead of offering to show them in a folder
+- While your organization hasn't approved Startline yet, the Microsoft 365 page says it's waiting for that approval, with Sign in again and Cancel, instead of "Signed in" and Sign out
 
 ## 0.0.1
 

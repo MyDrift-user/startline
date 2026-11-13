@@ -138,7 +138,7 @@ pub struct Menu {
     /// The person moved to the selected row themselves, so left and right are for it, not
     /// the text cursor. A wrong arrow while fixing a typo must not change a setting.
     nav_by_keys: bool,
-    nav: Vec<NavEntry>,
+    pub(crate) nav: Vec<NavEntry>,
     pub(crate) nav_next: Vec<NavEntry>,
     pub intents: Vec<Intent>,
     pub(crate) confirm: Option<(Do, Instant)>,
@@ -398,7 +398,7 @@ impl Menu {
     }
 
     /// Tells the providers about the search, every one of them or only those of one kind, and lists what they have.
-    fn ask_providers(&mut self, only: Option<Category>) {
+    pub(crate) fn ask_providers(&mut self, only: Option<Category>) {
         let started = Instant::now();
         let filter = FileFilter { regex: self.regex_on(), ..self.file_filter.clone() };
         let ask = Ask { query: &self.query, tokens: &self.tokens, cfg: &self.cfg, policy: &self.policy, filter: &filter, m365: self.m365.as_ref() };
@@ -1125,6 +1125,11 @@ impl Icon {
 }
 
 impl Row {
+    /// Its place among the things the keys move between.
+    pub(crate) fn nav_id(&self) -> Id {
+        Id::unique(("row", &self.name, &self.kind_key()))
+    }
+
     pub(crate) fn kind_key(&self) -> String {
         match &self.kind {
             RowKind::Open(target) => target.key(),

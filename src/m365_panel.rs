@@ -185,13 +185,31 @@ impl Calendar {
 
 /// A small square button with a symbol, lit when the pointer is on it.
 fn glyph_button(ui: &mut Ui, rect: Rect, glyph: char, tip: &str, color: Color32, pal: Pal) -> bool {
+    glyph_response(ui, rect, glyph, tip, color, pal).clicked()
+}
+
+/// The same button, for a menu to open from it.
+fn glyph_response(ui: &mut Ui, rect: Rect, glyph: char, tip: &str, color: Color32, pal: Pal) -> Response {
     let response = ui.interact(rect, ui.scope_id().with(("glyph", rect.min.x as i32, rect.min.y as i32, glyph)), Sense::click()).on_hover_text(tip);
     if response.hovered() {
         ui.painter().rect_filled(rect, pal.radius.min(4), pal.hover);
     }
     ui.painter().text(rect.center(), Align2::CENTER_CENTER, glyph, icon_font(12.0), color);
-    response.clicked()
+    response
 }
+
+/// The answers to an invitation, as menu lines.
+fn answer_menu(ui: &mut Ui, id: &str, answers: &mut Vec<(String, Answer)>) {
+    for &(_, tip, answer) in ANSWERS.iter().rev() {
+        if ui.button(tr(tip)).clicked() {
+            answers.push((id.to_string(), answer));
+            ui.close();
+        }
+    }
+}
+
+/// The answers to an invitation, right to left as their buttons stand.
+const ANSWERS: [(char, &str, Answer); 3] = [('\u{E711}', tx("Decline"), Answer::Declined), ('\u{E897}', tx("Tentative"), Answer::Tentative), ('\u{E8FB}', tx("Accept"), Answer::Accepted)];
 
 /// A small button with words, its width fitting them.
 fn word_button(ui: &mut Ui, at: Pos2, text: &str, pal: Pal) -> (Rect, bool) {
@@ -345,17 +363,26 @@ impl Menu {
                 let mut clicked_button = false;
                 let mut small = |ui: &mut Ui, glyph: char, tip: &str| {
                     right -= 22.0;
-                    glyph_button(ui, Rect::from_min_size(pos2(right, block.top() + 2.0), vec2(20.0, 20.0)), glyph, tip, ink, pal)
+                    glyph_response(ui, Rect::from_min_size(pos2(right, block.top() + 2.0), vec2(20.0, 20.0)), glyph, tip, ink, pal)
                 };
-                if event.is_invitation() && block.width() > 120.0 {
-                    for (glyph, tip, answer) in [('\u{E711}', tr("Decline"), Answer::Declined), ('\u{E897}', tr("Tentative"), Answer::Tentative), ('\u{E8FB}', tr("Accept"), Answer::Accepted)] {
-                        if small(ui, glyph, tip) {
-                            answers.push((event.id.clone(), answer));
-                            clicked_button = true;
+                if event.is_invitation() {
+                    if block.width() > 120.0 {
+                        for (glyph, tip, answer) in ANSWERS {
+                            if small(ui, glyph, tr(tip)).clicked() {
+                                answers.push((event.id.clone(), answer));
+                                clicked_button = true;
+                            }
                         }
+                    } else {
+                        // Beside another event there's no room for three buttons: one opens them as a menu.
+                        let more = small(ui, '\u{E712}', tr("Answer the invitation"));
+                        clicked_button |= more.clicked();
+                        Popup::menu(&more).show(|ui| answer_menu(ui, &event.id, &mut answers));
                     }
+                    // However narrow, a right click on it answers too.
+                    response.context_menu(|ui| answer_menu(ui, &event.id, &mut answers));
                 }
-                if !event.join_url.is_empty() && !faded && small(ui, '\u{E714}', tr("Join")) {
+                if !event.join_url.is_empty() && !faded && small(ui, '\u{E714}', tr("Join")).clicked() {
                     intents.push(Intent::Link(super::teams_link(&event.join_url, teams)));
                     clicked_button = true;
                 }

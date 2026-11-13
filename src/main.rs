@@ -10,6 +10,7 @@ mod home;
 mod i18n;
 mod icons;
 mod index;
+mod instance;
 mod intent;
 mod m365;
 mod matching;
@@ -30,6 +31,7 @@ mod update;
 mod widgets;
 
 use std::path::PathBuf;
+use std::time::Duration;
 
 /// What the command line asked for.
 #[derive(Default, Clone)]
@@ -56,6 +58,8 @@ pub struct Options {
     pub demo_m365: bool,
     /// For a picture of what policies do: read them from this file instead of the Registry.
     pub test_policies: Option<PathBuf>,
+    /// Started by the copy an update replaces, which may still be ending.
+    pub replacing: bool,
 }
 
 fn parse_options() -> (Options, Option<PathBuf>, Option<PathBuf>) {
@@ -104,6 +108,7 @@ fn parse_options() -> (Options, Option<PathBuf>, Option<PathBuf>) {
             }
             // Started by the copy it replaces, which is still ending.
             "--wait-for" => {
+                options.replacing = true;
                 if let Some(pid) = args.next().and_then(|p| p.parse().ok()) {
                     update::wait_for(pid);
                 }
@@ -151,10 +156,38 @@ pub fn app_icon_pixels(size: usize) -> Vec<u8> {
 }
 
 fn main() {
+    // Runs that do one job and end (--version, the update helper, writing the templates...) come first; they never keep
+    // a copy running. Everything else is a copy of the menu, and the first thing it does is make sure it's the only one.
     if let Some(code) = update::handle_command_line() {
         std::process::exit(code);
     }
     let (options, probe, probe_changes) = parse_options();
+    // Pictures and the automated key tests run beside a copy that may be running, and leave the keyboard to it.
+    let _one_copy = if options.screenshot.is_none() && !options.test_injected_keys && probe.is_none() && probe_changes.is_none() {
+        // The copy an update replaces is still ending: wait for it rather than give way to it. Copies started in the
+        // background (at logon, or again after an update's installer closed the old one) wait a little too, in case
+        // the one before is just ending.
+        let wait = if options.replacing {
+            Duration::from_secs(20)
+        } else if options.background {
+            Duration::from_secs(5)
+        } else {
+            Duration::ZERO
+        };
+        match instance::claim(&instance::session_name(), wait) {
+            Some(claim) => Some(claim),
+            // Nobody asked for a menu: a second autostart entry mustn't open it at logon.
+            None if options.background => return,
+            None => {
+                // Another copy runs: it opens its menu, as a second launch always did. It may still be starting, so
+                // its window is looked for a few seconds, and never longer.
+                system::signal_running_instance(Duration::from_secs(10));
+                return;
+            }
+        }
+    } else {
+        None
+    };
 
     if let Some(path) = probe {
         // The same screen coordinates the running menu uses.
@@ -169,10 +202,6 @@ fn main() {
         return;
     }
 
-    // Only one copy may hold the keyboard connection. A second launch just opens the menu.
-    if options.screenshot.is_none() && !options.test_injected_keys && system::signal_running_instance() {
-        return;
-    }
     update::clean_after_update();
 
     let cfg = config::Config::load();

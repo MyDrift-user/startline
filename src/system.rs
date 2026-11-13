@@ -1020,15 +1020,24 @@ pub fn start(shared: Arc<Shared>, hooks: bool) {
 
 const SYSTEM_CLASS: PCWSTR = w!("StartlineSystemWindow");
 
-/// If Startline already runs, asks it to open and returns true.
-pub fn signal_running_instance() -> bool {
-    unsafe {
-        let Ok(window) = FindWindowW(SYSTEM_CLASS, PCWSTR::null()) else { return false };
-        let mut pid = 0;
-        GetWindowThreadProcessId(window, Some(&mut pid));
-        let _ = AllowSetForegroundWindow(pid);
-        let _ = PostMessageW(Some(window), WM_APP_OPEN_MENU, WPARAM(0), LPARAM(0));
-        true
+/// Asks the copy that runs to open its menu. It may still be starting, so its window is looked for up to `within`.
+/// False if it didn't turn up in that time.
+pub fn signal_running_instance(within: Duration) -> bool {
+    let started = Instant::now();
+    loop {
+        if let Ok(window) = unsafe { FindWindowW(SYSTEM_CLASS, PCWSTR::null()) } {
+            unsafe {
+                let mut pid = 0;
+                GetWindowThreadProcessId(window, Some(&mut pid));
+                let _ = AllowSetForegroundWindow(pid);
+                let _ = PostMessageW(Some(window), WM_APP_OPEN_MENU, WPARAM(0), LPARAM(0));
+            }
+            return true;
+        }
+        if started.elapsed() >= within {
+            return false;
+        }
+        std::thread::sleep(Duration::from_millis(100));
     }
 }
 
