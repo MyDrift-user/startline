@@ -454,7 +454,12 @@ impl Menu {
 
     /// Whether the search is after files only: a file type button, a typed type, the search language or regex mode.
     pub(crate) fn filtering(&self) -> bool {
-        !self.file_filter.is_empty() || !self.typed_filters().is_empty() || self.regex_on() || crate::index::uses_file_syntax(&self.query)
+        !self.file_filter.is_empty() || !self.typed_filters().is_empty() || self.regex_on() || (crate::index::uses_file_syntax(&self.query) && !self.is_sum())
+    }
+
+    /// A sum for the calculator, such as 12*7+3, whose * isn't a file name wildcard.
+    fn is_sum(&self) -> bool {
+        self.cfg.quick_calculator && self.cfg.shows(Category::Actions) && crate::calc::answer(&self.query).is_some()
     }
 
     /// Regex mode, which only counts while its switch is there to turn it off again, unless a policy fixes it on.

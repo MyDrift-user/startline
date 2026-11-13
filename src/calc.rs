@@ -482,6 +482,8 @@ mod tests {
     #[test]
     fn sums_are_worked_out_and_plain_searches_left_alone() {
         assert_eq!(value("2 + 3 * 4"), Some("14".into()));
+        assert_eq!(value("12*7+3"), Some("87".into()), "without spaces too");
+        assert_eq!(answer("*.pdf"), None, "a file name wildcard isn't a sum");
         assert_eq!(value("(2 + 3) * 4"), Some("20".into()));
         assert_eq!(value("2^3^2"), Some("512".into()));
         assert_eq!(value("-2^2"), Some("-4".into()));
