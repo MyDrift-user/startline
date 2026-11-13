@@ -22,6 +22,11 @@ impl Do {
     pub fn needs_confirm(self) -> bool {
         matches!(self, Do::SignOut | Do::Restart | Do::ShutDown | Do::EmptyRecycleBin)
     }
+
+    /// Lock, sleep, sign out, switch user, restart and shut down: the power actions search can offer.
+    pub fn is_power(self) -> bool {
+        matches!(self, Do::Lock | Do::Sleep | Do::SignOut | Do::SwitchUser | Do::Restart | Do::ShutDown)
+    }
 }
 
 pub struct Action {

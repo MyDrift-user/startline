@@ -185,6 +185,13 @@ Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modifi
       <string id="R_CompactRows">Usato solo dall'aspetto Startline.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_MediaControls">In riproduzione</string>
+      <string id="E_MediaControls">Una piccola scheda con ciò che è in riproduzione, tramite i controlli multimediali di Windows: copertina, titolo, artista e app, riproduci o pausa, precedente e successivo, e un cambio tra app quando ne suonano diverse. Funziona con Spotify, i browser e qualsiasi lettore che lo comunica a Windows, senza accesso. Disattivato se non configurato.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_MediaControls">Una piccola scheda con ciò che è in riproduzione, tramite i controlli multimediali di Windows: copertina, titolo, artista e app, riproduci o pausa, precedente e successivo, e un cambio tra app quando ne suonano diverse. Funziona con Spotify, i browser e qualsiasi lettore che lo comunica a Windows, senza accesso. Disattivato se non configurato.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_HorizontalPosition">Dove si apre in orizzontale</string>
       <string id="E_HorizontalPosition">Usato solo dall'aspetto Startline.
 
@@ -305,10 +312,10 @@ Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modifi
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_SearchResults">Tipi di risultati</string>
-      <string id="E_SearchResults">Uno per riga, dal primo all'ultimo: Apps, Settings, Files, People, Mail, Web. Un tipo non indicato non viene mai mostrato. People e Mail richiedono anche i loro criteri di Microsoft 365.
+      <string id="E_SearchResults">Uno per riga, dal primo all'ultimo: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. Un tipo non indicato non viene mai mostrato. Actions sono le azioni rapide: la calcolatrice, la cronologia degli appunti e le uscite audio. Bookmarks richiede anche SearchBookmarks, People e Mail i loro criteri di Microsoft 365.
 
 Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
-      <string id="R_SearchResults">Uno per riga, dal primo all'ultimo: Apps, Settings, Files, People, Mail, Web. Un tipo non indicato non viene mai mostrato. People e Mail richiedono anche i loro criteri di Microsoft 365.
+      <string id="R_SearchResults">Uno per riga, dal primo all'ultimo: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. Un tipo non indicato non viene mai mostrato. Actions sono le azioni rapide: la calcolatrice, la cronologia degli appunti e le uscite audio. Bookmarks richiede anche SearchBookmarks, People e Mail i loro criteri di Microsoft 365.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_SearchMaxApps">Numero massimo di app nei risultati</string>
@@ -365,6 +372,55 @@ Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modifi
       <string id="R_SearchWindowsSettingsPages">Disabilitato rimuove i collegamenti della ricerca alle pagine di Impostazioni di Windows e agli strumenti, e i link a Pannello di controllo, stampanti e programmi predefiniti.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchPowerActions">Azioni di alimentazione nella ricerca</string>
+      <string id="E_SearchPowerActions">Blocca, sospendi, disconnetti, cambia utente, riavvia e arresta come risultati della ricerca. Riavvia e arresta vanno premuti due volte. Ognuna si può anche rimuovere da sola in Comandi che gli utenti possono usare.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchPowerActions">Blocca, sospendi, disconnetti, cambia utente, riavvia e arresta come risultati della ricerca. Riavvia e arresta vanno premuti due volte. Ognuna si può anche rimuovere da sola in Comandi che gli utenti possono usare.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchCalculator">Calcolatrice nella ricerca</string>
+      <string id="E_SearchCalculator">Calcoli, conversioni di lunghezza, peso, temperatura, volume, dimensioni dei dati e tempo, e date come oggi + 30 giorni, calcolati sul PC. Invio copia il risultato. Disattivato se non configurato.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchCalculator">Calcoli, conversioni di lunghezza, peso, temperatura, volume, dimensioni dei dati e tempo, e date come oggi + 30 giorni, calcolati sul PC. Invio copia il risultato. Disattivato se non configurato.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchClipboardHistory">Cronologia degli appunti nella ricerca</string>
+      <string id="E_SearchClipboardHistory">Testi nella cronologia degli appunti di Windows, trovati dalle loro parole, da incollare di nuovo. Solo mentre la cronologia degli appunti è attiva in Windows. Disattivato se non configurato.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchClipboardHistory">Testi nella cronologia degli appunti di Windows, trovati dalle loro parole, da incollare di nuovo. Solo mentre la cronologia degli appunti è attiva in Windows. Disattivato se non configurato.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_SearchBookmarks">Segnalibri nella ricerca</string>
+      <string id="E_SearchBookmarks">I segnalibri della persona, quelli del criterio Bookmarks e, con BookmarksFromBrowsers, quelli dei browser sul PC. Disattivato se non configurato.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_SearchBookmarks">I segnalibri della persona, quelli del criterio Bookmarks e, con BookmarksFromBrowsers, quelli dei browser sul PC. Disattivato se non configurato.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_BookmarksFromBrowsers">Segnalibri dai browser</string>
+      <string id="E_BookmarksFromBrowsers">Segnalibri di ogni profilo di Chrome, Edge, Brave, Vivaldi, Opera, Helium e altri browser Chromium, e di Firefox. Vengono solo letti, mai modificati, e si aprono nel browser e nel profilo da cui provengono.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_BookmarksFromBrowsers">Segnalibri di ogni profilo di Chrome, Edge, Brave, Vivaldi, Opera, Helium e altri browser Chromium, e di Firefox. Vengono solo letti, mai modificati, e si aprono nel browser e nel profilo da cui provengono.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_BookmarksLeftOut">Profili del browser esclusi dai segnalibri</string>
+      <string id="E_BookmarksLeftOut">Uno per riga, come Browser/cartella del profilo, ad esempio Chrome/Profile 2, Edge/Default o Firefox/default-release. I loro segnalibri non vengono cercati.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_BookmarksLeftOut">Uno per riga, come Browser/cartella del profilo, ad esempio Chrome/Profile 2, Edge/Default o Firefox/default-release. I loro segnalibri non vengono cercati.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_Bookmarks">Segnalibri</string>
+      <string id="E_Bookmarks">Uno per riga: Cartella|Nome|Destinazione o Cartella|Nome|Destinazione|Argomenti. La destinazione è un indirizzo web, un file, una cartella o un programma; Cartella può essere vuota o contenere cartelle in cartelle come Lavoro/Strumenti. Le variabili d'ambiente come %USERPROFILE% funzionano. Come impostazione fissa sono mostrati a tutti e non si possono rimuovere; come predefinita sono i segnalibri con cui gli utenti iniziano.
+
+Abilitato aggiunge gli elementi qui sotto a quelli degli utenti, che non possono rimuoverli. Possono comunque aggiungerne altri. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_Bookmarks">Uno per riga: Cartella|Nome|Destinazione o Cartella|Nome|Destinazione|Argomenti. La destinazione è un indirizzo web, un file, una cartella o un programma; Cartella può essere vuota o contenere cartelle in cartelle come Lavoro/Strumenti. Le variabili d'ambiente come %USERPROFILE% funzionano. Come impostazione fissa sono mostrati a tutti e non si possono rimuovere; come predefinita sono i segnalibri con cui gli utenti iniziano.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_SearchRegex">Tratta le ricerche come espressioni regolari</string>
       <string id="E_SearchRegex">L'intera ricerca è un'espressione regolare, confrontata con i nomi senza distinzione tra maiuscole e minuscole. L'interruttore nella casella di ricerca la attiva e la disattiva.
 
@@ -660,6 +716,12 @@ Abilitato applica le selezioni qui sotto. Disabilitato o Non configurato consent
           <defaultValue>https://duckduckgo.com/?q={}</defaultValue>
         </textBox>
       </presentation>
+      <presentation id="P_BookmarksLeftOut">
+        <listBox refId="Value">Profili del browser esclusi dai segnalibri:</listBox>
+      </presentation>
+      <presentation id="P_Bookmarks">
+        <listBox refId="Value">Segnalibri:</listBox>
+      </presentation>
       <presentation id="P_M365ClientId">
         <textBox refId="Value">
           <label>Registrazione dell'app (ID client):</label>
@@ -680,6 +742,7 @@ Abilitato applica le selezioni qui sotto. Disabilitato o Non configurato consent
         <checkBox refId="Setting_SystemDark" defaultChecked="true">Barra delle applicazioni e Start scuri</checkBox>
         <checkBox refId="Setting_KeepAwake" defaultChecked="true">Mantieni attivo</checkBox>
         <checkBox refId="Setting_Mute" defaultChecked="true">Disattiva audio</checkBox>
+        <checkBox refId="Setting_DoNotDisturb" defaultChecked="true">Non disturbare</checkBox>
         <checkBox refId="Setting_MicMute" defaultChecked="true">Disattiva microfono</checkBox>
         <checkBox refId="Setting_Transparency" defaultChecked="true">Effetti di trasparenza</checkBox>
         <checkBox refId="Setting_AccentTaskbar" defaultChecked="true">Colore principale sulla barra delle applicazioni</checkBox>

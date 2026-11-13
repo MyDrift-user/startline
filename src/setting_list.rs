@@ -11,6 +11,7 @@ pub enum QuickId {
     SystemDark,
     KeepAwake,
     Mute,
+    DoNotDisturb,
     MicMute,
     Transparency,
     AccentTaskbar,
@@ -111,7 +112,7 @@ const fn toggle(label: &'static str, glyph: char, keywords: &'static str, page: 
 }
 
 impl QuickId {
-    pub const ALL: [QuickId; 43] = [
+    pub const ALL: [QuickId; 44] = [
         QuickId::Wifi,
         QuickId::Bluetooth,
         QuickId::DarkMode,
@@ -119,6 +120,7 @@ impl QuickId {
         QuickId::SystemDark,
         QuickId::KeepAwake,
         QuickId::Mute,
+        QuickId::DoNotDisturb,
         QuickId::MicMute,
         QuickId::Transparency,
         QuickId::AccentTaskbar,
@@ -182,6 +184,13 @@ impl QuickId {
                 on_phrases: "mute, stumm, silence, sound off, off sound, ton aus", // i18n-ignore: search words
                 off_phrases: "unmute, sound on, on sound, ton an", // i18n-ignore: search words
                 ..toggle(tx("Mute"), '\u{E74F}', "sound audio speaker stummschalten ton", SOUND) // i18n-ignore: search words
+            },
+            QuickId::DoNotDisturb => Info {
+                names: "dnd, focus, nicht stören, non disturbare", // i18n-ignore: search words
+                on_phrases: "do not disturb on, quiet, no notifications, notifications off", // i18n-ignore: search words
+                off_phrases: "do not disturb off, notifications on", // i18n-ignore: search words
+                late: true,
+                ..toggle(tx("Do not disturb"), '\u{E7ED}', "notifications banners alerts mitteilungen benachrichtigungen notifiche", "ms-settings:notifications") // i18n-ignore: search words
             },
             QuickId::MicMute => Info {
                 on_phrases: "mute mic, mute microphone, mic off, off mic, microphone off, off microphone, mikrofon aus", // i18n-ignore: search words

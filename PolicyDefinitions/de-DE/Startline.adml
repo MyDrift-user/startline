@@ -185,6 +185,13 @@ Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer könne
       <string id="R_CompactRows">Nur das Startline-Design verwendet dies.
 
 Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_MediaControls">Aktuelle Wiedergabe</string>
+      <string id="E_MediaControls">Eine kleine Karte mit dem, was gerade läuft, über die Mediensteuerung von Windows: Cover, Titel, Interpret und App, Wiedergabe oder Pause, zurück und weiter, und ein Wechsel zwischen Apps, wenn mehrere abspielen. Funktioniert mit Spotify, Browsern und jedem Player, der es Windows mitteilt, ohne Anmeldung. Aus, wenn nicht konfiguriert.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_MediaControls">Eine kleine Karte mit dem, was gerade läuft, über die Mediensteuerung von Windows: Cover, Titel, Interpret und App, Wiedergabe oder Pause, zurück und weiter, und ein Wechsel zwischen Apps, wenn mehrere abspielen. Funktioniert mit Spotify, Browsern und jedem Player, der es Windows mitteilt, ohne Anmeldung. Aus, wenn nicht konfiguriert.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_HorizontalPosition">Wo es sich waagerecht öffnet</string>
       <string id="E_HorizontalPosition">Nur das Startline-Design verwendet dies.
 
@@ -305,10 +312,10 @@ Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer könne
 
 Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_SearchResults">Arten von Ergebnissen</string>
-      <string id="E_SearchResults">Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Files, People, Mail, Web. Eine nicht genannte Art wird nie angezeigt. People und Mail brauchen auch ihre Microsoft 365-Richtlinien.
+      <string id="E_SearchResults">Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. Eine nicht genannte Art wird nie angezeigt. Actions sind die Schnellaktionen: der Rechner, der Zwischenablageverlauf und die Tonausgaben. Bookmarks braucht auch SearchBookmarks, People und Mail ihre Microsoft 365-Richtlinien.
 
 Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
-      <string id="R_SearchResults">Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Files, People, Mail, Web. Eine nicht genannte Art wird nie angezeigt. People und Mail brauchen auch ihre Microsoft 365-Richtlinien.
+      <string id="R_SearchResults">Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. Eine nicht genannte Art wird nie angezeigt. Actions sind die Schnellaktionen: der Rechner, der Zwischenablageverlauf und die Tonausgaben. Bookmarks braucht auch SearchBookmarks, People und Mail ihre Microsoft 365-Richtlinien.
 
 Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_SearchMaxApps">Höchstzahl angezeigter Apps</string>
@@ -365,6 +372,55 @@ Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer könne
       <string id="R_SearchWindowsSettingsPages">Deaktiviert entfernt die Verknüpfungen der Suche zu Seiten der Windows-Einstellungen und zu Tools sowie die Links zu Systemsteuerung, Druckern und Standardprogrammen.
 
 Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchPowerActions">Energieaktionen in der Suche</string>
+      <string id="E_SearchPowerActions">Sperren, Energiesparmodus, Abmelden, Benutzer wechseln, Neu starten und Herunterfahren als Suchergebnisse. Neu starten und Herunterfahren müssen zweimal gedrückt werden. Jede Aktion lässt sich auch einzeln unter Befehle, die Benutzer verwenden können, entfernen.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchPowerActions">Sperren, Energiesparmodus, Abmelden, Benutzer wechseln, Neu starten und Herunterfahren als Suchergebnisse. Neu starten und Herunterfahren müssen zweimal gedrückt werden. Jede Aktion lässt sich auch einzeln unter Befehle, die Benutzer verwenden können, entfernen.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchCalculator">Rechner in der Suche</string>
+      <string id="E_SearchCalculator">Rechnungen, Umrechnungen von Länge, Gewicht, Temperatur, Volumen, Datengrößen und Zeit, und Daten wie heute + 30 Tage, auf dem PC berechnet. Die Eingabetaste kopiert das Ergebnis. Aus, wenn nicht konfiguriert.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchCalculator">Rechnungen, Umrechnungen von Länge, Gewicht, Temperatur, Volumen, Datengrößen und Zeit, und Daten wie heute + 30 Tage, auf dem PC berechnet. Die Eingabetaste kopiert das Ergebnis. Aus, wenn nicht konfiguriert.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchClipboardHistory">Zwischenablageverlauf in der Suche</string>
+      <string id="E_SearchClipboardHistory">Texte im Zwischenablageverlauf von Windows, nach ihren Wörtern gefunden, um sie wieder einzufügen. Nur solange der Zwischenablageverlauf in Windows eingeschaltet ist. Aus, wenn nicht konfiguriert.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchClipboardHistory">Texte im Zwischenablageverlauf von Windows, nach ihren Wörtern gefunden, um sie wieder einzufügen. Nur solange der Zwischenablageverlauf in Windows eingeschaltet ist. Aus, wenn nicht konfiguriert.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_SearchBookmarks">Lesezeichen in der Suche</string>
+      <string id="E_SearchBookmarks">Die eigenen Lesezeichen, die aus der Richtlinie Bookmarks und, mit BookmarksFromBrowsers, die der Browser auf dem PC. Aus, wenn nicht konfiguriert.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_SearchBookmarks">Die eigenen Lesezeichen, die aus der Richtlinie Bookmarks und, mit BookmarksFromBrowsers, die der Browser auf dem PC. Aus, wenn nicht konfiguriert.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_BookmarksFromBrowsers">Lesezeichen aus den Browsern</string>
+      <string id="E_BookmarksFromBrowsers">Lesezeichen jedes Profils von Chrome, Edge, Brave, Vivaldi, Opera, Helium und anderen Chromium-Browsern sowie von Firefox. Sie werden nur gelesen, nie verändert, und öffnen sich in dem Browser und Profil, aus dem sie stammen.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_BookmarksFromBrowsers">Lesezeichen jedes Profils von Chrome, Edge, Brave, Vivaldi, Opera, Helium und anderen Chromium-Browsern sowie von Firefox. Sie werden nur gelesen, nie verändert, und öffnen sich in dem Browser und Profil, aus dem sie stammen.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_BookmarksLeftOut">Browserprofile ohne Lesezeichensuche</string>
+      <string id="E_BookmarksLeftOut">Eines pro Zeile, als Browser/Profilordner, etwa Chrome/Profile 2, Edge/Default oder Firefox/default-release. Ihre Lesezeichen werden nicht durchsucht.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_BookmarksLeftOut">Eines pro Zeile, als Browser/Profilordner, etwa Chrome/Profile 2, Edge/Default oder Firefox/default-release. Ihre Lesezeichen werden nicht durchsucht.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_Bookmarks">Lesezeichen</string>
+      <string id="E_Bookmarks">Eines pro Zeile: Ordner|Name|Ziel oder Ordner|Name|Ziel|Argumente. Ziel ist eine Webadresse, eine Datei, ein Ordner oder ein Programm; Ordner kann leer sein oder Ordner in Ordnern enthalten, als Arbeit/Tools. Umgebungsvariablen wie %USERPROFILE% funktionieren. Als feste Einstellung sehen alle sie und können sie nicht entfernen; als Standard sind es die Lesezeichen, mit denen Benutzer beginnen.
+
+Aktiviert fügt die Einträge unten zu den eigenen der Benutzer hinzu, und sie können sie nicht entfernen. Weitere hinzufügen können sie weiterhin. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_Bookmarks">Eines pro Zeile: Ordner|Name|Ziel oder Ordner|Name|Ziel|Argumente. Ziel ist eine Webadresse, eine Datei, ein Ordner oder ein Programm; Ordner kann leer sein oder Ordner in Ordnern enthalten, als Arbeit/Tools. Umgebungsvariablen wie %USERPROFILE% funktionieren. Als feste Einstellung sehen alle sie und können sie nicht entfernen; als Standard sind es die Lesezeichen, mit denen Benutzer beginnen.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_SearchRegex">Suchen als reguläre Ausdrücke behandeln</string>
       <string id="E_SearchRegex">Die ganze Suche ist ein regulärer Ausdruck, verglichen mit Namen ohne Rücksicht auf Groß- und Kleinschreibung. Der Schalter im Suchfeld schaltet das ein und aus.
 
@@ -660,6 +716,12 @@ Aktiviert wendet die Häkchen unten an. Deaktiviert oder Nicht konfiguriert läs
           <defaultValue>https://duckduckgo.com/?q={}</defaultValue>
         </textBox>
       </presentation>
+      <presentation id="P_BookmarksLeftOut">
+        <listBox refId="Value">Browserprofile ohne Lesezeichensuche:</listBox>
+      </presentation>
+      <presentation id="P_Bookmarks">
+        <listBox refId="Value">Lesezeichen:</listBox>
+      </presentation>
       <presentation id="P_M365ClientId">
         <textBox refId="Value">
           <label>App-Registrierung (Client-ID):</label>
@@ -680,6 +742,7 @@ Aktiviert wendet die Häkchen unten an. Deaktiviert oder Nicht konfiguriert läs
         <checkBox refId="Setting_SystemDark" defaultChecked="true">Dunkle Taskleiste und Start</checkBox>
         <checkBox refId="Setting_KeepAwake" defaultChecked="true">Wach halten</checkBox>
         <checkBox refId="Setting_Mute" defaultChecked="true">Stumm</checkBox>
+        <checkBox refId="Setting_DoNotDisturb" defaultChecked="true">Nicht stören</checkBox>
         <checkBox refId="Setting_MicMute" defaultChecked="true">Mikrofon stumm</checkBox>
         <checkBox refId="Setting_Transparency" defaultChecked="true">Transparenzeffekte</checkBox>
         <checkBox refId="Setting_AccentTaskbar" defaultChecked="true">Akzentfarbe auf der Taskleiste</checkBox>

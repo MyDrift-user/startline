@@ -100,6 +100,12 @@ pub enum RowKind {
     Person(crate::m365::graph::Person),
     /// An address to open, such as a message in Outlook on the web. Not remembered among the most used.
     Link(String),
+    /// The calculator's answer: Enter copies it.
+    Copy(String),
+    /// A text from the clipboard history: Enter pastes it where the person was.
+    Paste(String),
+    /// A sound output, by Windows' id for it: Enter plays everything there.
+    Output(String),
 }
 
 #[derive(Clone, Debug, PartialEq)]

@@ -8,7 +8,7 @@ use crate::platform;
 use crate::styles::NativeCorner;
 use std::collections::VecDeque;
 use std::ffi::c_void;
-use std::sync::atomic::{AtomicBool, AtomicIsize, AtomicU16, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicIsize, AtomicU8, AtomicU16, AtomicU64, Ordering};
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant};
@@ -71,6 +71,10 @@ pub struct Shared {
     commands: Mutex<VecDeque<Command>>,
     placement: Mutex<Placement>,
     start_buttons: Mutex<Vec<RECT>>,
+    /// The taskbar search buttons and boxes, on every taskbar.
+    search_buttons: Mutex<Vec<RECT>>,
+    /// When the menu last opened: focus moving about just after is Windows settling, not the person moving on.
+    opened_at: Mutex<Option<Instant>>,
     native_until: Mutex<Option<Instant>>,
     shape: Mutex<Shape>,
     hidden_at: Mutex<Option<Instant>>,
@@ -98,6 +102,8 @@ impl Shared {
             commands: Mutex::new(VecDeque::new()),
             placement: Mutex::new(placement),
             start_buttons: Mutex::new(Vec::new()),
+            search_buttons: Mutex::new(Vec::new()),
+            opened_at: Mutex::new(None),
             native_until: Mutex::new(None),
             shape: Mutex::new(Shape { corner: 0.0, round_bottom: true, native: None }),
             hidden_at: Mutex::new(None),
@@ -211,6 +217,7 @@ impl Shared {
         self.fade_generation.fetch_add(1, Ordering::SeqCst);
         set_window_alpha(hwnd, None);
         self.visible.store(true, Ordering::SeqCst);
+        *self.opened_at.lock().unwrap() = Some(Instant::now());
         self.push(Command::Open(how));
         let started = Instant::now();
         self.place_window(true);
@@ -319,6 +326,11 @@ impl Shared {
         self.hidden_at.lock().unwrap().is_some_and(|at| at.elapsed() < Duration::from_millis(900))
     }
 
+    /// The menu opened less than a second ago.
+    fn just_opened(&self) -> bool {
+        self.opened_at.lock().unwrap().is_some_and(|at| at.elapsed() < Duration::from_millis(1000))
+    }
+
     fn native_allowed(&self) -> bool {
         self.native_until.lock().unwrap().is_some_and(|until| Instant::now() < until)
     }
@@ -404,6 +416,15 @@ fn send_strokes(inputs: &[INPUT]) {
 fn press_keys(keys: &[(u16, bool)]) {
     let inputs: Vec<INPUT> = keys.iter().map(|&(vk, up)| stroke(vk, up, 0, false)).collect();
     send_strokes(&inputs);
+}
+
+/// Ctrl+V into whatever has the focus, once the menu has handed it back: pastes a clipboard history item.
+pub fn paste_after(delay: Duration) {
+    std::thread::spawn(move || {
+        std::thread::sleep(delay);
+        const V: u16 = 0x56;
+        press_keys(&[(VK_CONTROL.0, false), (V, false), (V, true), (VK_CONTROL.0, true)]);
+    });
 }
 
 // ---- The Start key decision, kept free of Windows calls so it can be tested ----
@@ -540,7 +561,23 @@ impl WinKeyMachine {
 
 static SHARED: OnceLock<Arc<Shared>> = OnceLock::new();
 static MACHINE: Mutex<Option<WinKeyMachine>> = Mutex::new(None);
-static START_CLICK_SWALLOWED: AtomicBool = AtomicBool::new(false);
+/// Which taskbar button's press was kept from Explorer, so its release is kept too: none, Start or search.
+static CLICK_SWALLOWED: AtomicU8 = AtomicU8::new(0);
+const CLICKED_START: u8 = 1;
+const CLICKED_SEARCH: u8 = 2;
+
+/// What a left press at `point` on a taskbar opens instead of Windows's own menu: the Start button the menu, the search
+/// button or box the search, each only while Startline takes it over.
+pub fn taskbar_target(start: &[RECT], search: &[RECT], point: POINT, take_start: bool, take_search: bool) -> Option<Opened> {
+    let inside = |r: &RECT| point.x >= r.left && point.x < r.right && point.y >= r.top && point.y < r.bottom;
+    if take_start && start.iter().any(inside) {
+        Some(Opened::Menu)
+    } else if take_search && search.iter().any(inside) {
+        Some(Opened::Search)
+    } else {
+        None
+    }
+}
 static LAST_WIN_KEY: AtomicU16 = AtomicU16::new(VK_LWIN.0);
 static SYSTEM_WINDOW: AtomicIsize = AtomicIsize::new(0);
 /// Set when the screen goes to the lock screen, a UAC prompt or Ctrl+Alt+Del. Windows doesn't show a
@@ -657,18 +694,30 @@ unsafe extern "system" fn mouse_proc(code: i32, wparam: WPARAM, lparam: LPARAM) 
             if message == WM_LBUTTONDOWN || message == WM_LBUTTONUP {
                 let info = &*(lparam.0 as *const MSLLHOOKSTRUCT);
                 if let Some(shared) = SHARED.get() {
-                    if shared.take_start.load(Ordering::Relaxed) {
-                        if message == WM_LBUTTONDOWN {
-                            let hit = shared.start_buttons.lock().unwrap().iter().any(|r| {
-                                info.pt.x >= r.left && info.pt.x < r.right && info.pt.y >= r.top && info.pt.y < r.bottom
-                            });
-                            if hit {
-                                START_CLICK_SWALLOWED.store(true, Ordering::SeqCst);
+                    // Explorer never sees a click on the Start or search button, so neither Windows menu starts.
+                    if message == WM_LBUTTONDOWN {
+                        let target = taskbar_target(
+                            &shared.start_buttons.lock().unwrap(),
+                            &shared.search_buttons.lock().unwrap(),
+                            info.pt,
+                            shared.take_start.load(Ordering::Relaxed),
+                            shared.take_search.load(Ordering::Relaxed),
+                        );
+                        if let Some(target) = target {
+                            CLICK_SWALLOWED.store(if target == Opened::Menu { CLICKED_START } else { CLICKED_SEARCH }, Ordering::SeqCst);
+                            return LRESULT(1);
+                        }
+                    } else {
+                        match CLICK_SWALLOWED.swap(0, Ordering::SeqCst) {
+                            CLICKED_START => {
+                                send_job(Job::Toggle);
                                 return LRESULT(1);
                             }
-                        } else if START_CLICK_SWALLOWED.swap(false, Ordering::SeqCst) {
-                            send_job(Job::Toggle);
-                            return LRESULT(1);
+                            CLICKED_SEARCH => {
+                                send_job(Job::ToggleSearch);
+                                return LRESULT(1);
+                            }
+                            _ => {}
                         }
                     }
                 }
@@ -704,6 +753,8 @@ unsafe extern "system" fn foreground_changed(_: HWINEVENTHOOK, _: u32, hwnd: HWN
 /// hands the key straight on.
 enum Job {
     Toggle,
+    /// The taskbar search button: opens the search, or closes it when it's in front.
+    ToggleSearch,
     Open,
     OpenNative,
     Lock,
@@ -723,6 +774,7 @@ fn window_thread(shared: Arc<Shared>, jobs: Receiver<Job>) {
         let started = Instant::now();
         match job {
             Job::Toggle => shared.toggle(Opened::Menu),
+            Job::ToggleSearch => shared.toggle(Opened::Search),
             Job::Open => shared.open(Opened::Search),
             Job::OpenNative => shared.open_native_start(),
             Job::Lock => {
@@ -745,9 +797,16 @@ fn on_foreground(shared: &Arc<Shared>, hwnd: HWND) {
     log_if_testing(shared, &format!("foreground -> {name} (menu visible={})", shared.visible.load(Ordering::SeqCst))); // i18n-ignore: test log
     let native_start = name == "startmenuexperiencehost.exe";
     let native_search = name == "searchhost.exe" || name == "searchapp.exe";
-    if (native_start && shared.take_start.load(Ordering::Relaxed) || native_search && shared.take_search.load(Ordering::Relaxed))
-        && !shared.native_allowed()
-    {
+    if native_search && shared.take_search.load(Ordering::Relaxed) && !shared.native_allowed() {
+        // Windows Search got past the button (a touch, a button not found yet). The Escape goes to its own window, so it
+        // can't land in the menu, and whatever Windows focuses as it closes doesn't count as moving on.
+        close_window_with_escape(hwnd);
+        if !shared.just_hidden() {
+            shared.open(Opened::Search);
+        }
+        return;
+    }
+    if native_start && shared.take_start.load(Ordering::Relaxed) && !shared.native_allowed() {
         // Our menu has search built in, so this is always the same menu, and a press
         // that just closed it must leave it closed.
         press_keys(&[(VK_ESCAPE.0, false), (VK_ESCAPE.0, true)]);
@@ -756,8 +815,26 @@ fn on_foreground(shared: &Arc<Shared>, hwnd: HWND) {
         }
         return;
     }
-    if shared.visible.load(Ordering::SeqCst) && !shared.hold_open.load(Ordering::SeqCst) {
-        shared.hide();
+    if !shared.visible.load(Ordering::SeqCst) || shared.hold_open.load(Ordering::SeqCst) {
+        return;
+    }
+    if shared.just_opened() {
+        // Windows hands the focus back to the app from before as its own menu closes: the menu takes it again.
+        if HWND(shared.previous_foreground.load(Ordering::SeqCst) as *mut c_void) == hwnd {
+            if let Some(ours) = ours {
+                force_foreground(ours);
+            }
+        }
+        return;
+    }
+    shared.hide();
+}
+
+/// Closes a window of Windows's own, like the search, by sending Escape to it alone rather than to whatever has the focus.
+fn close_window_with_escape(hwnd: HWND) {
+    unsafe {
+        let _ = PostMessageW(Some(hwnd), WM_KEYDOWN, WPARAM(VK_ESCAPE.0 as usize), LPARAM(1));
+        let _ = PostMessageW(Some(hwnd), WM_KEYUP, WPARAM(VK_ESCAPE.0 as usize), LPARAM((1 | (3 << 30)) as isize));
     }
 }
 
@@ -904,7 +981,8 @@ fn watch_start_buttons(shared: Arc<Shared>) {
     let mut last_full = Instant::now() - Duration::from_secs(3600);
     loop {
         std::thread::sleep(Duration::from_millis(300));
-        if !shared.take_start.load(Ordering::Relaxed) {
+        let (take_start, take_search) = (shared.take_start.load(Ordering::Relaxed), shared.take_search.load(Ordering::Relaxed));
+        if !take_start && !take_search {
             continue;
         }
         let bars = taskbars();
@@ -917,9 +995,35 @@ fn watch_start_buttons(shared: Arc<Shared>) {
         });
         if hovering || last_full.elapsed() > Duration::from_secs(5) {
             last_full = Instant::now();
-            let rects = find_start_buttons(&automation, &bars);
-            *shared.start_buttons.lock().unwrap() = rects;
+            let starts = if take_start { find_start_buttons(&automation, &bars) } else { Vec::new() };
+            *shared.start_buttons.lock().unwrap() = starts;
+            let searches = if take_search { find_search_buttons(&automation, &bars) } else { Vec::new() };
+            *shared.search_buttons.lock().unwrap() = searches;
         }
+    }
+}
+
+/// The automation ids of the taskbar's search: the button, and the box and pill it can be shown as instead.
+const SEARCH_IDS: [&str; 4] = ["SearchButton", "SearchBoxButton", "SearchBox", "TaskbarSearchBox"];
+
+/// The taskbar search button or box on each taskbar that shows one.
+pub fn find_search_buttons(automation: &IUIAutomation, bars: &[HWND]) -> Vec<RECT> {
+    unsafe {
+        let conditions: Vec<Option<IUIAutomationCondition>> = SEARCH_IDS
+            .iter()
+            .filter_map(|id| automation.CreatePropertyCondition(UIA_AutomationIdPropertyId, &VARIANT::from(BSTR::from(*id))).ok().map(Some))
+            .collect();
+        let Ok(any) = automation.CreateOrConditionFromNativeArray(&conditions) else {
+            return Vec::new();
+        };
+        bars.iter()
+            .filter_map(|bar| {
+                let element = automation.ElementFromHandle(*bar).ok()?;
+                let button = element.FindFirst(TreeScope_Descendants, &any).ok()?;
+                let rect = button.CurrentBoundingRectangle().ok()?;
+                (rect.right > rect.left && rect.bottom > rect.top).then_some(rect)
+            })
+            .collect()
     }
 }
 
@@ -1063,6 +1167,11 @@ pub fn probe_start_button() -> String {
     for rect in rects {
         out.push_str(&format!("  start button at left={} top={} right={} bottom={}\n", rect.left, rect.top, rect.right, rect.bottom)); // i18n-ignore: probe report for tests
     }
+    let searches = find_search_buttons(&automation, &bars);
+    out.push_str(&format!("search buttons found={}\n", searches.len())); // i18n-ignore: probe report for tests
+    for rect in searches {
+        out.push_str(&format!("  search button at left={} top={} right={} bottom={}\n", rect.left, rect.top, rect.right, rect.bottom)); // i18n-ignore: probe report for tests
+    }
     out
 }
 
@@ -1159,6 +1268,25 @@ mod tests {
     const E: u16 = 0x45;
     const LEFT_ARROW: u16 = VK_LEFT.0;
     const SHIFT: u16 = VK_LSHIFT.0;
+
+    #[test]
+    fn the_taskbar_search_button_opens_the_search_and_never_reaches_windows() {
+        let rect = |left, right| RECT { left, top: 1040, right, bottom: 1088 };
+        // Two monitors: a Start button and a search box on each taskbar.
+        let start = [rect(0, 48), rect(1920, 1968)];
+        let search = [rect(52, 280), rect(1972, 2020)];
+        let at = |x| POINT { x, y: 1060 };
+        assert_eq!(taskbar_target(&start, &search, at(10), true, true), Some(Opened::Menu));
+        assert_eq!(taskbar_target(&start, &search, at(100), true, true), Some(Opened::Search));
+        assert_eq!(taskbar_target(&start, &search, at(1990), true, true), Some(Opened::Search), "on the second taskbar too");
+        assert_eq!(taskbar_target(&start, &search, at(300), true, true), None, "beside it the click goes to Windows");
+        assert_eq!(taskbar_target(&start, &search, at(279), true, true), Some(Opened::Search));
+        assert_eq!(taskbar_target(&start, &search, at(280), true, true), None, "the right edge is outside");
+        assert_eq!(taskbar_target(&start, &search, at(100), true, false), None, "search not taken over");
+        assert_eq!(taskbar_target(&start, &search, at(100), false, true), Some(Opened::Search), "search alone is enough");
+        assert_eq!(taskbar_target(&start, &search, at(10), false, true), None);
+        assert_eq!(taskbar_target(&start, &search, POINT { x: 100, y: 1000 }, true, true), None, "above the taskbar");
+    }
 
     fn tap(m: &mut WinKeyMachine, vk: u16, down: bool) -> KeyDecision {
         m.on_key(vk, down, false, false, true, true, 0)

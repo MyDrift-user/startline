@@ -93,6 +93,27 @@ pub fn target_entries(cfg: &Config, name: &str, target: &Target, path: Option<&s
     entries
 }
 
+/// Adding a result to the bookmarks, or changing or removing one of the person's own. The organization's can't be.
+pub fn bookmark_entries(cfg: &Config, row: &crate::search::Row, target: &Target, managed: &[String]) -> Vec<Entry> {
+    if !cfg.bookmarks_search {
+        return Vec::new();
+    }
+    let own = cfg.bookmarks.iter().position(|b| &b.target == target && b.name == row.name);
+    let theirs = crate::bookmarks::bookmarks_of(managed).iter().any(|b| &b.target == target && b.name == row.name);
+    let mut entries = vec![Entry::Line];
+    match own {
+        Some(at) => {
+            entries.push(item('\u{E70F}', tr("Edit bookmark..."), Intent::EditBookmark(at)));
+            entries.push(item('\u{E74D}', tr("Remove from bookmarks"), Intent::RemoveBookmark(at)));
+        }
+        None if !theirs && !cfg.bookmarks.iter().any(|b| &b.target == target) => {
+            entries.push(item('\u{E734}', tr("Add to bookmarks"), Intent::AddBookmark { name: row.name.clone(), target: target.clone() }));
+        }
+        None => return Vec::new(),
+    }
+    entries
+}
+
 /// The account menu behind your picture and name.
 pub fn user_entries() -> Vec<Entry> {
     vec![

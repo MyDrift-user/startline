@@ -33,9 +33,12 @@ windows-future = "0.3.2"
 version = "0.62.2"
 features = [
     "ApplicationModel",
+    "ApplicationModel_DataTransfer",
     "Devices_Radios",
     "Foundation",
     "Foundation_Collections",
+    "Graphics_Imaging",
+    "Media_Control",
     "Security_Authentication_Web_Core",
     "Security_Credentials",
     "Storage_Streams",

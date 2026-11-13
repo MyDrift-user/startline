@@ -109,7 +109,7 @@ pub struct PinGroup {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Debug)]
-pub enum Category { Apps, Settings, Files, Web, People, Mail }
+pub enum Category { Apps, Settings, Files, Web, People, Mail, Bookmarks, Actions }
 
 /// One kind of search result, and whether it's shown.
 #[derive(Clone, Copy, PartialEq, Serialize, Deserialize, Debug)]
@@ -119,7 +119,7 @@ pub struct ResultKind {
 }
 
 impl Category {
-    pub const ALL: [Category; 6] = [Category::Apps, Category::Settings, Category::Files, Category::People, Category::Mail, Category::Web];
+    pub const ALL: [Category; 8] = [Category::Apps, Category::Settings, Category::Actions, Category::Files, Category::Bookmarks, Category::People, Category::Mail, Category::Web];
 
     pub fn from_name(name: &str) -> Option<Category> {
         Category::ALL.into_iter().find(|c| format!("{c:?}").eq_ignore_ascii_case(name.trim()))
@@ -133,6 +133,8 @@ impl Category {
             Category::Web => tr("Web"),
             Category::People => tr("People"),
             Category::Mail => tr("Mail"),
+            Category::Bookmarks => tr("Bookmarks"),
+            Category::Actions => tr("Quick actions"),
         }
     }
 }
@@ -169,6 +171,8 @@ pub struct Config {
     pub tile_size: f32,
     pub show_labels: bool,
     pub compact_rows: bool,
+    /// What's playing, with its controls, in the menu.
+    pub media_controls: bool,
 
     // Layout
     pub h_anchor: HAnchor,
@@ -224,6 +228,18 @@ pub struct Config {
     pub search_settings_pages: bool,
     /// The one result whose name fits the search best comes first, in a section of its own.
     pub best_match: bool,
+    /// Lock, sleep, sign out, restart and shut down in search.
+    pub search_power_actions: bool,
+    /// Sums, unit conversions and dates worked out in search.
+    pub quick_calculator: bool,
+    /// Windows' clipboard history in search, when it's switched on in Windows.
+    pub quick_clipboard: bool,
+    /// Bookmarks in search: the person's own, an administrator's, and the browsers'.
+    pub bookmarks_search: bool,
+    pub bookmarks_browsers: bool,
+    /// Browser profiles not searched, as "Browser/profile folder".
+    pub bookmarks_left_out: Vec<String>,
+    pub bookmarks: Vec<crate::bookmarks::Bookmark>,
     /// Web searches open `web_url`. Off, they go to the default browser and the search engine set up there, and
     /// `web_url` only serves when that browser isn't one Startline knows how to ask.
     pub web_fixed: bool,
@@ -296,6 +312,7 @@ impl Default for Config {
             tile_size: 84.0,
             show_labels: true,
             compact_rows: false,
+            media_controls: false,
             h_anchor: HAnchor::Center,
             v_anchor: VAnchor::Bottom,
             width: 660.0,
@@ -339,6 +356,13 @@ impl Default for Config {
             search_windows_settings: true,
             search_settings_pages: true,
             best_match: true,
+            search_power_actions: true,
+            quick_calculator: false,
+            quick_clipboard: false,
+            bookmarks_search: false,
+            bookmarks_browsers: true,
+            bookmarks_left_out: Vec::new(),
+            bookmarks: Vec::new(),
             web_fixed: false,
             web_name: tx("the web").into(),
             web_url: "https://duckduckgo.com/?q={}".into(),
@@ -563,7 +587,7 @@ mod tests {
         let mut old = Config::parse(br#"{"version": 3, "results": [{"kind": "Files", "on": true}, {"kind": "Apps", "on": true}, {"kind": "Settings", "on": false}, {"kind": "Web", "on": true}]}"#).unwrap();
         old.repair();
         let kinds: Vec<Category> = old.results.iter().map(|r| r.kind).collect();
-        assert_eq!(kinds, [Category::Files, Category::Apps, Category::Settings, Category::People, Category::Mail, Category::Web]);
+        assert_eq!(kinds, [Category::Files, Category::Apps, Category::Settings, Category::Actions, Category::Bookmarks, Category::People, Category::Mail, Category::Web]);
         assert!(!old.results[2].on, "the person's own choices stay");
     }
 

@@ -2,7 +2,10 @@
 
 mod actions;
 mod apps;
+mod bookmarks_page;
+mod bookmarks;
 mod browser;
+mod calc;
 mod classic;
 mod config;
 mod customize;
@@ -14,16 +17,20 @@ mod instance;
 mod intent;
 mod m365;
 mod matching;
+mod now_playing;
+mod media;
 mod pins_page;
 mod platform;
 mod policy;
 mod popup;
 mod providers;
+mod quick;
 mod scope;
 mod search;
 mod search_page;
 mod setting_list;
 mod settings;
+mod sqlite;
 mod styles;
 mod system;
 mod ui;
@@ -56,6 +63,8 @@ pub struct Options {
     pub demo_scroll: Option<f32>,
     /// For a picture of the Microsoft 365 parts: a made-up signed-in account and example events, nothing sent anywhere.
     pub demo_m365: bool,
+    /// For a picture of the Now playing card: a made-up song, nothing asked of Windows.
+    pub demo_media: bool,
     /// For a picture of what policies do: read them from this file instead of the Registry.
     pub test_policies: Option<PathBuf>,
     /// Started by the copy an update replaces, which may still be ending.
@@ -87,6 +96,7 @@ fn parse_options() -> (Options, Option<PathBuf>, Option<PathBuf>) {
             "--demo-open" => options.demo_open = true,
             "--demo-text-menu" => options.demo_text_menu = true,
             "--demo-m365" => options.demo_m365 = true,
+            "--demo-media" => options.demo_media = true,
             "--demo-scroll" => options.demo_scroll = args.next().and_then(|p| p.parse().ok()),
             "--test-policies" => options.test_policies = args.next().map(PathBuf::from),
             // For installer tests and admins: which Microsoft 365 app registration and tenant this copy uses, and why.
@@ -194,6 +204,9 @@ fn main() {
         let _ = unsafe { windows::Win32::UI::HiDpi::SetProcessDpiAwarenessContext(windows::Win32::UI::HiDpi::DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) };
         let mut report = settings::probe_report();
         report.push_str(&system::probe_start_button());
+        report.push_str(&quick::probe_report());
+        report.push_str(&bookmarks::probe_report());
+        report.push_str(&media::probe_report());
         let _ = std::fs::write(path, report);
         return;
     }

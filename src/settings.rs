@@ -61,6 +61,8 @@ fn reg_flag(id: QuickId) -> Option<RegFlag> {
         QuickId::ItemCheckboxes => flag(EXPLORER_ADVANCED, "AutoCheckSelect", 1, 0, false, Notify::Shell),
         QuickId::CompactExplorer => flag(EXPLORER_ADVANCED, "UseCompactMode", 1, 0, false, Notify::Shell),
         QuickId::ClipboardHistory => flag("Software\\Microsoft\\Clipboard", "EnableClipboardHistory", 1, 0, false, Notify::Nothing),
+        // Notification banners off is what Do not disturb does. Windows may only pick the change up after signing out.
+        QuickId::DoNotDisturb => flag("Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings", "NOC_GLOBAL_SETTING_TOASTS_ENABLED", 0, 1, false, Notify::Nothing),
         QuickId::GameMode => flag("Software\\Microsoft\\GameBar", "AutoGameModeEnabled", 1, 0, true, Notify::Nothing),
         _ => None,
     }

@@ -19,6 +19,13 @@ What changed for people using Startline, compared with the version before. A rel
 - People and mail are looked for in what you typed before your Microsoft 365 account was ready, as soon as it is
 - The keyboard hint under the results fits the result: Enter starts a Teams chat for a person and opens the message for mail, instead of offering to show them in a folder
 - While your organization hasn't approved Startline yet, the Microsoft 365 page says it's waiting for that approval, with Sign in again and Cancel, instead of "Signed in" and Sign out
+- Clicking the search button or box on the taskbar opens Startline's search and keeps it open (#2). Windows Search no longer starts underneath and takes the focus back, on every taskbar; if it starts some other way, Startline closes it without a stray Escape and opens its search
+- Now playing, off until you turn it on: what's playing in Spotify, a browser or any player that tells Windows, with its cover, title, artist and app, play or pause, previous and next, and a switch between apps when several play
+- Bookmarks in search, off until you turn it on: every profile's bookmarks from Chrome, Edge, Brave, Vivaldi, Opera, Helium and other Chromium browsers and from Firefox, only ever read and opening in the browser and profile they're from; your own bookmarks of web addresses, files, folders and commands, in folders, added in Settings or from a result's right-click menu; and an organization's, by policy
+- A calculator in search, off until you turn it on: sums, conversions of length, weight, temperature, volume, data sizes and time, and dates such as today + 30 days. Enter copies the result
+- Clipboard history in search, off until you turn it on: find what you copied by its words and paste it again with Enter, when clipboard history is on in Windows
+- Do not disturb and switching the sound to another output join the Windows settings search can change, and the power actions in search get a switch of their own
+- New policies for all of these: MediaControls, SearchBookmarks, BookmarksFromBrowsers, BookmarksLeftOut, Bookmarks, SearchCalculator, SearchClipboardHistory and SearchPowerActions
 
 ## 0.0.1
 

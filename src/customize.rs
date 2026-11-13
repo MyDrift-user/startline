@@ -527,6 +527,10 @@ fn start_menu(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
             policy.lock(ui, &["FrequentCount"], |ui| slider(ui, tr("Most-used items"), "", &mut count, 2.0..=20.0, pal));
             menu.cfg.frequent_count = count as usize;
         });
+        heading(ui, tr("Now playing"), pal);
+        card(ui, pal, |ui| {
+            policy.lock(ui, &["MediaControls"], |ui| switch_row(ui, tr("Show what's playing"), tr("Cover, title and artist with play, pause, previous and next, for Spotify, browsers and any player that tells Windows. Out of sight when nothing plays. Windows 11, Windows 10 and Startline looks."), &mut menu.cfg.media_controls, pal));
+        });
     }, |menu, ui| {
         if pal.style != Experience::Startline {
             heading(ui, tr("Size and position"), pal);

@@ -238,6 +238,10 @@ CompactRows
     Compact lists
     REG_DWORD, 1 on, 0 off
     Only the Startline look uses this.
+MediaControls
+    Now playing
+    REG_DWORD, 1 on, 0 off
+    A small card with what's playing, through Windows' own media controls: the cover, title, artist and app, play or pause, previous and next, and a switch between apps when several play. Works with Spotify, browsers and any player that tells Windows, with no sign-in. Off unless set.
 HorizontalPosition
     Where it opens across the screen
     REG_SZ, one of: Left, Center, Right, FollowStart
@@ -341,7 +345,7 @@ SEARCH: RESULTS
 SearchResults
     Kinds of results
     list: REG_DWORD 1, its items in a subkey of the same name
-    One per line, first to last: Apps, Settings, Files, People, Mail, Web. A kind left out is never shown. People and Mail also need their Microsoft 365 policies.
+    One per line, first to last: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. A kind left out is never shown. Actions are the quick actions: the calculator, clipboard history and sound outputs. Bookmarks also need SearchBookmarks, People and Mail their Microsoft 365 policies.
 SearchMaxApps
     Most apps shown in the results
     REG_DWORD, 1 to 30
@@ -378,9 +382,37 @@ SearchWindowsSettingsPages
     Shortcuts to Windows settings and tools
     REG_DWORD, 1 on, 0 off
     Disabled removes search's shortcuts to Windows settings pages and tools, and the Control Panel, printer and default program links.
+SearchPowerActions
+    Power actions in search
+    REG_DWORD, 1 on, 0 off
+    Lock, sleep, sign out, switch user, restart and shut down as search results. Restart and shut down ask to be pressed twice. Each can also be removed on its own under Commands people can use.
+SearchCalculator
+    Calculator in search
+    REG_DWORD, 1 on, 0 off
+    Sums, conversions of length, weight, temperature, volume, data sizes and time, and dates such as today + 30 days, worked out on the PC. Enter copies the result. Off unless set.
+SearchClipboardHistory
+    Clipboard history in search
+    REG_DWORD, 1 on, 0 off
+    Texts in Windows' clipboard history, found by their words, to paste again. Only while clipboard history is switched on in Windows. Off unless set.
+SearchBookmarks
+    Bookmarks in search
+    REG_DWORD, 1 on, 0 off
+    The person's own bookmarks, the ones from the Bookmarks policy, and, with BookmarksFromBrowsers, those of the browsers on the PC. Off unless set.
+BookmarksFromBrowsers
+    Bookmarks from the browsers
+    REG_DWORD, 1 on, 0 off
+    Bookmarks of every profile of Chrome, Edge, Brave, Vivaldi, Opera, Helium and other Chromium browsers, and of Firefox. They're only read, never changed, and open in the browser and profile they come from.
+BookmarksLeftOut
+    Browser profiles left out of bookmarks
+    list: REG_DWORD 1, its items in a subkey of the same name
+    One per line, as Browser/profile folder, such as Chrome/Profile 2, Edge/Default or Firefox/default-release. Their bookmarks aren't searched.
+Bookmarks
+    Bookmarks
+    list: REG_DWORD 1, its items in a subkey of the same name; fixed, they're added to people's own
+    One per line: Folder|Name|Target or Folder|Name|Target|Arguments. Target is a web address, a file, a folder or a program; Folder can be empty or hold folders inside folders as Work/Tools. Environment variables such as %USERPROFILE% work. As a fixed setting they're shown to everyone and can't be removed; as a default they're the bookmarks people start with.
 SearchWindowsSettings  [fixed only]
     Windows settings search can change
-    REG_DWORD values named Allow_<item>, 1 allowed, 0 removed. Items: Setting_Wifi, Setting_Bluetooth, Setting_DarkMode, Setting_AppsDark, Setting_SystemDark, Setting_KeepAwake, Setting_Mute, Setting_MicMute, Setting_Transparency, Setting_AccentTaskbar, Setting_AccentTitleBars, Setting_AutoHideTaskbar, Setting_TaskbarAlign, Setting_TaskViewButton, Setting_ClockSeconds, Setting_FileExtensions, Setting_HiddenFiles, Setting_ItemCheckboxes, Setting_CompactExplorer, Setting_ClipboardHistory, Setting_GameMode, Setting_Animations, Setting_SnapWindows, Setting_DragContents, Setting_FontSmoothing, Setting_WindowShadows, Setting_HoverActivate, Setting_ScreenSaver, Setting_PointerPrecision, Setting_SwapMouseButtons, Setting_StickyKeys, Setting_Autostart, Setting_Volume, Setting_MicVolume, Setting_Brightness, Setting_MouseSpeed, Setting_ScrollLines, Setting_DoubleClick, Setting_KeyRepeatSpeed, Setting_KeyRepeatDelay, Setting_ScreenTimeout, Setting_SleepTimeout, Setting_PowerMode
+    REG_DWORD values named Allow_<item>, 1 allowed, 0 removed. Items: Setting_Wifi, Setting_Bluetooth, Setting_DarkMode, Setting_AppsDark, Setting_SystemDark, Setting_KeepAwake, Setting_Mute, Setting_DoNotDisturb, Setting_MicMute, Setting_Transparency, Setting_AccentTaskbar, Setting_AccentTitleBars, Setting_AutoHideTaskbar, Setting_TaskbarAlign, Setting_TaskViewButton, Setting_ClockSeconds, Setting_FileExtensions, Setting_HiddenFiles, Setting_ItemCheckboxes, Setting_CompactExplorer, Setting_ClipboardHistory, Setting_GameMode, Setting_Animations, Setting_SnapWindows, Setting_DragContents, Setting_FontSmoothing, Setting_WindowShadows, Setting_HoverActivate, Setting_ScreenSaver, Setting_PointerPrecision, Setting_SwapMouseButtons, Setting_StickyKeys, Setting_Autostart, Setting_Volume, Setting_MicVolume, Setting_Brightness, Setting_MouseSpeed, Setting_ScrollLines, Setting_DoubleClick, Setting_KeyRepeatSpeed, Setting_KeyRepeatDelay, Setting_ScreenTimeout, Setting_SleepTimeout, Setting_PowerMode
     Unticked settings are removed from search.
 
 SEARCH: SEARCH BOX

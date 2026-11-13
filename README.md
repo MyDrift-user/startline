@@ -37,7 +37,24 @@ While Startline runs, the Start key and the Start button open it instead of the 
 - New apps show up in the list and search within seconds of being installed, and removed ones go
 
 ### 🎚️ Settings right in the search
-Type what you want and act on it from the result: "dark mode", "volume 40", "louder", "bluetooth off", "wlan aus". There are dozens of switches and sliders, from dark mode, Wi-Fi, Bluetooth, volume and brightness to file extensions, hidden files, the clock's seconds, Game Mode and keeping the PC awake. Nothing changes until you act on the row.
+Type what you want and act on it from the result: "dark mode", "volume 40", "louder", "bluetooth off", "wlan aus". There are dozens of switches and sliders, from dark mode, Wi-Fi, Bluetooth, do not disturb, mute, volume and brightness to file extensions, hidden files, the clock's seconds, Game Mode and keeping the PC awake, each showing how it's set now. "audio output" or a device's name switches the sound to another output. Nothing changes until you act on the row.
+
+### 🧮 Quick actions
+Each one has its own switch under **Settings > Search > Quick actions**:
+- **Calculator** (off at first): sums like `12 * (3 + 4)` or `15% of 80`, conversions of length, weight, temperature, volume, data sizes and time like `5 km in mi`, `70 f to c` or `2 gib in mb`, and dates like `today + 30 days`. No currencies, nothing online. Enter copies the result
+- **Clipboard history** (off at first): what you copied, found by its words, from Windows's own clipboard history when it's switched on in Windows. Enter pastes it where you were
+- **Windows settings** and their pages by name in your language, and **power actions**: lock, sleep, sign out, restart and shut down, where restart and shut down ask you to press again. These were in search before and stay on
+
+### 🔖 Bookmarks
+Off until you turn it on under **Settings > Search > Bookmarks**. Then search also finds:
+- Your browsers' bookmarks, from every profile of Chrome, Edge, Brave, Vivaldi, Opera, Helium and other Chromium browsers, and Firefox. They're only ever read, never written, read again when they change, and open in the browser and profile they came from. Choose which browsers and profiles count
+- Your own bookmarks: web addresses, files, folders and commands, in folders, added in Settings or with **Add to bookmarks** on a result's right-click menu, where you can also change or remove them
+- Bookmarks your organization adds with the Bookmarks policy, shown to you but not removable
+
+Bookmarks take part in the Best match.
+
+### 🎵 Now playing
+Off until you turn it on under **Settings > Start menu**. A small card above the footer (under the tiles in the Windows 10 look) with what's playing: cover, title, artist and app, play or pause, previous and next, and a button to switch between apps when several play. It uses Windows's own media controls, the ones the volume flyout shows, so Spotify, browsers and any player that tells Windows work without keys or signing in. It's out of sight when nothing plays.
 
 ### 📅 Microsoft 365, if you want it
 Off until you turn it on. Sign in with a work or school account on the **Microsoft 365** page of Settings, through Windows's own account sign-in, and switch on what you'd like:
@@ -173,6 +190,9 @@ src/
   index.rs, scope.rs      the file index and where it looks
   apps.rs, icons.rs       installed apps and their icons
   intent.rs, settings.rs, actions.rs   settings you can change from a search
+  providers.rs, quick.rs, calc.rs   where results come from, and the quick actions: calculator, clipboard, sound outputs
+  bookmarks.rs, bookmarks_page.rs, sqlite.rs   bookmarks: the browsers' (Firefox's through Windows's own SQLite) and your own
+  media.rs, now_playing.rs   what's playing, through Windows's media controls, and its card
   system.rs, platform.rs  the Start key, tray icon and Windows calls
   customize.rs, pins_page.rs, setting_list.rs, widgets.rs, styles.rs   Settings and the looks
   config.rs               what's saved

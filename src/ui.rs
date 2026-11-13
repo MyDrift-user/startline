@@ -51,6 +51,16 @@ pub enum Intent {
     ShellMenu(String),
     MoveSection(usize, i32),
     RemoveSection(usize),
+    /// Copies the calculator's answer; the menu stays open for the next sum.
+    CopyAnswer(String),
+    /// Puts a clipboard history text back on the clipboard and pastes it where the person was.
+    Paste(String),
+    /// Plays sound on this output from now on.
+    UseOutput(String),
+    AddBookmark { name: String, target: Target },
+    /// Opens one of the person's own bookmarks in Settings, to change it.
+    EditBookmark(usize),
+    RemoveBookmark(usize),
 }
 
 /// What a file or folder dialog was opened for.
@@ -58,6 +68,7 @@ pub enum Intent {
 pub enum Picked {
     SearchFolder(String),
     Pin(String),
+    Bookmark(String),
 }
 
 /// The places and rules search should read right now.
@@ -165,6 +176,9 @@ pub struct Menu {
     pub(crate) calendar: crate::m365::panel::Calendar,
     /// Whether the Teams app takes msteams: links, so chats and meetings open in it.
     pub(crate) teams_installed: bool,
+    /// What's playing, while the setting is on.
+    pub(crate) media: crate::media::Media,
+    pub(crate) bookmark_ui: crate::bookmarks_page::BookmarkUi,
 
     /// Not running for pictures and tests.
     pub(crate) updater: Option<crate::update::Updater>,
@@ -296,6 +310,8 @@ impl Menu {
             m365_ui: crate::m365::page::M365Ui::default(),
             calendar: crate::m365::panel::Calendar::default(),
             teams_installed: crate::m365::teams_installed(),
+            media: crate::media::Media::start(ctx.clone()),
+            bookmark_ui: Default::default(),
             updater: None,
             auto_update: Arc::new(AtomicBool::new(true)),
             update_requested: false,
@@ -338,6 +354,10 @@ impl Menu {
             let me = crate::m365::graph::Me { id: "demo".into(), name: "Alex Wilber".into(), mail: "alex@contoso.com".into() }; // i18n-ignore: an example account for pictures
             menu.m365_ui.show_demo(me);
             menu.shared.set_placement(styles::placement_of(&menu.cfg, menu.system_look, false));
+        }
+        if menu.options.demo_media && menu.is_shot() {
+            menu.cfg.media_controls = true;
+            menu.media.show_demo();
         }
         if let Some(query) = menu.options.query.clone() {
             menu.query = query;
@@ -623,6 +643,44 @@ impl Menu {
                     }
                 }
             }
+            Intent::CopyAnswer(text) => {
+                let _ = platform::copy_text(&text);
+            }
+            Intent::Paste(text) => {
+                let _ = platform::copy_text(&text);
+                if !self.is_shot() {
+                    // The menu hands the focus back first, then Ctrl+V lands where the person was.
+                    self.close_menu();
+                    system::paste_after(Duration::from_millis(180));
+                }
+            }
+            Intent::UseOutput(id) => {
+                self.providers.quick.use_output(id);
+                self.close_menu();
+            }
+            Intent::AddBookmark { name, target } => {
+                if !self.cfg.bookmarks.iter().any(|b| b.target == target) {
+                    self.cfg.bookmarks.push(crate::bookmarks::Bookmark { folder: String::new(), name, target });
+                }
+                self.assemble_after_change();
+            }
+            Intent::EditBookmark(at) => {
+                self.bookmark_ui.edit(&self.cfg, Some(at));
+                self.open_settings(Tab::Search);
+            }
+            Intent::RemoveBookmark(at) => {
+                if at < self.cfg.bookmarks.len() {
+                    self.cfg.bookmarks.remove(at);
+                }
+                self.assemble_after_change();
+            }
+        }
+    }
+
+    /// The results again after something they show changed.
+    pub(crate) fn assemble_after_change(&mut self) {
+        if !self.query.trim().is_empty() {
+            self.ask_providers(Some(Category::Bookmarks));
         }
     }
 
@@ -1138,6 +1196,9 @@ impl Row {
             RowKind::Web(url) => url.clone(),
             RowKind::Person(person) => format!("person:{}", person.upn),
             RowKind::Link(url) => url.clone(),
+            RowKind::Copy(text) => format!("copy:{text}"),
+            RowKind::Paste(text) => format!("paste:{}", text.chars().take(200).collect::<String>()),
+            RowKind::Output(id) => format!("output:{id}"),
         }
     }
 }
@@ -1178,8 +1239,17 @@ impl eframe::App for Menu {
                     group.pins.push(pin);
                 }
             }
+            Some(Picked::Bookmark(path)) => {
+                if let Some(draft) = self.bookmark_ui.draft.as_mut() {
+                    draft.target = path;
+                }
+            }
             None => {}
         }
+        // The helpers for bookmarks and what's playing only run while their settings are on.
+        let shot = self.is_shot();
+        self.media.set_on(self.cfg.media_controls && !shot);
+        self.providers.bookmarks.on.store(self.cfg.bookmarks_search && self.cfg.bookmarks_browsers && !shot, Ordering::Relaxed);
         // Folder choices take effect by themselves, a moment after the last change.
         if self.index_dirty_at.is_some_and(|at| at.elapsed() > Duration::from_millis(1200)) {
             self.index_dirty_at = None;

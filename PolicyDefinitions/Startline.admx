@@ -652,6 +652,26 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="MediaControls" class="Both" displayName="$(string.P_MediaControls)" explainText="$(string.E_MediaControls)" key="Software\Policies\Startline" valueName="MediaControls">
+      <parentCategory ref="StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_MediaControls" class="Both" displayName="$(string.P_MediaControls)" explainText="$(string.R_MediaControls)" key="Software\Policies\Startline\Recommended" valueName="MediaControls">
+      <parentCategory ref="Rec_StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="HorizontalPosition" class="Both" displayName="$(string.P_HorizontalPosition)" explainText="$(string.E_HorizontalPosition)" presentation="$(presentation.P_HorizontalPosition)" key="Software\Policies\Startline">
       <parentCategory ref="StartMenu"/>
       <supportedOn ref="SUPPORTED_Startline"/>
@@ -1248,6 +1268,158 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="SearchPowerActions" class="Both" displayName="$(string.P_SearchPowerActions)" explainText="$(string.E_SearchPowerActions)" key="Software\Policies\Startline" valueName="SearchPowerActions">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchPowerActions" class="Both" displayName="$(string.P_SearchPowerActions)" explainText="$(string.R_SearchPowerActions)" key="Software\Policies\Startline\Recommended" valueName="SearchPowerActions">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="SearchCalculator" class="Both" displayName="$(string.P_SearchCalculator)" explainText="$(string.E_SearchCalculator)" key="Software\Policies\Startline" valueName="SearchCalculator">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchCalculator" class="Both" displayName="$(string.P_SearchCalculator)" explainText="$(string.R_SearchCalculator)" key="Software\Policies\Startline\Recommended" valueName="SearchCalculator">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="SearchClipboardHistory" class="Both" displayName="$(string.P_SearchClipboardHistory)" explainText="$(string.E_SearchClipboardHistory)" key="Software\Policies\Startline" valueName="SearchClipboardHistory">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchClipboardHistory" class="Both" displayName="$(string.P_SearchClipboardHistory)" explainText="$(string.R_SearchClipboardHistory)" key="Software\Policies\Startline\Recommended" valueName="SearchClipboardHistory">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="SearchBookmarks" class="Both" displayName="$(string.P_SearchBookmarks)" explainText="$(string.E_SearchBookmarks)" key="Software\Policies\Startline" valueName="SearchBookmarks">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_SearchBookmarks" class="Both" displayName="$(string.P_SearchBookmarks)" explainText="$(string.R_SearchBookmarks)" key="Software\Policies\Startline\Recommended" valueName="SearchBookmarks">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="BookmarksFromBrowsers" class="Both" displayName="$(string.P_BookmarksFromBrowsers)" explainText="$(string.E_BookmarksFromBrowsers)" key="Software\Policies\Startline" valueName="BookmarksFromBrowsers">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_BookmarksFromBrowsers" class="Both" displayName="$(string.P_BookmarksFromBrowsers)" explainText="$(string.R_BookmarksFromBrowsers)" key="Software\Policies\Startline\Recommended" valueName="BookmarksFromBrowsers">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="BookmarksLeftOut" class="Both" displayName="$(string.P_BookmarksLeftOut)" explainText="$(string.E_BookmarksLeftOut)" presentation="$(presentation.P_BookmarksLeftOut)" key="Software\Policies\Startline" valueName="BookmarksLeftOut">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\BookmarksLeftOut" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
+    <policy name="Rec_BookmarksLeftOut" class="Both" displayName="$(string.P_BookmarksLeftOut)" explainText="$(string.R_BookmarksLeftOut)" presentation="$(presentation.P_BookmarksLeftOut)" key="Software\Policies\Startline\Recommended" valueName="BookmarksLeftOut">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\Recommended\BookmarksLeftOut" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
+    <policy name="Bookmarks" class="Both" displayName="$(string.P_Bookmarks)" explainText="$(string.E_Bookmarks)" presentation="$(presentation.P_Bookmarks)" key="Software\Policies\Startline" valueName="Bookmarks">
+      <parentCategory ref="SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\Bookmarks" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
+    <policy name="Rec_Bookmarks" class="Both" displayName="$(string.P_Bookmarks)" explainText="$(string.R_Bookmarks)" presentation="$(presentation.P_Bookmarks)" key="Software\Policies\Startline\Recommended" valueName="Bookmarks">
+      <parentCategory ref="Rec_SearchResults"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <delete/>
+      </disabledValue>
+      <elements>
+        <list id="Value" key="Software\Policies\Startline\Recommended\Bookmarks" valuePrefix="" expandable="true"/>
+      </elements>
+    </policy>
     <policy name="SearchRegex" class="Both" displayName="$(string.P_SearchRegex)" explainText="$(string.E_SearchRegex)" key="Software\Policies\Startline" valueName="SearchRegex">
       <parentCategory ref="SearchBox"/>
       <supportedOn ref="SUPPORTED_Startline"/>
@@ -1759,6 +1931,14 @@
           </falseValue>
         </boolean>
         <boolean id="Setting_Mute" valueName="Allow_Setting_Mute">
+          <trueValue>
+            <decimal value="1"/>
+          </trueValue>
+          <falseValue>
+            <decimal value="0"/>
+          </falseValue>
+        </boolean>
+        <boolean id="Setting_DoNotDisturb" valueName="Allow_Setting_DoNotDisturb">
           <trueValue>
             <decimal value="1"/>
           </trueValue>

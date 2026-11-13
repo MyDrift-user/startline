@@ -457,6 +457,7 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
             let shown = |kind: Category| match kind {
                 Category::People => crate::m365::feature_on(&menu.cfg, crate::m365::Feature::People),
                 Category::Mail => crate::m365::feature_on(&menu.cfg, crate::m365::Feature::Mail),
+                Category::Bookmarks => menu.cfg.bookmarks_search,
                 _ => true,
             };
             let (mut listed, hidden): (Vec<ResultKind>, Vec<ResultKind>) = menu.cfg.results.iter().partition(|r| shown(r.kind));
@@ -477,8 +478,6 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         ui.separator();
         policy.lock(ui, &["SearchBestMatch"], |ui| switch_line(ui, tr("Best match at the top"), tr("The one result whose name fits what was typed best, whatever its kind, comes first."), &mut menu.cfg.best_match, pal));
         policy.lock(ui, &["SearchShowFolders"], |ui| switch_line(ui, tr("Show the folder under each file"), "", &mut menu.cfg.show_paths, pal));
-        policy.lock(ui, &["SearchChangeWindowsSettings"], |ui| switch_line(ui, tr("Change Windows settings from search"), tr("Dark mode, volume, Wi-Fi and the other switches and sliders."), &mut menu.cfg.search_windows_settings, pal));
-        policy.lock(ui, &["SearchWindowsSettingsPages"], |ui| switch_line(ui, tr("Shortcuts to Windows settings and tools"), tr("Pages of Windows Settings, and tools such as Task Manager."), &mut menu.cfg.search_settings_pages, pal));
         ui.separator();
         policy.lock(ui, &["SearchWebUseAddress"], |ui| switch_line(ui, tr("Search the web with a fixed address"), tr("Off, web searches open your default browser with the search engine you set up there. The address below then only serves when Startline doesn't know your browser."), &mut menu.cfg.web_fixed, pal));
         let fixed = menu.cfg.web_fixed;
@@ -493,6 +492,9 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
             }));
         });
     });
+
+    crate::bookmarks_page::draw_quick_actions(menu, ui, pal);
+    crate::bookmarks_page::draw_bookmarks(menu, ui, pal);
 
     heading(ui, tr("Search box"), pal);
     card(ui, pal, |ui| {

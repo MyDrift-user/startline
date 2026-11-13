@@ -356,12 +356,14 @@ impl Parsed {
                         .filter(|i| !i.is_empty())
                         .map(|i| match policy.field {
                             "/excluded_exts" => file_type(i),
-                            // a regular expression's own % and \ mean something
-                            "/skip_patterns" => i.to_string(),
+                            // a regular expression's own % and \ mean something; a bookmark's parts are filled in one by one
+                            "/skip_patterns" | "/bookmarks" => i.to_string(),
                             _ => expand(i),
                         })
                         .collect();
-                    if defaults {
+                    if defaults && policy.field == "/bookmarks" {
+                        out.fields.push((policy.field, serde_json::to_value(crate::bookmarks::bookmarks_of(&items)).unwrap_or_default()));
+                    } else if defaults {
                         out.fields.push((policy.field, json!(items)));
                     } else {
                         out.added.push((policy.field, items));
@@ -589,8 +591,10 @@ impl Policies {
     pub fn allows_row(&self, kind: &RowKind) -> bool {
         match kind {
             RowKind::Run(Do::Open(_)) => self.allows(PAGES),
+            RowKind::Run(what) if what.is_power() && self.fixed("/search_power_actions") == Some(&json!(false)) => false,
             RowKind::Run(what) => self.allows_do(*what),
             RowKind::Quick(id, _) => self.allows(WINDOWS_SETTINGS) && self.allows(&format!("Setting_{id:?}")) && (*id != QuickId::Autostart || self.fixed.autostart.is_none()), // i18n-ignore: registry value name
+            RowKind::Output(_) => self.allows(WINDOWS_SETTINGS),
             _ => true,
         }
     }

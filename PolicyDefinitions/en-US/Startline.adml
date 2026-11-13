@@ -185,6 +185,13 @@ Enabled turns this on and Disabled turns it off, and people can't change it. Not
       <string id="R_CompactRows">Only the Startline look uses this.
 
 A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_MediaControls">Now playing</string>
+      <string id="E_MediaControls">A small card with what's playing, through Windows' own media controls: the cover, title, artist and app, play or pause, previous and next, and a switch between apps when several play. Works with Spotify, browsers and any player that tells Windows, with no sign-in. Off unless set.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_MediaControls">A small card with what's playing, through Windows' own media controls: the cover, title, artist and app, play or pause, previous and next, and a switch between apps when several play. Works with Spotify, browsers and any player that tells Windows, with no sign-in. Off unless set.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_HorizontalPosition">Where it opens across the screen</string>
       <string id="E_HorizontalPosition">Only the Startline look uses this.
 
@@ -305,10 +312,10 @@ Enabled turns this on and Disabled turns it off, and people can't change it. Not
 
 A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_SearchResults">Kinds of results</string>
-      <string id="E_SearchResults">One per line, first to last: Apps, Settings, Files, People, Mail, Web. A kind left out is never shown. People and Mail also need their Microsoft 365 policies.
+      <string id="E_SearchResults">One per line, first to last: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. A kind left out is never shown. Actions are the quick actions: the calculator, clipboard history and sound outputs. Bookmarks also need SearchBookmarks, People and Mail their Microsoft 365 policies.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
-      <string id="R_SearchResults">One per line, first to last: Apps, Settings, Files, People, Mail, Web. A kind left out is never shown. People and Mail also need their Microsoft 365 policies.
+      <string id="R_SearchResults">One per line, first to last: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. A kind left out is never shown. Actions are the quick actions: the calculator, clipboard history and sound outputs. Bookmarks also need SearchBookmarks, People and Mail their Microsoft 365 policies.
 
 A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchMaxApps">Most apps shown in the results</string>
@@ -365,6 +372,55 @@ Enabled turns this on and Disabled turns it off, and people can't change it. Not
       <string id="R_SearchWindowsSettingsPages">Disabled removes search's shortcuts to Windows settings pages and tools, and the Control Panel, printer and default program links.
 
 A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchPowerActions">Power actions in search</string>
+      <string id="E_SearchPowerActions">Lock, sleep, sign out, switch user, restart and shut down as search results. Restart and shut down ask to be pressed twice. Each can also be removed on its own under Commands people can use.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchPowerActions">Lock, sleep, sign out, switch user, restart and shut down as search results. Restart and shut down ask to be pressed twice. Each can also be removed on its own under Commands people can use.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchCalculator">Calculator in search</string>
+      <string id="E_SearchCalculator">Sums, conversions of length, weight, temperature, volume, data sizes and time, and dates such as today + 30 days, worked out on the PC. Enter copies the result. Off unless set.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchCalculator">Sums, conversions of length, weight, temperature, volume, data sizes and time, and dates such as today + 30 days, worked out on the PC. Enter copies the result. Off unless set.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchClipboardHistory">Clipboard history in search</string>
+      <string id="E_SearchClipboardHistory">Texts in Windows' clipboard history, found by their words, to paste again. Only while clipboard history is switched on in Windows. Off unless set.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchClipboardHistory">Texts in Windows' clipboard history, found by their words, to paste again. Only while clipboard history is switched on in Windows. Off unless set.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_SearchBookmarks">Bookmarks in search</string>
+      <string id="E_SearchBookmarks">The person's own bookmarks, the ones from the Bookmarks policy, and, with BookmarksFromBrowsers, those of the browsers on the PC. Off unless set.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_SearchBookmarks">The person's own bookmarks, the ones from the Bookmarks policy, and, with BookmarksFromBrowsers, those of the browsers on the PC. Off unless set.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_BookmarksFromBrowsers">Bookmarks from the browsers</string>
+      <string id="E_BookmarksFromBrowsers">Bookmarks of every profile of Chrome, Edge, Brave, Vivaldi, Opera, Helium and other Chromium browsers, and of Firefox. They're only read, never changed, and open in the browser and profile they come from.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_BookmarksFromBrowsers">Bookmarks of every profile of Chrome, Edge, Brave, Vivaldi, Opera, Helium and other Chromium browsers, and of Firefox. They're only read, never changed, and open in the browser and profile they come from.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_BookmarksLeftOut">Browser profiles left out of bookmarks</string>
+      <string id="E_BookmarksLeftOut">One per line, as Browser/profile folder, such as Chrome/Profile 2, Edge/Default or Firefox/default-release. Their bookmarks aren't searched.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_BookmarksLeftOut">One per line, as Browser/profile folder, such as Chrome/Profile 2, Edge/Default or Firefox/default-release. Their bookmarks aren't searched.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
+      <string id="P_Bookmarks">Bookmarks</string>
+      <string id="E_Bookmarks">One per line: Folder|Name|Target or Folder|Name|Target|Arguments. Target is a web address, a file, a folder or a program; Folder can be empty or hold folders inside folders as Work/Tools. Environment variables such as %USERPROFILE% work. As a fixed setting they're shown to everyone and can't be removed; as a default they're the bookmarks people start with.
+
+Enabled adds the items below to people's own, and they can't remove them. They can still add more. Disabled or Not configured leaves it to them.</string>
+      <string id="R_Bookmarks">One per line: Folder|Name|Target or Folder|Name|Target|Arguments. Target is a web address, a file, a folder or a program; Folder can be empty or hold folders inside folders as Work/Tools. Environment variables such as %USERPROFILE% work. As a fixed setting they're shown to everyone and can't be removed; as a default they're the bookmarks people start with.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchRegex">Treat searches as regular expressions</string>
       <string id="E_SearchRegex">The whole search is one regular expression, matched against names whatever the case. The switch in the search box turns it on and off.
 
@@ -660,6 +716,12 @@ Enabled applies the ticks below. Disabled or Not configured allows everything.</
           <defaultValue>https://duckduckgo.com/?q={}</defaultValue>
         </textBox>
       </presentation>
+      <presentation id="P_BookmarksLeftOut">
+        <listBox refId="Value">Browser profiles left out of bookmarks:</listBox>
+      </presentation>
+      <presentation id="P_Bookmarks">
+        <listBox refId="Value">Bookmarks:</listBox>
+      </presentation>
       <presentation id="P_M365ClientId">
         <textBox refId="Value">
           <label>App registration (client ID):</label>
@@ -680,6 +742,7 @@ Enabled applies the ticks below. Disabled or Not configured allows everything.</
         <checkBox refId="Setting_SystemDark" defaultChecked="true">Dark taskbar and Start</checkBox>
         <checkBox refId="Setting_KeepAwake" defaultChecked="true">Keep awake</checkBox>
         <checkBox refId="Setting_Mute" defaultChecked="true">Mute</checkBox>
+        <checkBox refId="Setting_DoNotDisturb" defaultChecked="true">Do not disturb</checkBox>
         <checkBox refId="Setting_MicMute" defaultChecked="true">Mic mute</checkBox>
         <checkBox refId="Setting_Transparency" defaultChecked="true">See-through effects</checkBox>
         <checkBox refId="Setting_AccentTaskbar" defaultChecked="true">Accent color on taskbar</checkBox>

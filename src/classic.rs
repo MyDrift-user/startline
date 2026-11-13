@@ -102,10 +102,16 @@ impl Menu {
             self.draw_filter_chips(ui, chips, pal);
             self.scroll_in(ui, list, "results", |menu, ui| menu.draw_results(ui, pal));
         } else {
+            // What's playing sits under the tiles.
+            let playing = self.now_playing();
+            let room = if playing.is_empty() { 0.0 } else { crate::now_playing::CARD_HEIGHT + 8.0 };
             let list = Rect::from_min_max(inner.min, pos2(inner.left() + 270.0, inner.bottom()));
-            let tiles = Rect::from_min_max(pos2(list.right() + 10.0, inner.top()), inner.max);
+            let tiles = Rect::from_min_max(pos2(list.right() + 10.0, inner.top()), pos2(inner.right(), inner.bottom() - room));
             self.scroll_in(ui, list, "apps", |menu, ui| menu.draw_app_list(ui, pal));
             self.scroll_in(ui, tiles, "tiles", |menu, ui| menu.draw_pinned(ui, pal));
+            if !playing.is_empty() {
+                self.draw_now_playing(ui, Rect::from_min_max(pos2(tiles.left(), tiles.bottom() + 8.0), inner.max), &playing, pal);
+            }
         }
 
         let spot = |y: f32| Rect::from_center_size(pos2(rail.center().x, y), Vec2::splat(48.0));

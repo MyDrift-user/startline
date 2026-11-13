@@ -276,6 +276,47 @@ fn a_policy_adds_rules_the_person_keeps_their_own_under() {
 }
 
 #[test]
+fn an_organizations_bookmarks_are_shown_and_stay_out_of_the_persons_own() {
+    let line = "Company|Intranet|https://intranet.example.com/";
+    let fixed = Policies::from_raw(&raw(json!({ "Bookmarks": [line, "%USERPROFILE%\\Docs||not enough"], "SearchBookmarks": 1, "BookmarksLeftOut": ["Chrome/Profile 2"] })));
+    let mut own = Config::default();
+    own.bookmarks = vec![crate::bookmarks::Bookmark { folder: String::new(), name: "Mine".into(), target: Target::path("https://mine.example.com/") }];
+    let mut cfg = own.clone();
+    fixed.enforce(&mut cfg);
+    assert!(cfg.bookmarks_search && cfg.bookmarks_browsers);
+    assert_eq!(cfg.bookmarks_left_out, ["Chrome/Profile 2"]);
+    assert_eq!(cfg.bookmarks, own.bookmarks, "the organization's are shown beside the person's, never mixed in");
+    let managed = crate::bookmarks::bookmarks_of(fixed.added("/bookmarks"));
+    assert_eq!(managed.len(), 1, "a line without a name is skipped");
+    assert_eq!((managed[0].folder.as_str(), managed[0].name.as_str()), ("Company", "Intranet"));
+    assert_eq!(fixed.without_forced(&cfg, &own).bookmarks, own.bookmarks);
+    // As a default, they're the bookmarks people start with and can change.
+    let defaults = Policies::from_raws(&Raw::default(), &raw(json!({ "Bookmarks": [line] })));
+    let mut fresh = Config::default();
+    defaults.enforce(&mut fresh);
+    assert_eq!(fresh.bookmarks.len(), 1);
+    assert_eq!(fresh.bookmarks[0].target, Target::path("https://intranet.example.com/"));
+    assert!(!defaults.is_set("Bookmarks"));
+}
+
+#[test]
+fn the_quick_actions_have_their_own_policies() {
+    let off = Policies::from_raw(&raw(json!({ "SearchPowerActions": 0, "SearchCalculator": 1, "SearchClipboardHistory": 1, "MediaControls": 1, "SearchChangeWindowsSettings": 0 })));
+    let mut cfg = Config::default();
+    assert!(!cfg.quick_calculator && !cfg.quick_clipboard && !cfg.media_controls && !cfg.bookmarks_search, "all off at first");
+    assert!(cfg.search_power_actions, "power actions were in search before, and stay");
+    off.enforce(&mut cfg);
+    assert!(!cfg.search_power_actions && cfg.quick_calculator && cfg.quick_clipboard && cfg.media_controls);
+    assert!(!off.allows_row(&RowKind::Run(Do::ShutDown)), "power actions leave search");
+    assert!(off.allows_do(Do::ShutDown), "the power button keeps them");
+    assert!(!off.allows_row(&RowKind::Output("speakers".into())), "switching the sound output is a Windows setting");
+    assert!(!off.allows_row(&RowKind::Quick(QuickId::DoNotDisturb, crate::intent::Want::Nothing)));
+    let ticked = Policies::from_raw(&raw(json!({ "Allow_Setting_DoNotDisturb": 0 })));
+    assert!(!ticked.allows_row(&RowKind::Quick(QuickId::DoNotDisturb, crate::intent::Want::Nothing)));
+    assert!(ticked.allows_row(&RowKind::Quick(QuickId::Mute, crate::intent::Want::Nothing)));
+}
+
+#[test]
 fn an_older_settings_file_keeps_its_meaning() {
     let cfg = Config::parse(br#"{"index_hidden": true, "web_search": false, "category_order": ["Files", "Apps", "Settings", "Web"]}"#).unwrap();
     assert!(!cfg.skip_hidden, "hidden files were included");

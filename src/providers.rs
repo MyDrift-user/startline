@@ -85,12 +85,13 @@ impl Provider for Settings {
 
     fn ask(&mut self, ask: &Ask) {
         let mut found = search::setting_rows(ask.tokens);
-        let (changes, pages) = (ask.cfg.search_windows_settings, ask.cfg.search_settings_pages);
+        let (changes, pages, power) = (ask.cfg.search_windows_settings, ask.cfg.search_settings_pages, ask.cfg.search_power_actions);
         found.rows.retain(|row| {
             ask.policy.allows_row(&row.kind)
                 && match &row.kind {
                     RowKind::Quick(..) => changes,
                     RowKind::Run(crate::actions::Do::Open(_)) => pages,
+                    RowKind::Run(what) if what.is_power() => power,
                     _ => true,
                 }
         });
@@ -313,6 +314,8 @@ pub struct Providers {
     pub web: Web,
     pub people: Graph365,
     pub mail: Graph365,
+    pub bookmarks: crate::bookmarks::Bookmarks,
+    pub quick: crate::quick::Quick,
 }
 
 impl Providers {
@@ -323,16 +326,18 @@ impl Providers {
             files: Files { search: FileSearch::start(index, ctx.clone()), waiting: 0, hits: Vec::new(), facets: Facets::default(), micros: None, error: None },
             web: Web { row: None },
             people: Graph365::start(Feature::People, ctx.clone()),
-            mail: Graph365::start(Feature::Mail, ctx),
+            mail: Graph365::start(Feature::Mail, ctx.clone()),
+            bookmarks: crate::bookmarks::Bookmarks::start(ctx.clone()),
+            quick: crate::quick::Quick::start(ctx),
         }
     }
 
-    pub fn each(&self) -> [&dyn Provider; 6] {
-        [&self.apps, &self.settings, &self.files, &self.web, &self.people, &self.mail]
+    pub fn each(&self) -> [&dyn Provider; 8] {
+        [&self.apps, &self.settings, &self.files, &self.web, &self.people, &self.mail, &self.bookmarks, &self.quick]
     }
 
-    pub fn each_mut(&mut self) -> [&mut dyn Provider; 6] {
-        [&mut self.apps, &mut self.settings, &mut self.files, &mut self.web, &mut self.people, &mut self.mail]
+    pub fn each_mut(&mut self) -> [&mut dyn Provider; 8] {
+        [&mut self.apps, &mut self.settings, &mut self.files, &mut self.web, &mut self.people, &mut self.mail, &mut self.bookmarks, &mut self.quick]
     }
 
     pub fn of(&self, category: Category) -> &dyn Provider {

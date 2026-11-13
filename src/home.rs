@@ -77,15 +77,23 @@ impl Menu {
         // The file type buttons sit against the search bar, on the side the results are.
         let chips_h = self.chip_row_height();
         let chip_room = if chips_h > 0.0 { chips_h + 6.0 } else { 0.0 };
+        // What's playing sits just above the footer.
+        let playing = self.now_playing();
+        let media_room = if playing.is_empty() { 0.0 } else { crate::now_playing::CARD_HEIGHT + gap };
+        let above = footer.top() - media_room;
         let (search_rect, chip_rect, body) = if search_low {
-            let search = Rect::from_min_max(pos2(content.left(), footer.top() - gap - search_h), pos2(content.right(), footer.top() - gap));
+            let search = Rect::from_min_max(pos2(content.left(), above - gap - search_h), pos2(content.right(), above - gap));
             let chips = Rect::from_min_max(pos2(content.left(), search.top() - chip_room), pos2(content.right(), search.top() - 6.0));
             (search, chips, Rect::from_min_max(content.left_top(), pos2(content.right(), search.top() - chip_room - gap)))
         } else {
             let search = Rect::from_min_size(content.left_top(), vec2(content.width(), search_h));
             let chips = Rect::from_min_max(pos2(content.left(), search.bottom() + 6.0), pos2(content.right(), search.bottom() + chip_room));
-            (search, chips, Rect::from_min_max(pos2(content.left(), search.bottom() + chip_room + gap), pos2(content.right(), footer.top() - gap)))
+            (search, chips, Rect::from_min_max(pos2(content.left(), search.bottom() + chip_room + gap), pos2(content.right(), above - gap)))
         };
+        if !playing.is_empty() {
+            let card = Rect::from_min_max(pos2(content.left(), above), pos2(content.right(), footer.top() - gap));
+            self.draw_now_playing(ui, card, &playing, pal);
+        }
 
         self.draw_search_bar(ui, search_rect, pal);
         self.draw_filter_chips(ui, chip_rect, pal);
@@ -772,6 +780,9 @@ impl Menu {
             RowKind::Web(url) => Some(Intent::Web(url.clone())),
             RowKind::Person(person) => Some(Intent::Link(crate::m365::chat_link(person.teams_id(), self.teams_installed))),
             RowKind::Link(url) => Some(Intent::Link(url.clone())),
+            RowKind::Copy(text) => Some(Intent::CopyAnswer(text.clone())),
+            RowKind::Paste(text) => Some(Intent::Paste(text.clone())),
+            RowKind::Output(id) => Some(Intent::UseOutput(id.clone())),
             RowKind::Quick(..) => None,
         };
         if let Some(intent) = &intent {
@@ -861,7 +872,8 @@ impl Menu {
         }
         if let (RowKind::Open(target), true) = (&row.kind, response.secondary_clicked()) {
             let path = row.path.clone().or_else(|| self.path_of_target(target));
-            let entries = popup::target_entries(&self.cfg, &row.name, target, path.as_deref(), false);
+            let mut entries = popup::target_entries(&self.cfg, &row.name, target, path.as_deref(), false);
+            entries.extend(popup::bookmark_entries(&self.cfg, row, target, self.policy.added("/bookmarks")));
             let at = response.interact_pointer_pos().unwrap_or(rect.center());
             self.open_popup(at, entries);
         }
@@ -916,6 +928,14 @@ impl Menu {
                 tr("Enter starts a Teams chat, Esc clears")
             } else if matches!(current, Some(RowKind::Link(_))) {
                 tr("Enter opens the message, Esc clears")
+            } else if matches!(current, Some(RowKind::Copy(_))) {
+                tr("Enter copies the result, Esc clears")
+            } else if matches!(current, Some(RowKind::Paste(_))) {
+                tr("Enter pastes it where you were, Esc clears")
+            } else if matches!(current, Some(RowKind::Output(_))) {
+                tr("Enter plays sound there, Esc clears")
+            } else if matches!(current, Some(RowKind::Open(_))) && self.rows.iter().find(|row| Some(row.nav_id()) == target).is_some_and(|row| row.category == Category::Bookmarks) {
+                tr("Enter opens the bookmark, right-click for more, Esc clears")
             } else if matches!(current, Some(RowKind::Web(_) | RowKind::Run(_))) {
                 tr("Enter opens, Esc clears")
             } else {
