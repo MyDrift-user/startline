@@ -16,6 +16,7 @@
       <string id="Cat_SearchResults">Ergebnisse</string>
       <string id="Cat_SearchBox">Suchfeld</string>
       <string id="Cat_General">Allgemein</string>
+      <string id="Cat_Microsoft365">Microsoft 365</string>
       <string id="Cat_Updates">Updates</string>
       <string id="Cat_Limits">Was Benutzer tun können</string>
       <string id="P_Experience">Aussehen</string>
@@ -304,10 +305,10 @@ Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer könne
 
 Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_SearchResults">Arten von Ergebnissen</string>
-      <string id="E_SearchResults">Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Files, Web. Eine nicht genannte Art wird nie angezeigt.
+      <string id="E_SearchResults">Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Files, People, Mail, Web. Eine nicht genannte Art wird nie angezeigt. People und Mail brauchen auch ihre Microsoft 365-Richtlinien.
 
 Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
-      <string id="R_SearchResults">Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Files, Web. Eine nicht genannte Art wird nie angezeigt.
+      <string id="R_SearchResults">Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Files, People, Mail, Web. Eine nicht genannte Art wird nie angezeigt. People und Mail brauchen auch ihre Microsoft 365-Richtlinien.
 
 Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_SearchMaxApps">Höchstzahl angezeigter Apps</string>
@@ -430,6 +431,48 @@ Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer könne
       <string id="R_SkipWelcome">Aktiviert blendet den Hinweis aus, der beim ersten Start erscheint.
 
 Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_M365Account">Microsoft 365-Konto</string>
+      <string id="E_M365Account">Erlaubt die Anmeldung mit einem Geschäfts- oder Schulkonto, für den Kalender und um Personen und E-Mails zu finden. Deaktiviert kann sich niemand anmelden, und Startline kontaktiert Microsoft nie. Aus, wenn nicht konfiguriert.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_M365Account">Erlaubt die Anmeldung mit einem Geschäfts- oder Schulkonto, für den Kalender und um Personen und E-Mails zu finden. Deaktiviert kann sich niemand anmelden, und Startline kontaktiert Microsoft nie. Aus, wenn nicht konfiguriert.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_M365Calendar">Kalender neben dem Menü</string>
+      <string id="E_M365Calendar">Der heutige Kalender in einem Bereich neben dem Menü, im Aussehen Windows 11 und Startline. Fordert Calendars.ReadWrite an. Aus, wenn nicht konfiguriert.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_M365Calendar">Der heutige Kalender in einem Bereich neben dem Menü, im Aussehen Windows 11 und Startline. Fordert Calendars.ReadWrite an. Aus, wenn nicht konfiguriert.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_M365People">Personen in der Suche</string>
+      <string id="E_M365People">Kolleginnen und Kollegen in der Suche, um in Teams mit ihnen zu chatten, sie anzurufen oder ihnen zu schreiben. Fordert User.ReadBasic.All an. Aus, wenn nicht konfiguriert.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_M365People">Kolleginnen und Kollegen in der Suche, um in Teams mit ihnen zu chatten, sie anzurufen oder ihnen zu schreiben. Fordert User.ReadBasic.All an. Aus, wenn nicht konfiguriert.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_M365Mail">E-Mails in der Suche</string>
+      <string id="E_M365Mail">Die eigenen E-Mails in der Suche, nach Betreff. Fordert Mail.ReadBasic an. Aus, wenn nicht konfiguriert.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_M365Mail">Die eigenen E-Mails in der Suche, nach Betreff. Fordert Mail.ReadBasic an. Aus, wenn nicht konfiguriert.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_M365ClientId">App-Registrierung (Client-ID)</string>
+      <string id="E_M365ClientId">Die Anwendungs-ID (Client-ID) der eigenen App-Registrierung der Organisation, statt der in Startline eingebauten. Muss eine GUID sein; alles andere wird ignoriert.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_M365ClientId">Die Anwendungs-ID (Client-ID) der eigenen App-Registrierung der Organisation, statt der in Startline eingebauten. Muss eine GUID sein; alles andere wird ignoriert.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_M365TenantId">Mandant</string>
+      <string id="E_M365TenantId">Die Mandanten-ID oder eine Domäne, etwa contoso.onmicrosoft.com. Nur Konten dieses Mandanten können sich anmelden. Nicht konfiguriert kann es jedes Geschäfts- oder Schulkonto.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_M365TenantId">Die Mandanten-ID oder eine Domäne, etwa contoso.onmicrosoft.com. Nur Konten dieses Mandanten können sich anmelden. Nicht konfiguriert kann es jedes Geschäfts- oder Schulkonto.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_AutomaticUpdates">Updates automatisch installieren</string>
       <string id="E_AutomaticUpdates">Startline installiert neue Versionen selbst und startet neu, während sein Menü geschlossen ist. Bei einer Installation für den ganzen PC installiert die Aufgabe Startline Updater sie innerhalb einer Stunde als SYSTEM. Deaktiviert überlässt Updates dem Benutzer oder, bei einer Installation für den ganzen PC, dem Administrator.
 
@@ -615,6 +658,18 @@ Aktiviert wendet die Häkchen unten an. Deaktiviert oder Nicht konfiguriert läs
         <textBox refId="Value">
           <label>Adresse der Websuche:</label>
           <defaultValue>https://duckduckgo.com/?q={}</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_M365ClientId">
+        <textBox refId="Value">
+          <label>App-Registrierung (Client-ID):</label>
+          <defaultValue></defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_M365TenantId">
+        <textBox refId="Value">
+          <label>Mandant:</label>
+          <defaultValue></defaultValue>
         </textBox>
       </presentation>
       <presentation id="P_SearchWindowsSettings">

@@ -38,6 +38,9 @@
     <category name="General" displayName="$(string.Cat_General)">
       <parentCategory ref="Startline"/>
     </category>
+    <category name="Microsoft365" displayName="$(string.Cat_Microsoft365)">
+      <parentCategory ref="Startline"/>
+    </category>
     <category name="Updates" displayName="$(string.Cat_Updates)">
       <parentCategory ref="Startline"/>
     </category>
@@ -72,6 +75,9 @@
       <parentCategory ref="Rec_Search"/>
     </category>
     <category name="Rec_General" displayName="$(string.Cat_General)">
+      <parentCategory ref="Rec_Startline"/>
+    </category>
+    <category name="Rec_Microsoft365" displayName="$(string.Cat_Microsoft365)">
       <parentCategory ref="Rec_Startline"/>
     </category>
     <category name="Rec_Updates" displayName="$(string.Cat_Updates)">
@@ -1441,6 +1447,114 @@
       <disabledValue>
         <decimal value="0"/>
       </disabledValue>
+    </policy>
+    <policy name="M365Account" class="Both" displayName="$(string.P_M365Account)" explainText="$(string.E_M365Account)" key="Software\Policies\Startline" valueName="M365Account">
+      <parentCategory ref="Microsoft365"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_M365Account" class="Both" displayName="$(string.P_M365Account)" explainText="$(string.R_M365Account)" key="Software\Policies\Startline\Recommended" valueName="M365Account">
+      <parentCategory ref="Rec_Microsoft365"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="M365Calendar" class="Both" displayName="$(string.P_M365Calendar)" explainText="$(string.E_M365Calendar)" key="Software\Policies\Startline" valueName="M365Calendar">
+      <parentCategory ref="Microsoft365"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_M365Calendar" class="Both" displayName="$(string.P_M365Calendar)" explainText="$(string.R_M365Calendar)" key="Software\Policies\Startline\Recommended" valueName="M365Calendar">
+      <parentCategory ref="Rec_Microsoft365"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="M365People" class="Both" displayName="$(string.P_M365People)" explainText="$(string.E_M365People)" key="Software\Policies\Startline" valueName="M365People">
+      <parentCategory ref="Microsoft365"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_M365People" class="Both" displayName="$(string.P_M365People)" explainText="$(string.R_M365People)" key="Software\Policies\Startline\Recommended" valueName="M365People">
+      <parentCategory ref="Rec_Microsoft365"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="M365Mail" class="Both" displayName="$(string.P_M365Mail)" explainText="$(string.E_M365Mail)" key="Software\Policies\Startline" valueName="M365Mail">
+      <parentCategory ref="Microsoft365"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_M365Mail" class="Both" displayName="$(string.P_M365Mail)" explainText="$(string.R_M365Mail)" key="Software\Policies\Startline\Recommended" valueName="M365Mail">
+      <parentCategory ref="Rec_Microsoft365"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="M365ClientId" class="Both" displayName="$(string.P_M365ClientId)" explainText="$(string.E_M365ClientId)" presentation="$(presentation.P_M365ClientId)" key="Software\Policies\Startline">
+      <parentCategory ref="Microsoft365"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <text id="Value" valueName="M365ClientId" required="true"/>
+      </elements>
+    </policy>
+    <policy name="Rec_M365ClientId" class="Both" displayName="$(string.P_M365ClientId)" explainText="$(string.R_M365ClientId)" presentation="$(presentation.P_M365ClientId)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Microsoft365"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <text id="Value" valueName="M365ClientId" required="true"/>
+      </elements>
+    </policy>
+    <policy name="M365TenantId" class="Both" displayName="$(string.P_M365TenantId)" explainText="$(string.E_M365TenantId)" presentation="$(presentation.P_M365TenantId)" key="Software\Policies\Startline">
+      <parentCategory ref="Microsoft365"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <text id="Value" valueName="M365TenantId" required="true"/>
+      </elements>
+    </policy>
+    <policy name="Rec_M365TenantId" class="Both" displayName="$(string.P_M365TenantId)" explainText="$(string.R_M365TenantId)" presentation="$(presentation.P_M365TenantId)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Microsoft365"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <text id="Value" valueName="M365TenantId" required="true"/>
+      </elements>
     </policy>
     <policy name="AutomaticUpdates" class="Both" displayName="$(string.P_AutomaticUpdates)" explainText="$(string.E_AutomaticUpdates)" key="Software\Policies\Startline" valueName="AutomaticUpdates">
       <parentCategory ref="Updates"/>

@@ -1,7 +1,7 @@
 //! The Search settings page: tick the places to search in a folder tree, flip simple skip
 //! rules, and see the result at once. Changes re-read the folders by themselves.
 
-use crate::config::ResultKind;
+use crate::config::{Category, ResultKind};
 use crate::customize::{card, heading};
 use crate::i18n::tr;
 use crate::platform::{self, Drive, DriveKind};
@@ -138,7 +138,7 @@ fn count_line(ui: &mut Ui, title: &str, value: &mut usize, range: std::ops::Rang
     });
 }
 
-fn switch_line(ui: &mut Ui, title: &str, about: &str, value: &mut bool, pal: Pal) {
+pub(crate) fn switch_line(ui: &mut Ui, title: &str, about: &str, value: &mut bool, pal: Pal) {
     let width = ui.available_width();
     ui.horizontal(|ui| {
         ui.set_min_height(34.0);
@@ -453,10 +453,21 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
     card(ui, pal, |ui| {
         policy.lock(ui, &["SearchResults"], |ui| {
             ui.label(RichText::new(tr("Drag to choose what comes first")).size(13.5).color(pal.text));
-            drag_rows(ui, Id::unique("result-order"), &mut menu.cfg.results, 34.0, pal, |ui, result: &mut ResultKind| {
+            // People and mail are in the list only while their Microsoft 365 feature is on; the rest keep their place after.
+            let shown = |kind: Category| match kind {
+                Category::People => crate::m365::feature_on(&menu.cfg, crate::m365::Feature::People),
+                Category::Mail => crate::m365::feature_on(&menu.cfg, crate::m365::Feature::Mail),
+                _ => true,
+            };
+            let (mut listed, hidden): (Vec<ResultKind>, Vec<ResultKind>) = menu.cfg.results.iter().partition(|r| shown(r.kind));
+            drag_rows(ui, Id::unique("result-order"), &mut listed, 34.0, pal, |ui, result: &mut ResultKind| {
                 ui.label(RichText::new(result.kind.label()).size(13.5).color(if result.on { pal.text } else { pal.sub }));
                 ui.with_layout(Layout::right_to_left(Align::Center), |ui| switch(ui, &mut result.on, pal));
             });
+            listed.extend(hidden);
+            if listed != menu.cfg.results {
+                menu.cfg.results = listed;
+            }
         });
         ui.add_space(4.0);
         ui.separator();

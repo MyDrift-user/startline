@@ -1,6 +1,7 @@
 <!-- Built by installer\windows\package.ps1.
      Silent, for this PC, from an admin prompt: msiexec /i name.msi /qn ALLUSERS=1 [APPLICATIONFOLDER="D:\Apps\Startline"]
-     Silent, for one account, no admin needed: msiexec /i name.msi /qn ALLUSERS=2 MSIINSTALLPERUSER=1 -->
+     Silent, for one account, no admin needed: msiexec /i name.msi /qn ALLUSERS=2 MSIINSTALLPERUSER=1
+     Either can add a Microsoft 365 app registration: M365CLIENTID=<client ID> [M365TENANTID=<tenant>] -->
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
   <!-- One ProductCode for all three languages of a build, as a language transform needs: package.ps1 makes it. -->
   <Package Name="Startline" Manufacturer="MyDrift" Version="$(var.Version)" Language="!(loc.Language)" ProductCode="$(var.ProductCode)" UpgradeCode="6F0B6C1E-3A52-4E8D-9C47-2D1E7A94B3C5" Scope="perUserOrMachine">
@@ -31,6 +32,34 @@
     <!-- On its own: the program has no version resource, so WiX can only make IDs for one-file components. -->
     <Component Directory="APPLICATIONFOLDER">
       <File Source="LICENSE" Name="LICENSE.txt" />
+    </Component>
+    <!-- The Microsoft 365 app registration and tenant, from M365CLIENTID and M365TENANTID on the command line. Written to
+         Startline's own key, HKLM\Software\Startline for this PC or HKCU\Software\Startline for one account, which
+         src/m365.rs reads after Group Policy and before what's built in. An upgrade that doesn't give them again finds
+         the ones already there and writes them back; uninstalling removes them. -->
+    <Property Id="M365CLIENTID" Secure="yes" />
+    <Property Id="M365TENANTID" Secure="yes" />
+    <Property Id="SAVEDCLIENTIDMACHINE" Secure="yes">
+      <RegistrySearch Id="SavedClientIdMachine" Root="HKLM" Key="Software\Startline" Name="M365ClientId" Type="raw" />
+    </Property>
+    <Property Id="SAVEDCLIENTIDUSER" Secure="yes">
+      <RegistrySearch Id="SavedClientIdUser" Root="HKCU" Key="Software\Startline" Name="M365ClientId" Type="raw" />
+    </Property>
+    <Property Id="SAVEDTENANTIDMACHINE" Secure="yes">
+      <RegistrySearch Id="SavedTenantIdMachine" Root="HKLM" Key="Software\Startline" Name="M365TenantId" Type="raw" />
+    </Property>
+    <Property Id="SAVEDTENANTIDUSER" Secure="yes">
+      <RegistrySearch Id="SavedTenantIdUser" Root="HKCU" Key="Software\Startline" Name="M365TenantId" Type="raw" />
+    </Property>
+    <SetProperty Id="M365CLIENTID" Action="KeepClientIdMachine" Value="[SAVEDCLIENTIDMACHINE]" After="AppSearch" Sequence="both" Condition="NOT M365CLIENTID AND ALLUSERS=1 AND SAVEDCLIENTIDMACHINE" />
+    <SetProperty Id="M365CLIENTID" Action="KeepClientIdUser" Value="[SAVEDCLIENTIDUSER]" After="KeepClientIdMachine" Sequence="both" Condition="NOT M365CLIENTID AND NOT ALLUSERS=1 AND SAVEDCLIENTIDUSER" />
+    <SetProperty Id="M365TENANTID" Action="KeepTenantIdMachine" Value="[SAVEDTENANTIDMACHINE]" After="KeepClientIdUser" Sequence="both" Condition="NOT M365TENANTID AND ALLUSERS=1 AND SAVEDTENANTIDMACHINE" />
+    <SetProperty Id="M365TENANTID" Action="KeepTenantIdUser" Value="[SAVEDTENANTIDUSER]" After="KeepTenantIdMachine" Sequence="both" Condition="NOT M365TENANTID AND NOT ALLUSERS=1 AND SAVEDTENANTIDUSER" />
+    <Component Id="M365ClientIdValue" Directory="APPLICATIONFOLDER" Condition="M365CLIENTID">
+      <RegistryValue Root="HKMU" Key="Software\Startline" Name="M365ClientId" Type="string" Value="[M365CLIENTID]" KeyPath="yes" />
+    </Component>
+    <Component Id="M365TenantIdValue" Directory="APPLICATIONFOLDER" Condition="M365TENANTID">
+      <RegistryValue Root="HKMU" Key="Software\Startline" Name="M365TenantId" Type="string" Value="[M365TENANTID]" KeyPath="yes" />
     </Component>
     <!-- Startline stays running in the background, so it would otherwise always hold its own file during an upgrade or uninstall. -->
     <CustomAction Id="CloseStartline" Directory="APPLICATIONFOLDER" Execute="immediate" Return="ignore"

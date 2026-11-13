@@ -322,6 +322,12 @@ impl Parsed {
                     if policy.field == "/web_url" && !((text.starts_with("https://") || text.starts_with("http://")) && text.contains("{}")) {
                         continue;
                     }
+                    if policy.field == "/m365_client_id" && !crate::m365::is_guid(text) {
+                        continue;
+                    }
+                    if policy.field == "/m365_tenant" && !crate::m365::is_tenant(text) {
+                        continue;
+                    }
                     out.fields.push((policy.field, json!(text)));
                     out.set.insert(policy.key.clone());
                 }

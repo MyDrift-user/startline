@@ -96,6 +96,10 @@ pub enum RowKind {
     Quick(QuickId, Want),
     /// A web search for these words.
     Web(String),
+    /// A colleague from the organization's directory, to chat with, call or mail.
+    Person(crate::m365::graph::Person),
+    /// An address to open, such as a message in Outlook on the web. Not remembered among the most used.
+    Link(String),
 }
 
 #[derive(Clone, Debug, PartialEq)]

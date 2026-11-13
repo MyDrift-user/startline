@@ -16,6 +16,7 @@
       <string id="Cat_SearchResults">Risultati</string>
       <string id="Cat_SearchBox">Casella di ricerca</string>
       <string id="Cat_General">Generale</string>
+      <string id="Cat_Microsoft365">Microsoft 365</string>
       <string id="Cat_Updates">Aggiornamenti</string>
       <string id="Cat_Limits">Cosa possono fare gli utenti</string>
       <string id="P_Experience">Aspetto</string>
@@ -304,10 +305,10 @@ Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modifi
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_SearchResults">Tipi di risultati</string>
-      <string id="E_SearchResults">Uno per riga, dal primo all'ultimo: Apps, Settings, Files, Web. Un tipo non indicato non viene mai mostrato.
+      <string id="E_SearchResults">Uno per riga, dal primo all'ultimo: Apps, Settings, Files, People, Mail, Web. Un tipo non indicato non viene mai mostrato. People e Mail richiedono anche i loro criteri di Microsoft 365.
 
 Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
-      <string id="R_SearchResults">Uno per riga, dal primo all'ultimo: Apps, Settings, Files, Web. Un tipo non indicato non viene mai mostrato.
+      <string id="R_SearchResults">Uno per riga, dal primo all'ultimo: Apps, Settings, Files, People, Mail, Web. Un tipo non indicato non viene mai mostrato. People e Mail richiedono anche i loro criteri di Microsoft 365.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_SearchMaxApps">Numero massimo di app nei risultati</string>
@@ -430,6 +431,48 @@ Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modifi
       <string id="R_SkipWelcome">Abilitato nasconde il messaggio mostrato al primo avvio.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_M365Account">Account Microsoft 365</string>
+      <string id="E_M365Account">Consente di accedere con un account aziendale o dell'istituto, per il calendario e per trovare persone e posta. Disattivato, nessuno può accedere e Startline non contatta mai Microsoft. Disattivato se non configurato.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_M365Account">Consente di accedere con un account aziendale o dell'istituto, per il calendario e per trovare persone e posta. Disattivato, nessuno può accedere e Startline non contatta mai Microsoft. Disattivato se non configurato.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_M365Calendar">Calendario accanto al menu</string>
+      <string id="E_M365Calendar">Il calendario di oggi in un pannello accanto al menu, negli aspetti Windows 11 e Startline. Richiede Calendars.ReadWrite. Disattivato se non configurato.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_M365Calendar">Il calendario di oggi in un pannello accanto al menu, negli aspetti Windows 11 e Startline. Richiede Calendars.ReadWrite. Disattivato se non configurato.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_M365People">Persone nella ricerca</string>
+      <string id="E_M365People">Colleghi nella ricerca, per chattare in Teams, chiamarli o scrivere loro. Richiede User.ReadBasic.All. Disattivato se non configurato.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_M365People">Colleghi nella ricerca, per chattare in Teams, chiamarli o scrivere loro. Richiede User.ReadBasic.All. Disattivato se non configurato.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_M365Mail">Posta nella ricerca</string>
+      <string id="E_M365Mail">La posta della persona nella ricerca, per oggetto. Richiede Mail.ReadBasic. Disattivato se non configurato.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_M365Mail">La posta della persona nella ricerca, per oggetto. Richiede Mail.ReadBasic. Disattivato se non configurato.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_M365ClientId">Registrazione dell'app (ID client)</string>
+      <string id="E_M365ClientId">L'ID applicazione (client) della registrazione dell'app dell'organizzazione, usato al posto di quello integrato in Startline. Deve essere un GUID; qualsiasi altro valore viene ignorato.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_M365ClientId">L'ID applicazione (client) della registrazione dell'app dell'organizzazione, usato al posto di quello integrato in Startline. Deve essere un GUID; qualsiasi altro valore viene ignorato.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_M365TenantId">Tenant</string>
+      <string id="E_M365TenantId">L'ID o un dominio del tenant, ad esempio contoso.onmicrosoft.com. Solo gli account di questo tenant possono accedere. Se non configurato, può farlo qualsiasi account aziendale o dell'istituto.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_M365TenantId">L'ID o un dominio del tenant, ad esempio contoso.onmicrosoft.com. Solo gli account di questo tenant possono accedere. Se non configurato, può farlo qualsiasi account aziendale o dell'istituto.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_AutomaticUpdates">Installa automaticamente gli aggiornamenti</string>
       <string id="E_AutomaticUpdates">Startline installa da solo le nuove versioni e si riavvia mentre il suo menu è chiuso. In un'installazione per l'intero PC, l'attività Startline Updater le installa come SYSTEM entro un'ora. Disabilitato lascia gli aggiornamenti all'utente o, in un'installazione per l'intero PC, all'amministratore.
 
@@ -615,6 +658,18 @@ Abilitato applica le selezioni qui sotto. Disabilitato o Non configurato consent
         <textBox refId="Value">
           <label>Indirizzo della ricerca web:</label>
           <defaultValue>https://duckduckgo.com/?q={}</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_M365ClientId">
+        <textBox refId="Value">
+          <label>Registrazione dell'app (ID client):</label>
+          <defaultValue></defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_M365TenantId">
+        <textBox refId="Value">
+          <label>Tenant:</label>
+          <defaultValue></defaultValue>
         </textBox>
       </presentation>
       <presentation id="P_SearchWindowsSettings">

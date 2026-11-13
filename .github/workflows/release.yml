@@ -24,6 +24,12 @@ jobs:
     runs-on: windows-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
+    env:
+      # The Microsoft 365 app registration and tenant built into the release, from repository variables if they're set:
+      # a public client, so its ID is no secret, but it's never in the source. Not set, the release is built without one,
+      # and an installer property or a policy can still give one.
+      STARTLINE_M365_CLIENT_ID: ${{ vars.STARTLINE_M365_CLIENT_ID }}
+      STARTLINE_M365_TENANT_ID: ${{ vars.STARTLINE_M365_TENANT_ID }}
     steps:
       - uses: actions/checkout@v7
 
@@ -142,6 +148,39 @@ jobs:
           $p = Start-Process msiexec -ArgumentList '/x',"`"$msi`"",'/qn','/norestart','ALLUSERS=2','MSIINSTALLPERUSER=1' -Wait -PassThru
           if ($p.ExitCode) { throw "MSI did not uninstall for one account: $($p.ExitCode)" }
           if ($null -ne (Get-ItemProperty $run -Name Startline -ErrorAction SilentlyContinue)) { throw "Uninstalling left Startline starting with Windows" }
+
+          # A Microsoft 365 app registration given to the installer lands in Startline's own key, for this PC under HKLM
+          # and for one account under HKCU, is what the program uses, and goes again on uninstall. Upgrades that keep it
+          # are tested with two versions in test-update.ps1.
+          Clear-M365Values
+          $m365 = "M365CLIENTID=$TestClientId", "M365TENANTID=$TestTenant"
+          $p = Start-Process msiexec -ArgumentList (@('/i', "`"$msi`"", '/qn', '/norestart', 'ALLUSERS=1') + $m365) -Wait -PassThru
+          if ($p.ExitCode) { throw "MSI did not install with an app registration: $($p.ExitCode)" }
+          Assert-M365Values 'HKLM:' $TestClientId $TestTenant 'MSI for this PC'
+          Assert-M365FromInstaller $exe
+          $p = Start-Process msiexec -ArgumentList '/x',"`"$msi`"",'/qn','/norestart' -Wait -PassThru
+          if ($p.ExitCode) { throw "MSI did not uninstall: $($p.ExitCode)" }
+          Assert-M365Values 'HKLM:' $null $null 'Uninstalling the MSI for this PC'
+          $p = Start-Process msiexec -ArgumentList (@('/i', "`"$msi`"", '/qn', '/norestart', 'ALLUSERS=2', 'MSIINSTALLPERUSER=1') + $m365) -Wait -PassThru
+          if ($p.ExitCode) { throw "MSI did not install for one account with an app registration: $($p.ExitCode)" }
+          Assert-M365Values 'HKCU:' $TestClientId $TestTenant 'MSI for one account'
+          Assert-M365Values 'HKLM:' $null $null 'MSI for one account, under HKLM'
+          Assert-M365FromInstaller $own
+          $p = Start-Process msiexec -ArgumentList '/x',"`"$msi`"",'/qn','/norestart','ALLUSERS=2','MSIINSTALLPERUSER=1' -Wait -PassThru
+          if ($p.ExitCode) { throw "MSI did not uninstall for one account: $($p.ExitCode)" }
+          Assert-M365Values 'HKCU:' $null $null 'Uninstalling the MSI for one account'
+          $p = Start-Process "dist\$base-setup.exe" -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/ALLUSERS',"/M365CLIENTID=$TestClientId","/M365TENANTID=$TestTenant" -Wait -PassThru
+          if ($p.ExitCode) { throw "setup.exe did not install with an app registration" }
+          Assert-M365Values 'HKLM:' $TestClientId $TestTenant 'setup.exe for this PC'
+          Assert-M365FromInstaller $exe
+          # the same setup.exe again, without them: they stay
+          $p = Start-Process "dist\$base-setup.exe" -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/ALLUSERS' -Wait -PassThru
+          if ($p.ExitCode) { throw "setup.exe did not install over itself" }
+          Assert-M365Values 'HKLM:' $TestClientId $TestTenant 'setup.exe over itself without the switches'
+          $p = Start-Process "$env:ProgramFiles\Startline\unins000.exe" -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait -PassThru
+          Start-Sleep -Seconds 5
+          if ($p.ExitCode) { throw "setup.exe did not uninstall" }
+          Assert-M365Values 'HKLM:' $null $null 'Uninstalling setup.exe for this PC'
 
           # Installing over the published release has to replace it, for this PC and for one account alike.
           New-Item -ItemType Directory old | Out-Null

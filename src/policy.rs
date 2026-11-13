@@ -36,7 +36,7 @@ pub const CHECK_FOR_UPDATES: &str = "CheckForUpdates";
 
 /// Saved in the settings file, but only ever remembered for the person, never chosen by them.
 #[cfg(test)]
-const NOT_SETTINGS: [&str; 7] = ["version", "pins_seeded", "autostart_applied", "settings_pos", "settings_size", "usage", "chosen"];
+const NOT_SETTINGS: [&str; 8] = ["version", "pins_seeded", "autostart_applied", "settings_pos", "settings_size", "usage", "chosen", "m365_account_id"];
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum Group {
@@ -48,13 +48,14 @@ pub enum Group {
     SearchResults,
     SearchBox,
     General,
+    Microsoft365,
     Updates,
     Limits,
 }
 
 impl Group {
     /// The category in the templates, its name, and the category it's in.
-    const ALL: [(Group, &'static str, &'static str, &'static str); 10] = [
+    const ALL: [(Group, &'static str, &'static str, &'static str); 11] = [
         (Group::Appearance, "Appearance", tx("Appearance"), "Startline"), // i18n-ignore: category ids
         (Group::StartMenu, "StartMenu", tx("Start menu"), "Startline"), // i18n-ignore: category ids
         (Group::Pins, "Pins", tx("Pinned apps"), "Startline"), // i18n-ignore: category ids
@@ -63,6 +64,7 @@ impl Group {
         (Group::SearchResults, "SearchResults", tx("Results"), "Search"), // i18n-ignore: category ids
         (Group::SearchBox, "SearchBox", tx("Search box"), "Search"), // i18n-ignore: category ids
         (Group::General, "General", tx("General"), "Startline"), // i18n-ignore: category ids
+        (Group::Microsoft365, "Microsoft365", tx("Microsoft 365"), "Startline"), // i18n-ignore: category ids
         (Group::Updates, "Updates", tx("Updates"), "Startline"), // i18n-ignore: category ids
         (Group::Limits, "Limits", tx("What people can do"), "Startline"), // i18n-ignore: category ids
     ];
@@ -74,6 +76,7 @@ impl Group {
             Group::Pins => Tab::Pins,
             Group::SearchPlaces | Group::SearchSkip | Group::SearchResults | Group::SearchBox => Tab::Search,
             Group::General | Group::Limits => Tab::General,
+            Group::Microsoft365 => Tab::Microsoft365,
             Group::Updates => Tab::About,
         }
     }
@@ -209,7 +212,7 @@ fn build(lang: Lang) -> Vec<Policy> {
         switch("SearchSkipHidden", "/skip_hidden", SearchSkip, t(tx("Hidden files and folders are never found")), t(tx("Things Windows keeps out of sight. Disabled finds them."))),
         switch("SearchSkipSystem", "/skip_system", SearchSkip, t(tx("System files are never found")), t(tx("Files and folders Windows marks as part of the system, such as desktop.ini. Disabled finds them."))),
         // Search: results
-        list("SearchResults", "/results", SearchResults, t(tx("Kinds of results")), t(tx("One per line, first to last: Apps, Settings, Files, Web. A kind left out is never shown."))),
+        list("SearchResults", "/results", SearchResults, t(tx("Kinds of results")), t(tx("One per line, first to last: Apps, Settings, Files, People, Mail, Web. A kind left out is never shown. People and Mail also need their Microsoft 365 policies."))),
         number("SearchMaxApps", "/max_apps", SearchResults, t(tx("Most apps shown in the results")), "", 1, 30, 8),
         number("SearchMaxSettings", "/max_settings", SearchResults, t(tx("Most settings shown in the results")), "", 1, 30, 6),
         number("SearchMaxFiles", "/max_files", SearchResults, t(tx("Most files shown in the results")), "", 5, 200, 30),
@@ -232,6 +235,13 @@ fn build(lang: Lang) -> Vec<Policy> {
         switch("TakeOverStartKey", "/take_over_start", General, t(tx("Start key and button open this menu")), t(tx("Shift + Start still opens the Windows menu."))),
         switch("TakeOverSearchKey", "/take_over_search", General, t(tx("Start + S opens this menu too")), t(tx("Other Windows shortcuts keep working."))),
         switch("SkipWelcome", "/seen_welcome", General, t(tx("Skip the welcome note")), t(tx("Enabled hides the note shown on the first run."))),
+        // Microsoft 365
+        switch("M365Account", "/m365", Microsoft365, t(tx("Microsoft 365 account")), t(tx("Lets people sign in with a work or school account, for their calendar and to find people and mail. Disabled, no one can sign in and Startline never contacts Microsoft. Off unless set."))),
+        switch("M365Calendar", "/m365_calendar", Microsoft365, t(tx("Calendar beside the menu")), t(tx("Today's calendar in a panel beside the menu, in the Windows 11 and Startline looks. Asks for Calendars.ReadWrite. Off unless set."))),
+        switch("M365People", "/m365_people", Microsoft365, t(tx("People in search")), t(tx("Colleagues in search, to chat with in Teams, call or mail. Asks for User.ReadBasic.All. Off unless set."))),
+        switch("M365Mail", "/m365_mail", Microsoft365, t(tx("Mail in search")), t(tx("The person's mail in search, by subject. Asks for Mail.ReadBasic. Off unless set."))),
+        entry("M365ClientId", "/m365_client_id", Microsoft365, t(tx("App registration (client ID)")), t(tx("The application (client) ID of the organization's own app registration, used instead of the one built into Startline. Must be a GUID; anything else is ignored.")), Kind::Text("")),
+        entry("M365TenantId", "/m365_tenant", Microsoft365, t(tx("Tenant")), t(tx("The tenant ID or domain, such as contoso.onmicrosoft.com. Only accounts of this tenant can sign in. Not set, any work or school account can.")), Kind::Text("")),
         // Updates
         switch("AutomaticUpdates", "/auto_update", Updates, t(tx("Install updates automatically")), t(tx("Startline installs new versions by itself, restarting while its menu is closed. On an install for the whole PC, the Startline Updater task installs them as SYSTEM within the hour. Disabled leaves updates to the person, or on an install for the whole PC, to the administrator."))),
         switch(CHECK_FOR_UPDATES, "", Updates, t(tx("Look for updates")), t(tx("Disabled stops Startline looking for new versions at all, for organizations that deploy them their own way."))),

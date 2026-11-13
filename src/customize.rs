@@ -20,16 +20,18 @@ pub enum Tab {
     Pins,
     Search,
     General,
+    Microsoft365,
     About,
 }
 
 impl Tab {
-    const ALL: [(Tab, &'static str, char); 6] = [
+    const ALL: [(Tab, &'static str, char); 7] = [
         (Tab::Appearance, tx("Appearance"), '\u{E790}'),
         (Tab::StartMenu, tx("Start menu"), '\u{E8FC}'),
         (Tab::Pins, tx("Pinned apps"), '\u{E718}'),
         (Tab::Search, tx("Search"), '\u{E721}'),
         (Tab::General, tx("General"), '\u{E713}'),
+        (Tab::Microsoft365, tx("Microsoft 365"), '\u{E753}'),
         (Tab::About, tx("About & updates"), '\u{E946}'),
     ];
 
@@ -38,7 +40,7 @@ impl Tab {
     }
 }
 
-const WINDOW_TITLE: &str = tx("Startline Settings");
+pub(crate) const WINDOW_TITLE: &str = tx("Startline Settings");
 
 pub fn show_window(menu: &mut Menu, ctx: &Context) {
     let id = ViewportId::from_hash_of("startline-settings");
@@ -147,6 +149,7 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, tab: Tab) {
                     Tab::Pins => crate::pins_page::draw(menu, ui, pal),
                     Tab::Search => crate::search_page::draw(menu, ui, pal),
                     Tab::General => general(menu, ui, pal),
+                    Tab::Microsoft365 => crate::m365::page::draw(menu, ui, pal),
                     Tab::About => about(menu, ui, pal),
                 }
             });

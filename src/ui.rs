@@ -6,7 +6,8 @@ use crate::apps::App;
 use crate::config::{Category, Config, PRESETS, Pin, Target};
 use crate::customize::Tab;
 use crate::icons::{self, IconCache};
-use crate::index::{Facets, FileFilter, Hit, IndexManager, IndexParams, typed_extension};
+use crate::index::{Facets, FileFilter, IndexManager, IndexParams, typed_extension};
+use crate::providers::{Ask, Provider, Providers};
 use crate::intent::{self, Want};
 use crate::pins_page::{self, PinUi};
 use crate::popup::Popup;
@@ -15,7 +16,7 @@ use crate::search_page::{self, ScopeUi};
 use crate::matching;
 use crate::platform;
 use crate::policy::Policies;
-use crate::search::{self, FileSearch, Icon, Row, RowKind};
+use crate::search::{self, Icon, Row, RowKind};
 use crate::settings::{self, Control, QuickId, Settings, Value};
 use crate::styles::{self, Experience, Look, SystemLook};
 use crate::system::{self, Command, Shape, Shared};
@@ -40,6 +41,8 @@ pub enum Intent {
     TogglePin { name: String, target: Target },
     Run(Do),
     Web(String),
+    /// Opens an address without remembering it among the most used: a message, a meeting, a Teams chat.
+    Link(String),
     Show(Page),
     Properties(String),
     OpenWith(String),
@@ -108,7 +111,7 @@ pub struct Menu {
     apps_seen: usize,
     pub index: IndexManager,
     pub index_params: IndexParams,
-    files: FileSearch,
+    pub(crate) providers: Providers,
     pub(crate) icons: IconCache,
     pub settings: Settings,
     pub(crate) recent: Arc<Mutex<Vec<(String, String, u32)>>>,
@@ -117,15 +120,11 @@ pub struct Menu {
     pub(crate) query: String,
     pub(crate) tokens: Vec<String>,
     pub(crate) subject: Vec<String>,
-    settings_lead: bool,
-    fast_rows: Vec<Row>,
-    file_hits: Vec<Hit>,
     /// The file type buttons switched on under the search bar.
     pub(crate) file_filter: FileFilter,
     pub(crate) facets: Facets,
     pub(crate) file_micros: Option<u64>,
     pub(crate) fast_micros: u64,
-    waiting_generation: u64,
     pub(crate) rows: Vec<Row>,
     /// Which of `rows` is the best match, shown first under a heading of its own.
     pub(crate) best_at: Option<usize>,
@@ -159,6 +158,13 @@ pub struct Menu {
     pub pin_ui: PinUi,
     pub scope_ui: ScopeUi,
     pub reset_armed: Option<Instant>,
+
+    /// The Microsoft 365 account, while one is signed in and switched on.
+    pub(crate) m365: Option<Arc<crate::m365::Session>>,
+    pub(crate) m365_ui: crate::m365::page::M365Ui,
+    pub(crate) calendar: crate::m365::panel::Calendar,
+    /// Whether the Teams app takes msteams: links, so chats and meetings open in it.
+    pub(crate) teams_installed: bool,
 
     /// Not running for pictures and tests.
     pub(crate) updater: Option<crate::update::Updater>,
@@ -223,8 +229,8 @@ impl Menu {
 
         let index_params = index_params_of(&cfg);
         let index = IndexManager::start(index_params.clone());
-        let files = FileSearch::start(index.index.clone(), ctx.clone());
         let apps = crate::apps::start(ctx.clone());
+        let providers = Providers::start(apps.clone(), index.index.clone(), ctx.clone());
         let icons = IconCache::new(ctx.clone());
         let settings = Settings::start(ctx.clone());
         let recent: Arc<Mutex<Vec<(String, String, u32)>>> = Arc::default();
@@ -250,7 +256,7 @@ impl Menu {
             apps_seen: 0,
             index,
             index_params,
-            files,
+            providers,
             icons,
             settings,
             recent,
@@ -258,14 +264,10 @@ impl Menu {
             query: String::new(),
             tokens: Vec::new(),
             subject: Vec::new(),
-            settings_lead: false,
-            fast_rows: Vec::new(),
-            file_hits: Vec::new(),
             file_filter: FileFilter::default(),
             facets: Facets::default(),
             file_micros: None,
             fast_micros: 0,
-            waiting_generation: 0,
             rows: Vec::new(),
             best_at: None,
             search_error: None,
@@ -290,6 +292,10 @@ impl Menu {
             pin_ui: PinUi::default(),
             scope_ui: ScopeUi::default(),
             reset_armed: None,
+            m365: None,
+            m365_ui: crate::m365::page::M365Ui::default(),
+            calendar: crate::m365::panel::Calendar::default(),
+            teams_installed: crate::m365::teams_installed(),
             updater: None,
             auto_update: Arc::new(AtomicBool::new(true)),
             update_requested: false,
@@ -319,9 +325,32 @@ impl Menu {
             menu.scope_ui.open_home(&ctx);
             menu.pin_ui = PinUi::with_first_selected();
         }
+        // Only ever for pictures: a made-up account that never signs in or sends anything.
+        if menu.options.demo_m365 && menu.is_shot() {
+            menu.cfg.m365 = true;
+            menu.cfg.m365_calendar = true;
+            menu.cfg.m365_people = true;
+            if !crate::m365::available(&menu.cfg) {
+                menu.cfg.m365_client_id = "00000000-0000-0000-0000-000000000001".into();
+            }
+            menu.cfg.m365_account_id = "demo".into();
+            menu.calendar.demo();
+            let me = crate::m365::graph::Me { id: "demo".into(), name: "Alex Wilber".into(), mail: "alex@contoso.com".into() }; // i18n-ignore: an example account for pictures
+            menu.m365_ui.show_demo(me);
+            menu.shared.set_placement(styles::placement_of(&menu.cfg, menu.system_look, false));
+        }
         if let Some(query) = menu.options.query.clone() {
             menu.query = query;
             menu.query_changed();
+            if menu.options.demo_m365 && menu.is_shot() {
+                let person = |name: &str, title: &str, upn: &str| crate::m365::graph::Person { name: name.into(), title: title.into(), mail: upn.into(), upn: upn.into() };
+                let people = vec![
+                    person(&format!("{} Martin", menu.query.trim()), "Product Manager", "alex.martin@contoso.com"), // i18n-ignore: example people for pictures
+                    person(&format!("{} Rivera", menu.query.trim()), "Designer", "sam.rivera@contoso.com"), // i18n-ignore: example people for pictures
+                ];
+                menu.providers.people.show(crate::providers::people_rows(people));
+                menu.assemble_rows();
+            }
         }
         menu
     }
@@ -355,19 +384,47 @@ impl Menu {
         self.nav_by_keys = false;
         if self.query.trim().is_empty() {
             self.subject.clear();
-            self.settings_lead = false;
             self.file_filter = FileFilter::default();
             self.facets = Facets::default();
-            self.fast_rows.clear();
-            self.file_hits.clear();
             self.file_micros = None;
-            self.waiting_generation = self.files.request("", &FileFilter::default(), 0);
+            for provider in self.providers.each_mut() {
+                provider.clear();
+            }
             self.rows.clear();
+            self.best_at = None;
             return;
         }
-        self.rebuild_fast_rows();
+        self.ask_providers(None);
+    }
+
+    /// Tells the providers about the search, every one of them or only those of one kind, and lists what they have.
+    fn ask_providers(&mut self, only: Option<Category>) {
+        let started = Instant::now();
         let filter = FileFilter { regex: self.regex_on(), ..self.file_filter.clone() };
-        self.waiting_generation = self.files.request(&self.query, &filter, self.cfg.max_files.max(1));
+        let ask = Ask { query: &self.query, tokens: &self.tokens, cfg: &self.cfg, policy: &self.policy, filter: &filter, m365: self.m365.as_ref() };
+        for provider in self.providers.each_mut() {
+            if only.is_none_or(|kind| provider.category() == kind) {
+                provider.ask(&ask);
+            }
+        }
+        self.subject = self.providers.settings.subject.clone();
+        self.fast_micros = started.elapsed().as_micros() as u64;
+        self.assemble_rows();
+    }
+
+    /// Answers that came in the background, from files and Microsoft 365.
+    fn poll_providers(&mut self) {
+        let mut changed = false;
+        for provider in self.providers.each_mut() {
+            changed |= provider.poll();
+        }
+        if changed {
+            let files = &self.providers.files;
+            self.facets = files.facets.clone();
+            self.file_micros = files.micros;
+            self.search_error = files.error.clone();
+            self.assemble_rows();
+        }
     }
 
     /// File types typed into the search itself: ".pdf", "*.pdf", "ext:pdf".
@@ -445,58 +502,26 @@ impl Menu {
         }
     }
 
-    fn rebuild_fast_rows(&mut self) {
-        let started = Instant::now();
-        let mut rows = {
-            let apps = self.apps.read().unwrap();
-            search::app_rows(&apps, &self.cfg, &self.tokens)
-        };
-        let mut settings = search::setting_rows(&self.tokens);
-        let (changes, pages) = (self.cfg.search_windows_settings, self.cfg.search_settings_pages);
-        settings.rows.retain(|row| {
-            self.policy.allows_row(&row.kind)
-                && match &row.kind {
-                    RowKind::Quick(..) => changes,
-                    RowKind::Run(actions::Do::Open(_)) => pages,
-                    _ => true,
-                }
-        });
-        settings.rows.truncate(self.cfg.max_settings.max(1));
-        rows.extend(settings.rows);
-        self.subject = settings.subject;
-        self.settings_lead = settings.lead;
-        self.fast_rows = rows;
-        self.fast_micros = started.elapsed().as_micros() as u64;
-        self.assemble_rows();
-    }
-
-    fn assemble_rows(&mut self) {
-        let file_rows = search::file_rows(&self.file_hits, &self.cfg);
+    pub(crate) fn assemble_rows(&mut self) {
         let direct = search::direct_row(&self.query);
-        let web = search::web_row(&self.query, &self.cfg);
-        let mut rows: Vec<Row> = Vec::with_capacity(self.fast_rows.len() + file_rows.len() + 2);
+        let mut rows: Vec<Row> = Vec::new();
         self.best_at = None;
         rows.extend(direct);
         // A file type filter means the person is after files: nothing else belongs in the list.
         if self.filtering() {
             if self.cfg.shows(Category::Files) {
-                rows.extend(file_rows);
+                rows.extend(self.providers.files.rows(&self.cfg));
             }
             self.rows = rows;
             return;
         }
-        let lead = self.settings_lead && self.cfg.shows(Category::Settings);
-        let mut order: Vec<Category> = if lead { vec![Category::Settings] } else { Vec::new() };
-        order.extend(self.cfg.results.iter().filter(|r| r.on).map(|r| r.kind).filter(|k| !(lead && *k == Category::Settings)));
+        // A provider the search is plainly about goes first, then the rest in the order the person chose.
+        let lead = self.providers.each().into_iter().find(|p| p.leads() && self.cfg.shows(p.category())).map(|p| p.category());
+        let mut order: Vec<Category> = lead.into_iter().collect();
+        order.extend(self.cfg.results.iter().filter(|r| r.on).map(|r| r.kind).filter(|k| Some(*k) != lead));
         let mut listed: Vec<Row> = Vec::new();
         for &category in &order {
-            match category {
-                Category::Apps | Category::Settings => {
-                    listed.extend(self.fast_rows.iter().filter(|r| r.category == category).cloned());
-                }
-                Category::Files => listed.extend(file_rows.iter().cloned()),
-                Category::Web => listed.extend(web.iter().cloned()),
-            }
+            listed.extend(self.providers.of(category).rows(&self.cfg));
         }
         // The one result whose name fits best goes first, whatever its kind, and isn't listed again below.
         if self.cfg.best_match && !self.regex_on() {
@@ -540,6 +565,10 @@ impl Menu {
                 let _ = platform::copy_text(&text);
             }
             Intent::TogglePin { name, target } => self.cfg.toggle_pin(&name, &target),
+            Intent::Link(url) => {
+                platform::open_async("", url, String::new());
+                self.close_for_launch();
+            }
             Intent::Web(words) => {
                 let address = search::web_address(&self.cfg, &words);
                 if self.cfg.web_fixed {
@@ -725,7 +754,7 @@ impl Menu {
                 self.shared.take_start.store(self.cfg.take_over_start, Ordering::Relaxed);
                 self.shared.take_search.store(self.cfg.take_over_search, Ordering::Relaxed);
                 if !self.query.trim().is_empty() {
-                    self.rebuild_fast_rows();
+                    self.ask_providers(None);
                 }
             }
         }
@@ -765,6 +794,7 @@ impl Menu {
         self.popup = None;
         self.confirm = None;
         self.focus_search = true;
+        self.calendar.opened();
         self.settings.refresh();
         self.refresh_recent();
     }
@@ -1101,6 +1131,8 @@ impl Row {
             RowKind::Run(what) => format!("{what:?}"),
             RowKind::Quick(id, _) => format!("{id:?}"),
             RowKind::Web(url) => url.clone(),
+            RowKind::Person(person) => format!("person:{}", person.upn),
+            RowKind::Link(url) => url.clone(),
         }
     }
 }
@@ -1127,18 +1159,11 @@ impl eframe::App for Menu {
         if apps_now != self.apps_seen {
             self.apps_seen = apps_now;
             if !self.query.trim().is_empty() {
-                self.rebuild_fast_rows();
+                self.ask_providers(Some(Category::Apps));
             }
         }
-        if let Some(answer) = self.files.take_answer() {
-            if answer.generation == self.waiting_generation {
-                self.file_hits = answer.hits;
-                self.facets = answer.facets;
-                self.file_micros = Some(answer.micros);
-                self.search_error = answer.error;
-                self.assemble_rows();
-            }
-        }
+        self.keep_m365(ctx);
+        self.poll_providers();
         let picked = self.picked.lock().unwrap().take();
         match picked {
             Some(Picked::SearchFolder(path)) => self.add_search_place(path),

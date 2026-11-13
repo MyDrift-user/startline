@@ -807,6 +807,25 @@ pub fn recycle(path: String) {
     });
 }
 
+/// A text value from the Registry, with %ProgramFiles% and the like filled in.
+pub fn reg_text(root: windows::Win32::System::Registry::HKEY, key: &str, name: &str) -> Option<String> {
+    use windows::Win32::System::Registry::{RRF_RT_REG_EXPAND_SZ, RRF_RT_REG_SZ, RegGetValueW};
+    let (key_w, name_w) = (wide(key), wide(name));
+    let flags = RRF_RT_REG_SZ | RRF_RT_REG_EXPAND_SZ;
+    let mut size = 0u32;
+    unsafe { RegGetValueW(root, PCWSTR(key_w.as_ptr()), PCWSTR(name_w.as_ptr()), flags, None, None, Some(&mut size)) }.ok().ok()?;
+    let mut buffer = vec![0u16; (size as usize).div_ceil(2) + 1];
+    unsafe { RegGetValueW(root, PCWSTR(key_w.as_ptr()), PCWSTR(name_w.as_ptr()), flags, None, Some(buffer.as_mut_ptr() as *mut c_void), Some(&mut size)) }.ok().ok()?;
+    let len = buffer.iter().position(|&c| c == 0).unwrap_or(buffer.len());
+    Some(String::from_utf16_lossy(&buffer[..len]))
+}
+
+/// The window with this title, if there is one.
+pub fn window_by_title(title: &str) -> Option<isize> {
+    let title_w = wide(title);
+    unsafe { FindWindowW(PCWSTR::null(), PCWSTR(title_w.as_ptr())) }.ok().map(|w| w.0 as isize)
+}
+
 /// Opens the native picker for a folder or a file, in front of `owner`. Blocks, so call it
 /// from a helper thread.
 pub fn pick_path(owner: isize, folder: bool) -> Option<String> {

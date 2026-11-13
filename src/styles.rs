@@ -203,11 +203,13 @@ pub fn placement_of(cfg: &Config, system: SystemLook, in_settings: bool) -> Plac
         return Placement { h: HAnchor::Center, v: VAnchor::Middle, width: SETTINGS_SIZE[0], height: SETTINGS_SIZE[1], margin: 0.0, on_top: false };
     }
     let flush = |width, height| Placement { h: HAnchor::FollowStart, v: VAnchor::Bottom, width, height, margin: 0.0, on_top: true };
+    // The calendar panel makes the menu wider, only while it's switched on.
+    let panel = if crate::m365::panel_shown(cfg) { crate::m365::PANEL_WIDTH } else { 0.0 };
     match cfg.experience {
         Experience::Windows11 => Placement {
             h: if system.taskbar_left { HAnchor::Left } else { HAnchor::Center },
             v: VAnchor::Bottom,
-            width: 660.0,
+            width: 660.0 + panel,
             height: 720.0,
             margin: 12.0,
             on_top: true,
@@ -215,7 +217,7 @@ pub fn placement_of(cfg: &Config, system: SystemLook, in_settings: bool) -> Plac
         Experience::Windows10 => flush(660.0, 640.0),
         Experience::Windows7 => flush(430.0, 560.0),
         Experience::WindowsXp => flush(420.0, 540.0),
-        Experience::Startline => Placement { h: cfg.h_anchor, v: cfg.v_anchor, width: cfg.width, height: cfg.height, margin: cfg.margin, on_top: true },
+        Experience::Startline => Placement { h: cfg.h_anchor, v: cfg.v_anchor, width: cfg.width + panel, height: cfg.height, margin: cfg.margin, on_top: true },
     }
 }
 

@@ -78,7 +78,6 @@ pub const T: &[(&str, &str)] = &[
     ("Files and folders Windows marks as part of the system, such as desktop.ini. Disabled finds them.", "File e cartelle che Windows contrassegna come parte del sistema, ad esempio desktop.ini. Disabilitato li trova."),
     // policy.rs: results
     ("Kinds of results", "Tipi di risultati"),
-    ("One per line, first to last: Apps, Settings, Files, Web. A kind left out is never shown.", "Uno per riga, dal primo all'ultimo: Apps, Settings, Files, Web. Un tipo non indicato non viene mai mostrato."),
     ("Most apps shown in the results", "Numero massimo di app nei risultati"),
     ("Most settings shown in the results", "Numero massimo di impostazioni nei risultati"),
     ("Most files shown in the results", "Numero massimo di file nei risultati"),
@@ -144,4 +143,12 @@ pub const T: &[(&str, &str)] = &[
     ("Enabled, web searches open the web search address. Disabled or not set, they go to the default browser and the search engine set up there.", "Attivato, le ricerche web aprono l'indirizzo della ricerca web. Disattivato o non configurato, vanno al browser predefinito e al motore di ricerca impostato lì."),
     ("Shown as: Search <name> for ..., when the web search address is used.", "Mostrato come: Search <name> for ..., quando si usa l'indirizzo della ricerca web."),
     ("Used when SearchWebUseAddress is enabled, and when the default browser isn't one Startline knows how to ask. Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.", "Usato quando SearchWebUseAddress è attivato e quando Startline non sa come interpellare il browser predefinito. Deve iniziare con http:// o https:// e contenere {} dove vanno le parole. Qualsiasi altro valore viene ignorato."),
+    ("Microsoft 365 account", "Account Microsoft 365"),
+    ("Lets people sign in with a work or school account, for their calendar and to find people and mail. Disabled, no one can sign in and Startline never contacts Microsoft. Off unless set.", "Consente di accedere con un account aziendale o dell'istituto, per il calendario e per trovare persone e posta. Disattivato, nessuno può accedere e Startline non contatta mai Microsoft. Disattivato se non configurato."),
+    ("Today's calendar in a panel beside the menu, in the Windows 11 and Startline looks. Asks for Calendars.ReadWrite. Off unless set.", "Il calendario di oggi in un pannello accanto al menu, negli aspetti Windows 11 e Startline. Richiede Calendars.ReadWrite. Disattivato se non configurato."),
+    ("Colleagues in search, to chat with in Teams, call or mail. Asks for User.ReadBasic.All. Off unless set.", "Colleghi nella ricerca, per chattare in Teams, chiamarli o scrivere loro. Richiede User.ReadBasic.All. Disattivato se non configurato."),
+    ("The person's mail in search, by subject. Asks for Mail.ReadBasic. Off unless set.", "La posta della persona nella ricerca, per oggetto. Richiede Mail.ReadBasic. Disattivato se non configurato."),
+    ("The application (client) ID of the organization's own app registration, used instead of the one built into Startline. Must be a GUID; anything else is ignored.", "L'ID applicazione (client) della registrazione dell'app dell'organizzazione, usato al posto di quello integrato in Startline. Deve essere un GUID; qualsiasi altro valore viene ignorato."),
+    ("The tenant ID or domain, such as contoso.onmicrosoft.com. Only accounts of this tenant can sign in. Not set, any work or school account can.", "L'ID o un dominio del tenant, ad esempio contoso.onmicrosoft.com. Solo gli account di questo tenant possono accedere. Se non configurato, può farlo qualsiasi account aziendale o dell'istituto."),
+    ("One per line, first to last: Apps, Settings, Files, People, Mail, Web. A kind left out is never shown. People and Mail also need their Microsoft 365 policies.", "Uno per riga, dal primo all'ultimo: Apps, Settings, Files, People, Mail, Web. Un tipo non indicato non viene mai mostrato. People e Mail richiedono anche i loro criteri di Microsoft 365."),
 ];

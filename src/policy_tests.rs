@@ -16,7 +16,11 @@ fn forced(policy: &Policy) -> Option<Value> {
         Kind::Bool => Some(json!(if matches!(policy.field, "/regex_search" | "/mica" | "/seen_welcome" | "/compact_rows") { 1 } else { 0 })),
         Kind::Number { min, max, .. } => Some(json!(if *min + 1 <= *max { *min + 1 } else { *min })),
         Kind::Choice(items) => Some(json!(items.last().unwrap().0)),
-        Kind::Text(_) => Some(json!("https://example.com/?q={}")),
+        Kind::Text(_) => Some(json!(match policy.field {
+            "/m365_client_id" => "11111111-2222-3333-4444-555555555555",
+            "/m365_tenant" => "contoso.onmicrosoft.com",
+            _ => "https://example.com/?q={}",
+        })),
         Kind::Color(_) => Some(json!("#010203")),
         Kind::List | Kind::AddList => Some(json!(match policy.field {
             "/sections" => vec!["Recent"],
@@ -230,7 +234,7 @@ fn lists_keep_their_meaning() {
     assert_eq!((cfg.sections[0].kind, cfg.sections[0].visible), (SectionKind::Recent, true));
     assert_eq!((cfg.sections[2].kind, cfg.sections[2].visible), (SectionKind::Frequent, false));
     assert_eq!(cfg.results[0], ResultKind { kind: Category::Files, on: true });
-    assert_eq!(cfg.results.len(), 4);
+    assert_eq!(cfg.results.len(), Category::ALL.len(), "every kind is there, those left out switched off");
     assert!(!cfg.shows(Category::Web), "a kind left out is never shown");
     assert_eq!(cfg.groups.len(), 1);
     assert_eq!(cfg.groups[0].pins.len(), 2);

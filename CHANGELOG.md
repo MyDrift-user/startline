@@ -7,6 +7,13 @@ What changed for people using Startline, compared with the version before. A rel
 - A Best match at the top of the results: the one result whose name fits what you typed best, whatever its kind, so typing a folder's name and pressing Enter opens that folder. It can be turned off, also by policy
 - Web searches open your default browser with the search engine you set up there, instead of a fixed address. A fixed address is still there as a setting and a policy
 - Newly installed apps show up in the list and in search within seconds, and uninstalled ones go, Store apps included, without restarting Startline
+- Microsoft 365, optional and off until you turn it on: sign in with a work or school account on the new Microsoft 365 page of Settings, through Windows's own account sign-in
+- Today's calendar beside the menu in the Windows 11 and Startline looks: a timeline with the time now, all-day events on top, the day before and after, Join for online meetings, Accept, Tentative and Decline for invitations, and new events. It shows the last copy at once and while offline
+- People in search: colleagues from your organization, with Enter starting a Teams chat and buttons to call or mail them
+- Mail in search, by subject, opening the message in Outlook on the web
+- Startline asks Microsoft only for what's switched on, talks to nothing but Microsoft's sign-in and Graph, and signing out forgets the account, its tokens and the cached calendar
+- Where an organization doesn't let people approve apps themselves, Startline says so and copies the approval link for the administrator. Organizations can switch the account and each part on or off by policy
+- An organization's own app registration and tenant can be given by Group Policy, when installing (M365CLIENTID and M365TENANTID for the MSI and setup.exe, kept by upgrades), or when building; Settings says which one is in use
 
 ## 0.0.1
 

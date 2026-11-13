@@ -89,7 +89,7 @@ The search policies are under Startline > Search, in four parts:
                     expressions. Fixed, the lists add to what people leave out themselves: they see your items with a
                     lock and can't remove them, but can still add their own.
   Results           which kinds of results show, in what order and how many of each (SearchResults: Apps, Settings,
-                    Files, Web, one per line; a kind left out is never shown), the Best match at the top
+                    Files, People, Mail, Web, one per line; a kind left out is never shown), the Best match at the top
                     (SearchBestMatch), and how they look.
   Search box        regular expression mode, and which parts of the search box and results show.
 Web searches go to the default browser and the search engine set up there, so Startline picks no engine. To send them
@@ -107,6 +107,40 @@ What people can type in the search box: words (all of them have to be in the nam
 "exact text", wildcards (*.pdf, img_??.png), -word to leave out, ext:pdf,docx, kind:folder, document, picture, video,
 music, archive, code or app, size:>10mb, size:<1k, size:1mb..1gb, modified:today, yesterday, week, month, year, 2025,
 2025-03, >2026-01-01 or <2026-01-01 (date: the same), and regular expressions with re:pattern or /pattern/.
+
+
+MICROSOFT 365
+People can sign in with a work or school account for a calendar beside the menu and for people and mail in search.
+All of it is off until someone turns it on, and each part has its own policy under Startline > Microsoft 365:
+  M365Account     the account itself. Disabled, no one can sign in and Startline never contacts Microsoft.
+  M365Calendar    today's calendar beside the menu (Windows 11 and Startline looks), asks for Calendars.ReadWrite.
+  M365People      colleagues in search, to chat with in Teams, call or mail, asks for User.ReadBasic.All.
+  M365Mail        the person's mail in search, by subject, asks for Mail.ReadBasic.
+Startline always asks for User.Read, and otherwise only for what is switched on. It signs in through Windows's account
+broker, so Windows keeps the tokens and Startline only the account's id; where the broker isn't there, through the
+browser, with the refresh token encrypted for the Windows account. It talks to Microsoft's sign-in and to Microsoft
+Graph and nowhere else, and sends no telemetry. Signing out deletes the account's id, its tokens and the cached calendar.
+
+Approving Startline. Where people may not agree to apps themselves, they see a message with a link to send you. As a
+Global or Application Administrator, open
+    https://login.microsoftonline.com/<your tenant>/adminconsent?client_id=<client ID>
+and approve the permissions for the organization. Or approve Startline under Enterprise applications in the Entra
+admin center.
+
+Your own app registration. To use your own instead of the one built into Startline, register a single-tenant public
+client in Entra ID: platform Mobile and desktop applications, with the redirect URIs http://localhost and
+ms-appx-web://Microsoft.AAD.BrokerPlugin/<client ID>, "Allow public client flows" on, and the delegated Microsoft Graph
+permissions User.Read, User.ReadBasic.All, Calendars.ReadWrite and Mail.ReadBasic. Then give Startline its application
+(client) ID, and your tenant's ID or domain so that only your accounts can sign in, in any of three ways. Where more
+than one is set, Group Policy wins, then the installer, then the build:
+  Group Policy    M365ClientId and M365TenantId.
+  The installer   msiexec /i <msi> M365CLIENTID=<client ID> M365TENANTID=<tenant>, or setup.exe /M365CLIENTID=<client ID>
+                  /M365TENANTID=<tenant>. Written to HKLM\Software\Startline for this PC or HKCU\Software\Startline for
+                  one account, kept by upgrades that don't give them again, removed on uninstall.
+  The build       STARTLINE_M365_CLIENT_ID and STARTLINE_M365_TENANT_ID when building, or
+                  installer\windows\package.ps1 -M365ClientId <client ID> -M365TenantId <tenant>.
+Settings shows which one is in use; startline.exe --m365-source prints it. With none of them set, Microsoft 365 shows
+as not available.
 
 EVERY VALUE
 ===========
@@ -307,7 +341,7 @@ SEARCH: RESULTS
 SearchResults
     Kinds of results
     list: REG_DWORD 1, its items in a subkey of the same name
-    One per line, first to last: Apps, Settings, Files, Web. A kind left out is never shown.
+    One per line, first to last: Apps, Settings, Files, People, Mail, Web. A kind left out is never shown. People and Mail also need their Microsoft 365 policies.
 SearchMaxApps
     Most apps shown in the results
     REG_DWORD, 1 to 30
@@ -393,6 +427,33 @@ SkipWelcome
     Skip the welcome note
     REG_DWORD, 1 on, 0 off
     Enabled hides the note shown on the first run.
+
+MICROSOFT 365
+-------------
+M365Account
+    Microsoft 365 account
+    REG_DWORD, 1 on, 0 off
+    Lets people sign in with a work or school account, for their calendar and to find people and mail. Disabled, no one can sign in and Startline never contacts Microsoft. Off unless set.
+M365Calendar
+    Calendar beside the menu
+    REG_DWORD, 1 on, 0 off
+    Today's calendar in a panel beside the menu, in the Windows 11 and Startline looks. Asks for Calendars.ReadWrite. Off unless set.
+M365People
+    People in search
+    REG_DWORD, 1 on, 0 off
+    Colleagues in search, to chat with in Teams, call or mail. Asks for User.ReadBasic.All. Off unless set.
+M365Mail
+    Mail in search
+    REG_DWORD, 1 on, 0 off
+    The person's mail in search, by subject. Asks for Mail.ReadBasic. Off unless set.
+M365ClientId
+    App registration (client ID)
+    REG_SZ
+    The application (client) ID of the organization's own app registration, used instead of the one built into Startline. Must be a GUID; anything else is ignored.
+M365TenantId
+    Tenant
+    REG_SZ
+    The tenant ID or domain, such as contoso.onmicrosoft.com. Only accounts of this tenant can sign in. Not set, any work or school account can.
 
 UPDATES
 -------

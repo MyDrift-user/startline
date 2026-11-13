@@ -1,4 +1,5 @@
 ; Built by installer\windows\package.ps1: ISCC /DAppVersion=x.y.z /DOutputName=name installer\windows\setup.iss
+; Silent: setup.exe /VERYSILENT /ALLUSERS (or /CURRENTUSER) [/M365CLIENTID=<client ID>] [/M365TENANTID=<tenant>]
 [Setup]
 AppId={{4E1D8B7A-2C55-4F3B-A9D6-7B0E3C915F28}
 AppName=Startline
@@ -35,6 +36,14 @@ Source: "..\..\target\release\startline.exe"; DestDir: "{app}"; Flags: ignorever
 Source: "..\..\LICENSE"; DestDir: "{app}"; DestName: "LICENSE.txt"; Flags: ignoreversion
 Source: "machine-install.txt"; DestDir: "{app}"; Flags: ignoreversion; Check: IsAdminInstallMode
 
+[Registry]
+; The Microsoft 365 app registration and tenant, from /M365CLIENTID= and /M365TENANTID=, in Startline's own key: HKLM for
+; this PC, HKCU for one account, which src/m365.rs reads after Group Policy and before what's built in. An install that
+; doesn't give them leaves the ones already there alone, so an upgrade keeps them; uninstalling removes them, as the
+; uninstall log of the install that wrote them stays with the ones that came after.
+Root: HKA; Subkey: "Software\Startline"; ValueType: string; ValueName: "M365ClientId"; ValueData: "{param:M365CLIENTID}"; Flags: uninsdeletevalue uninsdeletekeyifempty; Check: HasParam('M365CLIENTID')
+Root: HKA; Subkey: "Software\Startline"; ValueType: string; ValueName: "M365TenantId"; ValueData: "{param:M365TENANTID}"; Flags: uninsdeletevalue uninsdeletekeyifempty; Check: HasParam('M365TENANTID')
+
 [Icons]
 Name: "{autoprograms}\Startline"; Filename: "{app}\startline.exe"
 
@@ -51,6 +60,12 @@ Filename: "{sys}\schtasks.exe"; Parameters: "/Delete /F /TN ""Startline Updater"
 Type: filesandordirs; Name: "{app}\updates"
 
 [Code]
+// Whether the command line gives /Name=value.
+function HasParam(Name: String): Boolean;
+begin
+  Result := ExpandConstant('{param:' + Name + '|}') <> '';
+end;
+
 // For a PC-wide install: a task installs updates as SYSTEM, so nobody gets an admin prompt. See src/update.rs.
 // It runs this folder's program as SYSTEM, so only admins may change it, wherever it was installed.
 // There's no task if that can't be done. Only on the folder, as files inherit from it: with /T the same command

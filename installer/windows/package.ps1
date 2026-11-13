@@ -1,5 +1,22 @@
-# Builds the release files into dist/, from what `cargo build --release` left in target\. Needs VERSION, Inno Setup and WiX.
+# Builds the release files into dist/. Needs Inno Setup and WiX; VERSION is Cargo.toml's unless it's set.
+# Without parameters it packages what `cargo build --release` left in target\. With a Microsoft 365 app registration it
+# first builds the program with that registration (and tenant) built in, so the MSI and setup.exe come ready to use:
+#     installer\windows\package.ps1 -M365ClientId <application (client) ID> [-M365TenantId <tenant ID or domain>]
+# Both are optional and never written into the source; see the admins' part of the README.
+param(
+  [string]$M365ClientId = '',
+  [string]$M365TenantId = ''
+)
 $ErrorActionPreference = 'Stop'
+if (-not $env:VERSION) { $env:VERSION = (Select-String -Path Cargo.toml -Pattern '^version = "(.*)"' | Select-Object -First 1).Matches.Groups[1].Value }
+if ($M365ClientId -or $M365TenantId) {
+  if ($M365ClientId -and $M365ClientId -notmatch '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$') { throw "-M365ClientId has to be the app registration's application (client) ID, such as 00000000-0000-0000-0000-000000000000" }
+  if ($M365TenantId -and $M365TenantId -notmatch '^[A-Za-z0-9.-]+$') { throw "-M365TenantId has to be a tenant ID or a domain, such as contoso.onmicrosoft.com" }
+  $env:STARTLINE_M365_CLIENT_ID = $M365ClientId
+  $env:STARTLINE_M365_TENANT_ID = $M365TenantId
+  cargo build --release --locked
+  if ($LASTEXITCODE) { throw "cargo build failed" }
+}
 $base = "startline-v$env:VERSION-windows-x64"
 New-Item -ItemType Directory -Force dist | Out-Null
 & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /Q "/DAppVersion=$env:VERSION" "/DOutputName=$base-setup" installer\windows\setup.iss

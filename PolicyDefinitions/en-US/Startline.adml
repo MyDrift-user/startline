@@ -16,6 +16,7 @@
       <string id="Cat_SearchResults">Results</string>
       <string id="Cat_SearchBox">Search box</string>
       <string id="Cat_General">General</string>
+      <string id="Cat_Microsoft365">Microsoft 365</string>
       <string id="Cat_Updates">Updates</string>
       <string id="Cat_Limits">What people can do</string>
       <string id="P_Experience">Look</string>
@@ -304,10 +305,10 @@ Enabled turns this on and Disabled turns it off, and people can't change it. Not
 
 A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_SearchResults">Kinds of results</string>
-      <string id="E_SearchResults">One per line, first to last: Apps, Settings, Files, Web. A kind left out is never shown.
+      <string id="E_SearchResults">One per line, first to last: Apps, Settings, Files, People, Mail, Web. A kind left out is never shown. People and Mail also need their Microsoft 365 policies.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
-      <string id="R_SearchResults">One per line, first to last: Apps, Settings, Files, Web. A kind left out is never shown.
+      <string id="R_SearchResults">One per line, first to last: Apps, Settings, Files, People, Mail, Web. A kind left out is never shown. People and Mail also need their Microsoft 365 policies.
 
 A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchMaxApps">Most apps shown in the results</string>
@@ -430,6 +431,48 @@ Enabled turns this on and Disabled turns it off, and people can't change it. Not
       <string id="R_SkipWelcome">Enabled hides the note shown on the first run.
 
 A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_M365Account">Microsoft 365 account</string>
+      <string id="E_M365Account">Lets people sign in with a work or school account, for their calendar and to find people and mail. Disabled, no one can sign in and Startline never contacts Microsoft. Off unless set.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_M365Account">Lets people sign in with a work or school account, for their calendar and to find people and mail. Disabled, no one can sign in and Startline never contacts Microsoft. Off unless set.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_M365Calendar">Calendar beside the menu</string>
+      <string id="E_M365Calendar">Today's calendar in a panel beside the menu, in the Windows 11 and Startline looks. Asks for Calendars.ReadWrite. Off unless set.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_M365Calendar">Today's calendar in a panel beside the menu, in the Windows 11 and Startline looks. Asks for Calendars.ReadWrite. Off unless set.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_M365People">People in search</string>
+      <string id="E_M365People">Colleagues in search, to chat with in Teams, call or mail. Asks for User.ReadBasic.All. Off unless set.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_M365People">Colleagues in search, to chat with in Teams, call or mail. Asks for User.ReadBasic.All. Off unless set.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_M365Mail">Mail in search</string>
+      <string id="E_M365Mail">The person's mail in search, by subject. Asks for Mail.ReadBasic. Off unless set.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_M365Mail">The person's mail in search, by subject. Asks for Mail.ReadBasic. Off unless set.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_M365ClientId">App registration (client ID)</string>
+      <string id="E_M365ClientId">The application (client) ID of the organization's own app registration, used instead of the one built into Startline. Must be a GUID; anything else is ignored.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_M365ClientId">The application (client) ID of the organization's own app registration, used instead of the one built into Startline. Must be a GUID; anything else is ignored.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
+      <string id="P_M365TenantId">Tenant</string>
+      <string id="E_M365TenantId">The tenant ID or domain, such as contoso.onmicrosoft.com. Only accounts of this tenant can sign in. Not set, any work or school account can.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_M365TenantId">The tenant ID or domain, such as contoso.onmicrosoft.com. Only accounts of this tenant can sign in. Not set, any work or school account can.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_AutomaticUpdates">Install updates automatically</string>
       <string id="E_AutomaticUpdates">Startline installs new versions by itself, restarting while its menu is closed. On an install for the whole PC, the Startline Updater task installs them as SYSTEM within the hour. Disabled leaves updates to the person, or on an install for the whole PC, to the administrator.
 
@@ -615,6 +658,18 @@ Enabled applies the ticks below. Disabled or Not configured allows everything.</
         <textBox refId="Value">
           <label>Web search address:</label>
           <defaultValue>https://duckduckgo.com/?q={}</defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_M365ClientId">
+        <textBox refId="Value">
+          <label>App registration (client ID):</label>
+          <defaultValue></defaultValue>
+        </textBox>
+      </presentation>
+      <presentation id="P_M365TenantId">
+        <textBox refId="Value">
+          <label>Tenant:</label>
+          <defaultValue></defaultValue>
         </textBox>
       </presentation>
       <presentation id="P_SearchWindowsSettings">

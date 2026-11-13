@@ -109,7 +109,7 @@ pub struct PinGroup {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Debug)]
-pub enum Category { Apps, Settings, Files, Web }
+pub enum Category { Apps, Settings, Files, Web, People, Mail }
 
 /// One kind of search result, and whether it's shown.
 #[derive(Clone, Copy, PartialEq, Serialize, Deserialize, Debug)]
@@ -119,7 +119,7 @@ pub struct ResultKind {
 }
 
 impl Category {
-    pub const ALL: [Category; 4] = [Category::Apps, Category::Settings, Category::Files, Category::Web];
+    pub const ALL: [Category; 6] = [Category::Apps, Category::Settings, Category::Files, Category::People, Category::Mail, Category::Web];
 
     pub fn from_name(name: &str) -> Option<Category> {
         Category::ALL.into_iter().find(|c| format!("{c:?}").eq_ignore_ascii_case(name.trim()))
@@ -131,6 +131,8 @@ impl Category {
             Category::Settings => tr("Settings"),
             Category::Files => tr("Files and folders"),
             Category::Web => tr("Web"),
+            Category::People => tr("People"),
+            Category::Mail => tr("Mail"),
         }
     }
 }
@@ -227,6 +229,21 @@ pub struct Config {
     pub web_fixed: bool,
     pub web_name: String,
     pub web_url: String,
+
+    // Microsoft 365: an optional work or school account, off until the person or an administrator turns it on.
+    pub m365: bool,
+    /// Today's calendar in a panel beside the menu.
+    pub m365_calendar: bool,
+    /// Colleagues in search, to chat with, call or mail.
+    pub m365_people: bool,
+    /// Mail in search, by subject.
+    pub m365_mail: bool,
+    /// An organization's own app registration; empty uses the one built in.
+    pub m365_client_id: String,
+    /// Only accounts of this tenant may sign in; empty lets any work or school account.
+    pub m365_tenant: String,
+    /// The signed-in account, as Windows or Microsoft names it. Nothing else of the sign-in is kept here.
+    pub m365_account_id: String,
 
     // System
     pub take_over_start: bool,
@@ -325,6 +342,13 @@ impl Default for Config {
             web_fixed: false,
             web_name: tx("the web").into(),
             web_url: "https://duckduckgo.com/?q={}".into(),
+            m365: false,
+            m365_calendar: false,
+            m365_people: false,
+            m365_mail: false,
+            m365_client_id: String::new(),
+            m365_tenant: String::new(),
+            m365_account_id: String::new(),
             take_over_start: true,
             take_over_search: true,
             seen_welcome: false,
@@ -389,8 +413,12 @@ impl Config {
     }
 
     /// Bring lists up to date after an update added a new section, setting or category.
-    fn repair(&mut self) {
-        self.repair_with(&crate::platform::place_kind)
+    pub(crate) fn repair(&mut self) {
+        self.repair_with(&crate::platform::place_kind);
+        // The app registration and tenant only ever come from Group Policy, the installer or the build: one saved in
+        // the settings file by an earlier copy isn't an organization's, and isn't kept.
+        self.m365_client_id.clear();
+        self.m365_tenant.clear();
     }
 
     /// `kind_of` tells what a place sits on, without touching the disk.
@@ -424,7 +452,9 @@ impl Config {
         }
         for result in defaults.results {
             if !self.results.iter().any(|r| r.kind == result.kind) {
-                self.results.push(result);
+                // A new kind goes ahead of the web search, which is the last resort.
+                let at = self.results.iter().position(|r| r.kind == Category::Web).unwrap_or(self.results.len());
+                self.results.insert(at, result);
             }
         }
         if self.groups.is_empty() {
@@ -526,6 +556,15 @@ mod tests {
         assert!(!cfg.indexes(PlaceKind::Network) && !cfg.indexes(PlaceKind::Usb));
         let off = Config { index_local: false, auto_network: true, ..Config::default() };
         assert!(!off.indexes(PlaceKind::Ssd) && off.indexes(PlaceKind::Network) && !off.indexes(PlaceKind::Usb));
+    }
+
+    #[test]
+    fn new_kinds_of_results_come_before_the_web_search() {
+        let mut old = Config::parse(br#"{"version": 3, "results": [{"kind": "Files", "on": true}, {"kind": "Apps", "on": true}, {"kind": "Settings", "on": false}, {"kind": "Web", "on": true}]}"#).unwrap();
+        old.repair();
+        let kinds: Vec<Category> = old.results.iter().map(|r| r.kind).collect();
+        assert_eq!(kinds, [Category::Files, Category::Apps, Category::Settings, Category::People, Category::Mail, Category::Web]);
+        assert!(!old.results[2].on, "the person's own choices stay");
     }
 
     #[test]

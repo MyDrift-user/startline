@@ -54,6 +54,14 @@ impl Menu {
 
     /// The Windows 11 and Startline menus: a search bar, a scrolling middle and a footer.
     fn draw_modern(&mut self, ui: &mut Ui, full: Rect, pal: Pal) {
+        // The calendar panel takes the right of the window; the menu keeps the width it always has.
+        let full = if crate::m365::panel_shown(&self.cfg) && full.width() > crate::m365::PANEL_WIDTH + 320.0 {
+            let split = full.right() - crate::m365::PANEL_WIDTH;
+            self.draw_calendar(ui, Rect::from_min_max(pos2(split, full.top()), full.max), pal);
+            Rect::from_min_max(full.min, pos2(split, full.bottom()))
+        } else {
+            full
+        };
         let content = full.shrink(14.0);
         let search_h = if pal.style == Experience::Startline { 40.0 } else { 46.0 };
         let footer_h = 40.0;
@@ -762,6 +770,8 @@ impl Menu {
             RowKind::Open(target) => Some(Intent::Open { name: row.name.clone(), target: target.clone(), admin: false }),
             RowKind::Run(what) => Some(Intent::Run(*what)),
             RowKind::Web(url) => Some(Intent::Web(url.clone())),
+            RowKind::Person(person) => Some(Intent::Link(crate::m365::chat_link(person.teams_id(), self.teams_installed))),
+            RowKind::Link(url) => Some(Intent::Link(url.clone())),
             RowKind::Quick(..) => None,
         };
         if let Some(intent) = &intent {
@@ -788,13 +798,37 @@ impl Menu {
         self.draw_icon(ui, icon_rect, &row.icon, &row.name, pal);
 
         let text_left = rect.left() + TEXT_COLUMN;
-        let text_width = rect.right() - text_left - 8.0;
+        // A person has buttons at the end of the row: chat and call in Teams, and mail.
+        let mut text_right = rect.right() - 8.0;
+        if let RowKind::Person(person) = &row.kind {
+            let teams = self.teams_installed;
+            let mut buttons = vec![('\u{E8BD}', tr("Chat in Teams"), crate::m365::chat_link(person.teams_id(), teams)), ('\u{E717}', tr("Call in Teams"), crate::m365::call_link(person.teams_id(), teams))];
+            if !person.mail.is_empty() {
+                buttons.push(('\u{E715}', tr("Mail"), crate::m365::mail_link(&person.mail)));
+            }
+            let size = if compact { 24.0 } else { 28.0 };
+            let mut x = rect.right() - 6.0 - size * buttons.len() as f32;
+            text_right = x - 4.0;
+            for (glyph, tip, link) in buttons {
+                let area = Rect::from_min_size(pos2(x, rect.center().y - size / 2.0), vec2(size, size));
+                let pressed = ui.interact(area, id.with(glyph as u32), Sense::click()).on_hover_text(tip);
+                if pressed.hovered() {
+                    ui.painter().rect_filled(area, pal.radius.min(4), pal.hover);
+                }
+                ui.painter().text(area.center(), Align2::CENTER_CENTER, glyph, icon_font(13.0), sub_ink);
+                if pressed.clicked() {
+                    self.intents.push(Intent::Link(link));
+                }
+                x += size;
+            }
+        }
+        let text_width = text_right - text_left;
         let confirming = matches!(row.kind, RowKind::Run(what) if self.confirm.is_some_and(|(d, at)| d == what && at.elapsed() < Duration::from_secs(5)));
         let shown_name = if confirming { crate::trf!("Press again to confirm: {name}", name = row.name) } else { row.name.clone() };
         let name_color = if confirming && !lit { pal.accent } else { name_ink };
         let mark = if lit && pal.style == Experience::WindowsXp { pal.on_accent } else { pal.accent };
         // Compact rows have no second line, so a file's folder follows its name: files of the same name stay told apart.
-        let folder_after = compact && show_detail && row.path.is_some() && !row.detail.is_empty();
+        let folder_after = compact && show_detail && (row.path.is_some() || matches!(row.kind, RowKind::Person(_) | RowKind::Link(_))) && !row.detail.is_empty();
         let gap = 10.0;
         let name_room = if folder_after {
             let folder_width = ui.painter().layout_no_wrap(row.detail.clone(), FontId::proportional(12.0), sub_ink).size().x;

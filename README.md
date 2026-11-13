@@ -39,6 +39,14 @@ While Startline runs, the Start key and the Start button open it instead of the 
 ### 🎚️ Settings right in the search
 Type what you want and act on it from the result: "dark mode", "volume 40", "louder", "bluetooth off", "wlan aus". There are dozens of switches and sliders, from dark mode, Wi-Fi, Bluetooth, volume and brightness to file extensions, hidden files, the clock's seconds, Game Mode and keeping the PC awake. Nothing changes until you act on the row.
 
+### 📅 Microsoft 365, if you want it
+Off until you turn it on. Sign in with a work or school account on the **Microsoft 365** page of Settings, through Windows's own account sign-in, and switch on what you'd like:
+- **Calendar** beside the menu in the Windows 11 and Startline looks: today's timeline with the time now, all-day events on top, the day before and after, **Join** for online meetings, Accept, Tentative and Decline for invitations, and new events. The last copy shows at once and offline
+- **People** in search: colleagues from your organization, with Enter starting a Teams chat and buttons to call or mail them
+- **Mail** in search, by subject, opening in Outlook on the web
+
+Startline asks Microsoft only for what's switched on, keeps only which account it is (Windows keeps the sign-in), and talks to nothing but Microsoft's sign-in and Microsoft Graph. Signing out forgets all of it.
+
 ### 🎨 Make it yours
 - Five looks: Windows 11, Windows 10, Windows 7, Windows XP, or Startline's own, which you can place anywhere on screen
 - Presets that set a look in one go: like Windows 11 Start, Startline's own, or compact. Each setting stays yours to change afterwards
@@ -54,6 +62,24 @@ Type what you want and act on it from the result: "dark mode", "volume 40", "lou
 Every setting can be fixed, or given as a default people can change, by **Group Policy** or straight in the Registry (`Software\Policies\Startline` and its `Recommended` subkey, under HKLM or HKCU), for computers or users. ADMX templates come with ADML in English, German and Italian. Pins and their sections, the layout and size, what the menu shows, how search behaves and whether updates install by themselves can all be deployed this way, without copying `start2.bin` around. Fixed settings show greyed out with "Managed by your organization", and running copies pick up changes within a minute. [`PolicyDefinitions/README.txt`](PolicyDefinitions/README.txt) lists every value.
 
 **What it reads from disks.** Startline reads only the names, sizes and dates of files and folders, never what's in them. Out of the box it indexes the PC's own drives; network and USB drives are off. Reading runs in Windows's background mode, one folder at a time on hard disks, and waits while a full-screen app is in front and for the first ten minutes on battery. Disks in a USB enclosure count as USB drives. After the first run it trusts its saved index and Windows's change notices, and reads a drive again only when the search places change, Windows loses track, or the index is more than a day old. Network shares, when switched on, are read at most once a day while the PC is idle, at most 20 folders a second, with no watch on the server. The policies **SearchLocalDrives**, **SearchNetworkDrives** and **SearchUsbDrives** turn each kind on or off.
+
+**Microsoft 365 for admins.** The account and each part have a policy: **M365Account**, **M365Calendar**, **M365People** and **M365Mail**, all off unless set. Startline asks for the delegated Graph permissions User.Read, plus User.ReadBasic.All for people, Calendars.ReadWrite for the calendar and Mail.ReadBasic for mail, only for what's on.
+- *Approving Startline.* Where people may not approve apps themselves, Startline tells them so and copies a link for you. As an administrator, open `https://login.microsoftonline.com/<tenant>/adminconsent?client_id=<client ID>`, or approve Startline under Enterprise applications in the Entra admin center.
+- *Your own app registration.* Register a single-tenant public client in Entra ID: Mobile and desktop applications, with the redirect URIs `http://localhost` and `ms-appx-web://Microsoft.AAD.BrokerPlugin/<client ID>`, "Allow public client flows" on, and the four delegated permissions above. Give Startline its application (client) ID, and your tenant's ID or domain so only your accounts can sign in, in any of the three ways below.
+
+*Where the app registration comes from.* The ID is never in the source, and all three ways are optional. Where more than one is set, **Group Policy wins, then the installer, then the build**, for the client ID and the tenant each on its own. The Microsoft 365 page of Settings says which one is in use ("Set by your organization", "Set by the installer", "Built in"), and shows "Not available in this build" only when none is set. `startline.exe --m365-source` prints the same.
+1. **Group Policy**: **M365ClientId** and **M365TenantId**, fixed or as defaults, under Startline > Microsoft 365.
+2. **When installing**, for this PC or one account:
+   ```bat
+   msiexec /i startline-v0.0.1-windows-x64.msi /qn ALLUSERS=1 M365CLIENTID=<client ID> M365TENANTID=<tenant>
+   startline-v0.0.1-windows-x64-setup.exe /VERYSILENT /ALLUSERS /M365CLIENTID=<client ID> /M365TENANTID=<tenant>
+   ```
+   They're written to Startline's own key, `HKLM\Software\Startline` for this PC or `HKCU\Software\Startline` for one account (values `M365ClientId` and `M365TenantId`). An upgrade that doesn't give them again keeps them, and uninstalling removes them.
+3. **When building**: set `STARTLINE_M365_CLIENT_ID` and `STARTLINE_M365_TENANT_ID` before `cargo build`, or build ready installers with your own registration:
+   ```powershell
+   installer\windows\package.ps1 -M365ClientId <client ID> -M365TenantId <tenant>
+   ```
+   The release workflow builds them in from the repository variables `STARTLINE_M365_CLIENT_ID` and `STARTLINE_M365_TENANT_ID` when they're set, and without them when they're not.
 
 ## ⌨️ Keyboard
 

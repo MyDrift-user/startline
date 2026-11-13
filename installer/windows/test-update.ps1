@@ -77,9 +77,9 @@ function Remove-Msi($msi, [string[]]$properties) {
   if ($p.ExitCode) { throw "$msi didn't uninstall: $($p.ExitCode)" }
 }
 
-function Install-Setup([string[]]$switches) {
-  $p = Start-Process "$oldBase-setup.exe" -ArgumentList (@('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART') + $switches) -Wait -PassThru
-  if ($p.ExitCode) { throw "setup.exe didn't install: $($p.ExitCode)" }
+function Install-Setup([string[]]$switches, $base = $oldBase) {
+  $p = Start-Process "$base-setup.exe" -ArgumentList (@('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART') + $switches) -Wait -PassThru
+  if ($p.ExitCode) { throw "$base-setup.exe didn't install: $($p.ExitCode)" }
 }
 
 function Remove-Setup($folder) {
@@ -271,6 +271,35 @@ try {
     $global:LASTEXITCODE = 0
     if ($test.Msi) { Remove-Msi "$newBase.msi" $perUser } else { Remove-Setup $test.Folder }
     if (Test-Path $exe) { throw "$exe is still there after uninstalling" }
+  }
+
+  # The installer's Microsoft 365 app registration: given to the old version, kept by an upgrade to the new one that
+  # doesn't give it again, used by the program, and removed when the new one is uninstalled.
+  $m365Msi = "M365CLIENTID=$TestClientId", "M365TENANTID=$TestTenant"
+  $m365Setup = "/M365CLIENTID=$TestClientId", "/M365TENANTID=$TestTenant"
+  $own = "$env:LOCALAPPDATA\Programs\Startline"
+  foreach ($test in @(
+      @{ Name = 'MSI for this PC'; Root = 'HKLM:'; Folder = $defaultFolder; Msi = $true; Scope = @('ALLUSERS=1') },
+      @{ Name = 'MSI for one account'; Root = 'HKCU:'; Folder = $own; Msi = $true; Scope = @('ALLUSERS=2', 'MSIINSTALLPERUSER=1') },
+      @{ Name = 'setup.exe for this PC'; Root = 'HKLM:'; Folder = $defaultFolder; Msi = $false; Scope = @('/ALLUSERS') },
+      @{ Name = 'setup.exe for one account'; Root = 'HKCU:'; Folder = $own; Msi = $false; Scope = @('/CURRENTUSER') })) {
+    Say "Microsoft 365 app registration, $($test.Name)"
+    Clear-M365Values
+    if ($test.Msi) { Install-Msi "$oldBase.msi" ($test.Scope + $m365Msi) } else { Install-Setup ($test.Scope + $m365Setup) }
+    Assert-M365Values $test.Root $TestClientId $TestTenant "$($test.Name), installed with them"
+    if ($test.Msi) { Install-Msi "$newBase.msi" $test.Scope } else { Install-Setup $test.Scope $newBase }
+    $exe = "$($test.Folder)\startline.exe"
+    Assert-Version $exe $new
+    Assert-M365Values $test.Root $TestClientId $TestTenant "$($test.Name), upgraded without them"
+    Assert-M365FromInstaller $exe
+    # setup.exe run again with another one replaces it (an MSI of the same version only repairs, so it's left out)
+    if (-not $test.Msi) {
+      $other = '11111111-2222-4333-8444-555555555555'
+      Install-Setup ($test.Scope + "/M365CLIENTID=$other") $newBase
+      Assert-M365Values $test.Root $other $TestTenant "$($test.Name), installed again with another one"
+    }
+    if ($test.Msi) { Remove-Msi "$newBase.msi" $test.Scope } else { Remove-Setup $test.Folder }
+    Assert-M365Values $test.Root $null $null "$($test.Name), uninstalled"
   }
 
   Say 'Portable'

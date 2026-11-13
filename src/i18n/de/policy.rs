@@ -80,7 +80,6 @@ pub const T: &[(&str, &str)] = &[
     ("Files and folders Windows marks as part of the system, such as desktop.ini. Disabled finds them.", "Dateien und Ordner, die Windows als Teil des Systems kennzeichnet, etwa desktop.ini. Deaktiviert findet sie."),
     // policy.rs: results
     ("Kinds of results", "Arten von Ergebnissen"),
-    ("One per line, first to last: Apps, Settings, Files, Web. A kind left out is never shown.", "Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Files, Web. Eine nicht genannte Art wird nie angezeigt."),
     ("Most apps shown in the results", "Höchstzahl angezeigter Apps"),
     ("Most settings shown in the results", "Höchstzahl angezeigter Einstellungen"),
     ("Most files shown in the results", "Höchstzahl angezeigter Dateien"),
@@ -151,4 +150,12 @@ pub const T: &[(&str, &str)] = &[
     ("Enabled, web searches open the web search address. Disabled or not set, they go to the default browser and the search engine set up there.", "Aktiviert öffnen Websuchen die Adresse der Websuche. Deaktiviert oder nicht konfiguriert gehen sie an den Standardbrowser und die dort eingestellte Suchmaschine."),
     ("Shown as: Search <name> for ..., when the web search address is used.", "Angezeigt als: Search <name> for ..., wenn die Adresse der Websuche verwendet wird."),
     ("Used when SearchWebUseAddress is enabled, and when the default browser isn't one Startline knows how to ask. Must start with http:// or https:// and hold {} where the words go. Anything else is ignored.", "Wird verwendet, wenn SearchWebUseAddress aktiviert ist und wenn Startline den Standardbrowser nicht ansprechen kann. Muss mit http:// oder https:// beginnen und {} dort enthalten, wo die Suchbegriffe stehen. Alles andere wird ignoriert."),
+    ("Microsoft 365 account", "Microsoft 365-Konto"),
+    ("Lets people sign in with a work or school account, for their calendar and to find people and mail. Disabled, no one can sign in and Startline never contacts Microsoft. Off unless set.", "Erlaubt die Anmeldung mit einem Geschäfts- oder Schulkonto, für den Kalender und um Personen und E-Mails zu finden. Deaktiviert kann sich niemand anmelden, und Startline kontaktiert Microsoft nie. Aus, wenn nicht konfiguriert."),
+    ("Today's calendar in a panel beside the menu, in the Windows 11 and Startline looks. Asks for Calendars.ReadWrite. Off unless set.", "Der heutige Kalender in einem Bereich neben dem Menü, im Aussehen Windows 11 und Startline. Fordert Calendars.ReadWrite an. Aus, wenn nicht konfiguriert."),
+    ("Colleagues in search, to chat with in Teams, call or mail. Asks for User.ReadBasic.All. Off unless set.", "Kolleginnen und Kollegen in der Suche, um in Teams mit ihnen zu chatten, sie anzurufen oder ihnen zu schreiben. Fordert User.ReadBasic.All an. Aus, wenn nicht konfiguriert."),
+    ("The person's mail in search, by subject. Asks for Mail.ReadBasic. Off unless set.", "Die eigenen E-Mails in der Suche, nach Betreff. Fordert Mail.ReadBasic an. Aus, wenn nicht konfiguriert."),
+    ("The application (client) ID of the organization's own app registration, used instead of the one built into Startline. Must be a GUID; anything else is ignored.", "Die Anwendungs-ID (Client-ID) der eigenen App-Registrierung der Organisation, statt der in Startline eingebauten. Muss eine GUID sein; alles andere wird ignoriert."),
+    ("The tenant ID or domain, such as contoso.onmicrosoft.com. Only accounts of this tenant can sign in. Not set, any work or school account can.", "Die Mandanten-ID oder eine Domäne, etwa contoso.onmicrosoft.com. Nur Konten dieses Mandanten können sich anmelden. Nicht konfiguriert kann es jedes Geschäfts- oder Schulkonto."),
+    ("One per line, first to last: Apps, Settings, Files, People, Mail, Web. A kind left out is never shown. People and Mail also need their Microsoft 365 policies.", "Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Files, People, Mail, Web. Eine nicht genannte Art wird nie angezeigt. People und Mail brauchen auch ihre Microsoft 365-Richtlinien."),
 ];

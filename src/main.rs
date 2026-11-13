@@ -11,11 +11,13 @@ mod i18n;
 mod icons;
 mod index;
 mod intent;
+mod m365;
 mod matching;
 mod pins_page;
 mod platform;
 mod policy;
 mod popup;
+mod providers;
 mod scope;
 mod search;
 mod search_page;
@@ -50,6 +52,8 @@ pub struct Options {
     pub demo_text_menu: bool,
     /// For a picture of a lower part of a Settings page: scrolled down this far.
     pub demo_scroll: Option<f32>,
+    /// For a picture of the Microsoft 365 parts: a made-up signed-in account and example events, nothing sent anywhere.
+    pub demo_m365: bool,
     /// For a picture of what policies do: read them from this file instead of the Registry.
     pub test_policies: Option<PathBuf>,
 }
@@ -78,8 +82,21 @@ fn parse_options() -> (Options, Option<PathBuf>, Option<PathBuf>) {
             "--experience" => options.experience = args.next(),
             "--demo-open" => options.demo_open = true,
             "--demo-text-menu" => options.demo_text_menu = true,
+            "--demo-m365" => options.demo_m365 = true,
             "--demo-scroll" => options.demo_scroll = args.next().and_then(|p| p.parse().ok()),
             "--test-policies" => options.test_policies = args.next().map(PathBuf::from),
+            // For installer tests and admins: which Microsoft 365 app registration and tenant this copy uses, and why.
+            "--m365-source" => {
+                let mut cfg = config::Config::load();
+                policy::Policies::read().enforce(&mut cfg);
+                let say = |what: &str, found: Option<(String, m365::Source)>| match found {
+                    Some((value, from)) => println!("{what} {from:?} {value}"),
+                    None => println!("{what} None"),
+                };
+                say("client", m365::client_source(&cfg));
+                say("tenant", m365::tenant_source(&cfg));
+                std::process::exit(0);
+            }
             "--write-policy-templates" => {
                 let folder = args.next().map_or_else(|| PathBuf::from("PolicyDefinitions"), PathBuf::from);
                 let done = policy::write_templates(&folder);
