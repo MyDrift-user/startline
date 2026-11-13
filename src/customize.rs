@@ -2,8 +2,8 @@
 //! pages laid out to use the room they have. Every change shows at once and saves on its own.
 
 use crate::actions::Do;
-use crate::config::{Config, CornerKind, HAnchor, PRESETS, Section, SectionKind, VAnchor, data_dir};
-use crate::i18n::{tr, tx};
+use crate::config::{Config, CornerKind, HAnchor, PRESETS, SYSTEM_THEME, Section, SectionKind, VAnchor, data_dir};
+use crate::i18n::{tr, tr_dyn, tx};
 use crate::trf;
 use crate::platform;
 use crate::settings;
@@ -127,7 +127,7 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, tab: Tab) {
     if let (Some(down), true) = (menu.options.demo_scroll, menu.is_shot()) {
         scroll = scroll.vertical_scroll_offset(down);
     }
-    scroll.show(&mut body_ui, |ui| {
+    quiet_scroll(&mut body_ui, scroll, Id::unique(("settings-bar", tab as u8)), |ui| {
         // Comfortable margins, and no lines stretching across a huge window.
         let room = ui.available_width();
         let width = (room - 56.0).clamp(380.0, 1120.0);
@@ -373,6 +373,35 @@ fn appearance(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         let gap = 6.0;
         let width = (ui.available_width() - gap * (columns as f32 - 1.0)) / columns as f32;
         policy.lock(ui, &crate::policy::THEME_KEYS, |ui| {
+        // Following Windows: a light and a dark theme, switched as Windows switches between light and dark mode.
+        let mut follow = menu.cfg.preset == SYSTEM_THEME;
+        let before = follow;
+        switch_row(ui, tr("Follow Windows"), tr("A light theme while Windows is in light mode, a dark one in dark mode."), &mut follow, pal);
+        if follow != before {
+            // Turned off, the theme showing now stays.
+            let dark = menu.system_look.dark;
+            menu.cfg.preset = if follow { SYSTEM_THEME.to_string() } else if dark { menu.cfg.theme_dark.clone() } else { menu.cfg.theme_light.clone() };
+            if !follow {
+                menu.cfg.theme = crate::config::theme_of(&Config { preset: SYSTEM_THEME.to_string(), ..menu.cfg.clone() }, dark);
+            }
+        }
+        if follow {
+            for (label, key, slot) in [(tr("In light mode"), "ColorThemeLight", 0), (tr("In dark mode"), "ColorThemeDark", 1)] {
+                let current = if slot == 0 { menu.cfg.theme_light.clone() } else { menu.cfg.theme_dark.clone() };
+                policy.lock(ui, &[key], |ui| row(ui, label, "", pal, |ui| {
+                    ComboBox::from_id_salt(key).selected_text(tr_dyn(&current)).width(160.0).show_ui(ui, |ui| {
+                        for (name, _) in PRESETS {
+                            if ui.selectable_label(current == *name, tr(name)).clicked() {
+                                let slot = if slot == 0 { &mut menu.cfg.theme_light } else { &mut menu.cfg.theme_dark };
+                                *slot = name.to_string();
+                            }
+                        }
+                    });
+                }));
+            }
+            ui.add_space(gap);
+            return;
+        }
         for chunk in PRESETS.chunks(columns) {
             ui.horizontal(|ui| {
                 ui.spacing_mut().item_spacing = vec2(gap, 0.0);
@@ -479,7 +508,7 @@ impl Preset {
             Preset::Startline | Preset::Compact => {
                 let compact = self == Preset::Compact;
                 cfg.experience = Experience::Startline;
-                cfg.preset = PRESETS[0].0.to_string();
+                cfg.preset = SYSTEM_THEME.to_string();
                 cfg.theme = PRESETS[0].1;
                 cfg.corners = CornerKind::Round;
                 cfg.mica = false;
@@ -530,6 +559,8 @@ fn start_menu(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         heading(ui, tr("Now playing"), pal);
         card(ui, pal, |ui| {
             policy.lock(ui, &["MediaControls"], |ui| switch_row(ui, tr("Show what's playing"), tr("Cover, title and artist with play, pause, previous and next, for Spotify, browsers and any player that tells Windows. Out of sight when nothing plays. Windows 11, Windows 10 and Startline looks."), &mut menu.cfg.media_controls, pal));
+            let on = menu.cfg.media_controls;
+            policy.lock(ui, &["MediaCovers"], |ui| ui.add_enabled_ui(on, |ui| switch_row(ui, tr("Show the cover"), tr("The album or video picture beside it."), &mut menu.cfg.media_cover, pal)));
         });
     }, |menu, ui| {
         if pal.style != Experience::Startline {

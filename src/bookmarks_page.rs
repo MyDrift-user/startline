@@ -62,7 +62,7 @@ pub fn draw_quick_actions(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         policy.lock(ui, &["SearchChangeWindowsSettings"], |ui| switch_line(ui, tr("Change Windows settings from search"), tr("Wi-Fi, Bluetooth, dark mode, do not disturb, mute, the sound output, volume and the other switches and sliders, with how they're set now."), &mut menu.cfg.search_windows_settings, pal));
         policy.lock(ui, &["SearchPowerActions"], |ui| switch_line(ui, tr("Power actions"), tr("Lock, sleep, sign out, restart and shut down. Restart and shut down ask you to press again."), &mut menu.cfg.search_power_actions, pal));
         policy.lock(ui, &["SearchWindowsSettingsPages"], |ui| switch_line(ui, tr("Shortcuts to Windows settings and tools"), tr("Pages of Windows Settings by their name, and tools such as Task Manager."), &mut menu.cfg.search_settings_pages, pal));
-        policy.lock(ui, &["SearchClipboardHistory"], |ui| switch_line(ui, tr("Clipboard history"), tr("Find what you copied by its words, and paste it again with Enter."), &mut menu.cfg.quick_clipboard, pal));
+        policy.lock(ui, &["SearchClipboardHistory"], |ui| switch_line(ui, tr("Clipboard history"), tr("Find what you copied by its words, from three letters on, and copy it again with Enter."), &mut menu.cfg.quick_clipboard, pal));
         if menu.cfg.quick_clipboard && menu.settings.get(QuickId::ClipboardHistory) == Value::On(false) {
             ui.horizontal(|ui| {
                 ui.label(RichText::new(tr("Clipboard history is off in Windows.")).size(12.5).color(pal.sub));
@@ -120,7 +120,8 @@ pub fn draw_bookmarks(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         ui.label(RichText::new(tr("Web addresses, files, folders and commands. Right-click a result in search to add it here.")).size(12.0).color(pal.sub));
         // The organization's come first, and stay.
         for mark in bookmarks_of(policy.added("/bookmarks")) {
-            bookmark_line(ui, &mark, true, pal);
+            let picture = site_picture(menu, &ctx, &mark);
+            bookmark_line(ui, &mark, true, picture, pal);
         }
         let mut edit = None;
         let mut remove = None;
@@ -131,7 +132,9 @@ pub fn draw_bookmarks(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
             if editing == Some(at) {
                 continue;
             }
-            match bookmark_line(ui, &menu.cfg.bookmarks[at], false, pal) {
+            let mark = menu.cfg.bookmarks[at].clone();
+            let picture = site_picture(menu, &ctx, &mark);
+            match bookmark_line(ui, &mark, false, picture, pal) {
                 Some(true) => edit = Some(at),
                 Some(false) => remove = Some(at),
                 None => {}
@@ -180,13 +183,28 @@ pub fn draw_bookmarks(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
     });
 }
 
-/// One bookmark: its name, folder and target. Some(true) to change it, Some(false) to remove it.
-fn bookmark_line(ui: &mut Ui, mark: &Bookmark, managed: bool, pal: Pal) -> Option<bool> {
+/// A web bookmark's site picture, if a browser keeps one.
+fn site_picture(menu: &mut Menu, ctx: &Context, mark: &Bookmark) -> Option<TextureId> {
+    match &mark.target {
+        Target::Path { path, .. } if path.contains("://") => menu.favicon_texture(ctx, path),
+        _ => None,
+    }
+}
+
+/// One bookmark: its picture, name, folder and target. Some(true) to change it, Some(false) to remove it.
+fn bookmark_line(ui: &mut Ui, mark: &Bookmark, managed: bool, picture: Option<TextureId>, pal: Pal) -> Option<bool> {
     let mut picked = None;
     ui.horizontal(|ui| {
         ui.set_min_height(30.0);
-        let glyph = if managed { '\u{E72E}' } else { '\u{E734}' };
-        ui.label(RichText::new(glyph.to_string()).font(icon_font(12.0)).color(pal.sub));
+        match picture {
+            Some(texture) => {
+                ui.add(Image::new((texture, vec2(16.0, 16.0))));
+            }
+            None => {
+                let glyph = if managed { '\u{E72E}' } else { '\u{E734}' };
+                ui.label(RichText::new(glyph.to_string()).font(icon_font(12.0)).color(pal.sub));
+            }
+        }
         let folder = if mark.folder.is_empty() { String::new() } else { format!("{}/", mark.folder) };
         ui.label(RichText::new(format!("{folder}{}", mark.name)).size(13.5).color(pal.text)).on_hover_text(target_text(&mark.target));
         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {

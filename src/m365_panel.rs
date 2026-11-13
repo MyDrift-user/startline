@@ -339,7 +339,7 @@ impl Menu {
         if let Some(offset) = scroll_to {
             scroll = scroll.vertical_scroll_offset(offset);
         }
-        scroll.show(&mut child, |ui| {
+        quiet_scroll(&mut child, scroll, Id::unique("calendar-day-bar"), |ui| {
             let (area, _) = ui.allocate_exact_size(vec2(ui.available_width(), HOUR * 24.0), Sense::hover());
             let y_of = |minute: u32| area.top() + minute as f32 / 60.0 * HOUR;
             for hour in 0..24u32 {

@@ -315,12 +315,6 @@ impl Shared {
         set_blur(hwnd, on, tint, alpha);
     }
 
-    /// Windows 11's Mica behind the window, tinted for a dark or light theme, or none.
-    pub fn set_mica(&self, on: bool, dark: bool) {
-        let Some(hwnd) = self.window() else { return };
-        set_backdrop(hwnd, on, dark);
-    }
-
     /// The menu closed a moment ago, so a Windows menu showing up now is not a request to open it.
     fn just_hidden(&self) -> bool {
         self.hidden_at.lock().unwrap().is_some_and(|at| at.elapsed() < Duration::from_millis(900))
@@ -416,15 +410,6 @@ fn send_strokes(inputs: &[INPUT]) {
 fn press_keys(keys: &[(u16, bool)]) {
     let inputs: Vec<INPUT> = keys.iter().map(|&(vk, up)| stroke(vk, up, 0, false)).collect();
     send_strokes(&inputs);
-}
-
-/// Ctrl+V into whatever has the focus, once the menu has handed it back: pastes a clipboard history item.
-pub fn paste_after(delay: Duration) {
-    std::thread::spawn(move || {
-        std::thread::sleep(delay);
-        const V: u16 = 0x56;
-        press_keys(&[(VK_CONTROL.0, false), (V, false), (V, true), (VK_CONTROL.0, true)]);
-    });
 }
 
 // ---- The Start key decision, kept free of Windows calls so it can be tested ----
@@ -584,6 +569,13 @@ static SYSTEM_WINDOW: AtomicIsize = AtomicIsize::new(0);
 /// Start key held back by the hook as down to GetAsyncKeyState, so this is how the hook learns that a
 /// release may have happened where it couldn't see it.
 static DESKTOP_SWITCHED: AtomicBool = AtomicBool::new(false);
+/// Windows said its look changed: light or dark mode, the accent color.
+static LOOK_CHANGED: AtomicBool = AtomicBool::new(false);
+
+/// Whether Windows' look changed since the last time this was asked.
+pub fn take_look_changed() -> bool {
+    LOOK_CHANGED.swap(false, Ordering::SeqCst)
+}
 
 /// The Start key state, with anything held before a desktop switch forgotten.
 fn machine() -> std::sync::MutexGuard<'static, Option<WinKeyMachine>> {
@@ -843,6 +835,14 @@ unsafe extern "system" fn system_wndproc(hwnd: HWND, message: u32, wparam: WPARA
         let shared = SHARED.get();
         match message {
             // Locked, unlocked, or another account switched to: keys let go meanwhile never reached the hook.
+            // Light or dark mode, the accent color or the taskbar changed: the menu looks again, even while it's open.
+            WM_SETTINGCHANGE | WM_THEMECHANGED | WM_DWMCOLORIZATIONCOLORCHANGED => {
+                LOOK_CHANGED.store(true, Ordering::SeqCst);
+                if let Some(ctx) = shared.and_then(|s| s.ctx.get()) {
+                    ctx.request_repaint();
+                }
+                return DefWindowProcW(hwnd, message, wparam, lparam);
+            }
             WM_WTSSESSION_CHANGE => {
                 DESKTOP_SWITCHED.store(true, Ordering::SeqCst);
                 return LRESULT(0);
@@ -1210,18 +1210,15 @@ fn cut_to_shape(hwnd: HWND, shape: Shape, width: i32, height: i32, scale: f32) {
     }
 }
 
-/// Mica, or none. Mica Alt, as Explorer uses behind its tabs: more of the desktop picture's color comes through than
-/// plain Mica's. Mica only shows where the window counts as frame to Windows, so the frame is stretched over all of
-/// it. Stretched from the bottom rather than the top, so Windows doesn't draw caption buttons of its own there.
-fn set_backdrop(hwnd: HWND, on: bool, dark: bool) {
-    use windows::Win32::UI::Controls::MARGINS;
-    let dark = BOOL::from(dark);
-    let kind = if on { DWMSBT_TABBEDWINDOW } else { DWMSBT_NONE };
-    let up = if on { 32_000 } else { 0 };
+/// Where the window is, and the monitor it's on, in pixels: for Mica, which lines the desktop picture up behind it.
+pub fn window_and_monitor(raw: isize) -> Option<(RECT, RECT)> {
+    let hwnd = HWND(raw as *mut c_void);
     unsafe {
-        let _ = DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &dark as *const _ as *const c_void, 4);
-        let _ = DwmSetWindowAttribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, &kind as *const _ as *const c_void, 4);
-        let _ = DwmExtendFrameIntoClientArea(hwnd, &MARGINS { cxLeftWidth: 0, cxRightWidth: 0, cyTopHeight: 0, cyBottomHeight: up });
+        let mut window = RECT::default();
+        GetWindowRect(hwnd, &mut window).ok()?;
+        let monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+        let mut info = MONITORINFO { cbSize: std::mem::size_of::<MONITORINFO>() as u32, ..Default::default() };
+        GetMonitorInfoW(monitor, &mut info).as_bool().then_some((window, info.rcMonitor))
     }
 }
 

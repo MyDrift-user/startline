@@ -5,11 +5,11 @@ const EXACT: i32 = 1000;
 const STEM_EXACT: i32 = 950;
 const PREFIX: i32 = 800;
 const WORD_START: i32 = 650;
-const INITIALS: i32 = 600;
 const CONTAINS: i32 = 450;
-const SUBSEQUENCE: i32 = 200;
-/// At or below this, a name only matched as scattered letters.
-pub const LOOSE: i32 = SUBSEQUENCE;
+/// Below anything found as one piece of text: "vsc" for Visual Studio Code.
+const INITIALS: i32 = 350;
+/// Nothing scores at or below this: letters scattered through a name never match.
+pub const LOOSE: i32 = 200;
 
 fn is_boundary(prev: u8, cur: u8) -> bool {
     matches!(prev, b' ' | b'-' | b'_' | b'.' | b'(' | b'[' | b'+' | b'&' | b',') && cur != b' '
@@ -41,13 +41,11 @@ pub fn score_token(name: &[u8], token: &[u8]) -> Option<i32> {
             first_contains = Some(pos);
         }
     }
-    if initials_match(name, token) {
-        return Some(INITIALS);
-    }
     if let Some(pos) = first_contains {
         return Some(CONTAINS - (pos.min(40) as i32));
     }
-    subsequence_score(name, token)
+    // Only the starts of words, in order. Letters from the middle of words, as "wifi" in "Windows-Fotoanzeige", aren't a match.
+    initials_match(name, token).then_some(INITIALS)
 }
 
 /// "vsc" finds "Visual Studio Code".
@@ -67,32 +65,6 @@ fn initials_match(name: &[u8], token: &[u8]) -> bool {
         prev = b;
     }
     next.is_none()
-}
-
-/// Letters in order with gaps ("wrd" finds "word"). The tighter, the better.
-pub fn subsequence_score(name: &[u8], token: &[u8]) -> Option<i32> {
-    if token.len() < 2 {
-        return None;
-    }
-    let mut i = 0;
-    let mut first = None;
-    for (pos, &b) in name.iter().enumerate() {
-        if b == token[i] {
-            if first.is_none() {
-                first = Some(pos);
-            }
-            i += 1;
-            if i == token.len() {
-                let spread = pos - first.unwrap_or(0) + 1 - token.len();
-                // Letters scattered across a long name are noise, not a match.
-                if spread > token.len() * 3 + 4 {
-                    return None;
-                }
-                return Some(SUBSEQUENCE - spread.min(150) as i32);
-            }
-        }
-    }
-    None
 }
 
 /// Lowercases without allocating anything extra for plain ASCII names.
@@ -140,8 +112,35 @@ mod tests {
         let prefix = score("notepad++", "note").unwrap();
         let word = score("sticky notes", "note").unwrap();
         let inside = score("keynote", "note").unwrap();
-        let loose = score("network", "ntwk").unwrap();
-        assert!(exact > prefix && prefix > word && word > inside && inside > loose);
+        let initials = score("visual studio code", "vsc").unwrap();
+        assert!(exact > prefix && prefix > word && word > inside && inside > initials && initials > LOOSE);
+        assert_eq!(score("network", "ntwk"), None, "letters with gaps aren't a match");
+    }
+
+    #[test]
+    fn everyday_searches_still_land() {
+        let find = |name: &str, typed: &str| score_all(&lower(name), "", &tokens(typed));
+        assert_eq!(find("Visual Studio Code", "code"), Some(WORD_START));
+        assert_eq!(find("Microsoft Edge", "edge"), Some(WORD_START));
+        assert_eq!(find("Calculator", "calc"), Some(PREFIX));
+        assert_eq!(find("Einstellungen", "einst"), Some(PREFIX));
+        assert_eq!(find("Einstellungen", "EINST"), Some(PREFIX), "whatever the case");
+        assert_eq!(find("Schriftgröße ändern", "änd"), Some(WORD_START), "umlauts are letters like any other");
+        assert!(find("Schriftgröße ändern", "GRÖSSE").is_none() && find("Schriftgröße ändern", "GRÖßE").is_some());
+        assert_eq!(find("Visual Studio Code", "vsc"), Some(INITIALS));
+        assert!(find("Visual Studio Code", "visual code").is_some(), "every word is looked for on its own");
+        assert!(find("Windows-Fotoanzeige", "wifi").is_none());
+        assert!(find("Windows-Fotoanzeige", "wf").is_some() && find("Windows-Fotoanzeige", "foto").is_some());
+    }
+
+    #[test]
+    fn only_whole_pieces_and_word_starts_match() {
+        assert_eq!(score("windows-fotoanzeige", "wifi"), None, "wifi isn't hidden in Windows-Fotoanzeige");
+        assert!(score("windows-fotoanzeige", "wf").is_some(), "the starts of its words are");
+        assert!(score("visual studio code", "vsc").is_some());
+        assert!(score("visual studio code", "dio").is_some(), "a piece of a word is");
+        assert!(score("systeminformationen", "note").is_none());
+        assert!(score("wi-fi settings", "wifi").is_none() && score("wi-fi settings", "wi-fi").is_some());
     }
 
     #[test]

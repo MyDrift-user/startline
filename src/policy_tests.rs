@@ -301,12 +301,13 @@ fn an_organizations_bookmarks_are_shown_and_stay_out_of_the_persons_own() {
 
 #[test]
 fn the_quick_actions_have_their_own_policies() {
-    let off = Policies::from_raw(&raw(json!({ "SearchPowerActions": 0, "SearchCalculator": 1, "SearchClipboardHistory": 1, "MediaControls": 1, "SearchChangeWindowsSettings": 0 })));
+    let off = Policies::from_raw(&raw(json!({ "SearchPowerActions": 0, "SearchCalculator": 1, "SearchClipboardHistory": 1, "MediaControls": 1, "MediaCovers": 0, "SearchChangeWindowsSettings": 0 })));
     let mut cfg = Config::default();
-    assert!(!cfg.quick_calculator && !cfg.quick_clipboard && !cfg.media_controls && !cfg.bookmarks_search, "all off at first");
+    assert!(!cfg.quick_calculator && !cfg.quick_clipboard && !cfg.bookmarks_search, "all off at first");
+    assert!(cfg.media_controls && cfg.media_cover, "Now playing and its covers are on at first");
     assert!(cfg.search_power_actions, "power actions were in search before, and stay");
     off.enforce(&mut cfg);
-    assert!(!cfg.search_power_actions && cfg.quick_calculator && cfg.quick_clipboard && cfg.media_controls);
+    assert!(!cfg.search_power_actions && cfg.quick_calculator && cfg.quick_clipboard && cfg.media_controls && !cfg.media_cover);
     assert!(!off.allows_row(&RowKind::Run(Do::ShutDown)), "power actions leave search");
     assert!(off.allows_do(Do::ShutDown), "the power button keeps them");
     assert!(!off.allows_row(&RowKind::Output("speakers".into())), "switching the sound output is a Windows setting");

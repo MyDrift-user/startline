@@ -1,6 +1,6 @@
 [package]
 name = "startline"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2024"
 rust-version = "1.95"
 description = "A customizable Start menu and instant local search for Windows"
@@ -41,6 +41,7 @@ features = [
     "Media_Control",
     "Security_Authentication_Web_Core",
     "Security_Credentials",
+    "Storage",
     "Storage_Streams",
     "Web_Http",
     "Web_Http_Headers",

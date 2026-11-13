@@ -64,20 +64,51 @@ Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modifi
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_ColorTheme">Combinazione di colori</string>
-      <string id="E_ColorTheme">Usato solo dall'aspetto Startline.
+      <string id="E_ColorTheme">System segue la modalità chiara o scura delle app di Windows con i temi di ColorThemeLight e ColorThemeDark, e cambia non appena questa cambia. Solo l'aspetto Startline lo usa.
 
 Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
-      <string id="R_ColorTheme">Usato solo dall'aspetto Startline.
+      <string id="R_ColorTheme">System segue la modalità chiara o scura delle app di Windows con i temi di ColorThemeLight e ColorThemeDark, e cambia non appena questa cambia. Solo l'aspetto Startline lo usa.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
-      <string id="I_ColorTheme_0">Pietra</string>
-      <string id="I_ColorTheme_1">Grafite</string>
-      <string id="I_ColorTheme_2">Muschio</string>
-      <string id="I_ColorTheme_3">Porto</string>
-      <string id="I_ColorTheme_4">Argilla</string>
-      <string id="I_ColorTheme_5">Nero</string>
-      <string id="I_ColorTheme_6">Luce del giorno</string>
-      <string id="I_ColorTheme_7">Carta</string>
+      <string id="I_ColorTheme_0">Segui Windows</string>
+      <string id="I_ColorTheme_1">Pietra</string>
+      <string id="I_ColorTheme_2">Grafite</string>
+      <string id="I_ColorTheme_3">Muschio</string>
+      <string id="I_ColorTheme_4">Porto</string>
+      <string id="I_ColorTheme_5">Argilla</string>
+      <string id="I_ColorTheme_6">Nero</string>
+      <string id="I_ColorTheme_7">Luce del giorno</string>
+      <string id="I_ColorTheme_8">Carta</string>
+      <string id="P_ColorThemeLight">Tema dei colori in modalità chiara</string>
+      <string id="E_ColorThemeLight">Il tema che il tema dei colori System usa quando Windows è in modalità chiara. Solo l'aspetto Startline lo usa.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_ColorThemeLight">Il tema che il tema dei colori System usa quando Windows è in modalità chiara. Solo l'aspetto Startline lo usa.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="I_ColorThemeLight_0">Pietra</string>
+      <string id="I_ColorThemeLight_1">Grafite</string>
+      <string id="I_ColorThemeLight_2">Muschio</string>
+      <string id="I_ColorThemeLight_3">Porto</string>
+      <string id="I_ColorThemeLight_4">Argilla</string>
+      <string id="I_ColorThemeLight_5">Nero</string>
+      <string id="I_ColorThemeLight_6">Luce del giorno</string>
+      <string id="I_ColorThemeLight_7">Carta</string>
+      <string id="P_ColorThemeDark">Tema dei colori in modalità scura</string>
+      <string id="E_ColorThemeDark">Il tema che il tema dei colori System usa quando Windows è in modalità scura. Solo l'aspetto Startline lo usa.
+
+Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
+      <string id="R_ColorThemeDark">Il tema che il tema dei colori System usa quando Windows è in modalità scura. Solo l'aspetto Startline lo usa.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="I_ColorThemeDark_0">Pietra</string>
+      <string id="I_ColorThemeDark_1">Grafite</string>
+      <string id="I_ColorThemeDark_2">Muschio</string>
+      <string id="I_ColorThemeDark_3">Porto</string>
+      <string id="I_ColorThemeDark_4">Argilla</string>
+      <string id="I_ColorThemeDark_5">Nero</string>
+      <string id="I_ColorThemeDark_6">Luce del giorno</string>
+      <string id="I_ColorThemeDark_7">Carta</string>
       <string id="P_Color_Background">Colore di sfondo</string>
       <string id="E_Color_Background">Scritto come #RRGGBB. Sostituisce questo colore della combinazione. Usato solo dall'aspetto Startline.
 
@@ -186,10 +217,17 @@ Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modifi
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_MediaControls">In riproduzione</string>
-      <string id="E_MediaControls">Una piccola scheda con ciò che è in riproduzione, tramite i controlli multimediali di Windows: copertina, titolo, artista e app, riproduci o pausa, precedente e successivo, e un cambio tra app quando ne suonano diverse. Funziona con Spotify, i browser e qualsiasi lettore che lo comunica a Windows, senza accesso. Disattivato se non configurato.
+      <string id="E_MediaControls">Una piccola scheda con ciò che è in riproduzione, tramite i controlli multimediali di Windows: titolo, artista e app, riproduci o pausa, precedente e successivo, e un cambio tra app quando ne suonano diverse. Funziona con Spotify, i browser e qualsiasi lettore che lo comunica a Windows, senza accesso. Nascosta quando non c'è nulla in riproduzione.
 
 Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
-      <string id="R_MediaControls">Una piccola scheda con ciò che è in riproduzione, tramite i controlli multimediali di Windows: copertina, titolo, artista e app, riproduci o pausa, precedente e successivo, e un cambio tra app quando ne suonano diverse. Funziona con Spotify, i browser e qualsiasi lettore che lo comunica a Windows, senza accesso. Disattivato se non configurato.
+      <string id="R_MediaControls">Una piccola scheda con ciò che è in riproduzione, tramite i controlli multimediali di Windows: titolo, artista e app, riproduci o pausa, precedente e successivo, e un cambio tra app quando ne suonano diverse. Funziona con Spotify, i browser e qualsiasi lettore che lo comunica a Windows, senza accesso. Nascosta quando non c'è nulla in riproduzione.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_MediaCovers">Copertine in In riproduzione</string>
+      <string id="E_MediaCovers">L'immagine dell'album o del video accanto a ciò che è in riproduzione.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_MediaCovers">L'immagine dell'album o del video accanto a ciò che è in riproduzione.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_HorizontalPosition">Dove si apre in orizzontale</string>
@@ -312,10 +350,10 @@ Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modifi
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_SearchResults">Tipi di risultati</string>
-      <string id="E_SearchResults">Uno per riga, dal primo all'ultimo: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. Un tipo non indicato non viene mai mostrato. Actions sono le azioni rapide: la calcolatrice, la cronologia degli appunti e le uscite audio. Bookmarks richiede anche SearchBookmarks, People e Mail i loro criteri di Microsoft 365.
+      <string id="E_SearchResults">Uno per riga, dal primo all'ultimo: Apps, Settings, Bookmarks, Actions, Files, People, Mail, Web. Un tipo non indicato non viene mai mostrato. Actions sono le azioni rapide: la calcolatrice, la cronologia degli appunti e le uscite audio. Bookmarks richiede anche SearchBookmarks, People e Mail i loro criteri di Microsoft 365.
 
 Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
-      <string id="R_SearchResults">Uno per riga, dal primo all'ultimo: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. Un tipo non indicato non viene mai mostrato. Actions sono le azioni rapide: la calcolatrice, la cronologia degli appunti e le uscite audio. Bookmarks richiede anche SearchBookmarks, People e Mail i loro criteri di Microsoft 365.
+      <string id="R_SearchResults">Uno per riga, dal primo all'ultimo: Apps, Settings, Bookmarks, Actions, Files, People, Mail, Web. Un tipo non indicato non viene mai mostrato. Actions sono le azioni rapide: la calcolatrice, la cronologia degli appunti e le uscite audio. Bookmarks richiede anche SearchBookmarks, People e Mail i loro criteri di Microsoft 365.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_SearchMaxApps">Numero massimo di app nei risultati</string>
@@ -607,6 +645,12 @@ Abilitato applica le selezioni qui sotto. Disabilitato o Non configurato consent
       </presentation>
       <presentation id="P_ColorTheme">
         <dropdownList refId="Value" noSort="true" defaultItem="0">Combinazione di colori:</dropdownList>
+      </presentation>
+      <presentation id="P_ColorThemeLight">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Tema dei colori in modalità chiara:</dropdownList>
+      </presentation>
+      <presentation id="P_ColorThemeDark">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Tema dei colori in modalità scura:</dropdownList>
       </presentation>
       <presentation id="P_Color_Background">
         <textBox refId="Value">

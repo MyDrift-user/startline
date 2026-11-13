@@ -64,20 +64,51 @@ Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer könne
 
 Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_ColorTheme">Farbschema</string>
-      <string id="E_ColorTheme">Nur das Startline-Design verwendet dies.
+      <string id="E_ColorTheme">System folgt dem hellen oder dunklen App-Modus von Windows mit den Designs aus ColorThemeLight und ColorThemeDark und wechselt, sobald er sich ändert. Nur das Startline-Aussehen verwendet dies.
 
 Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
-      <string id="R_ColorTheme">Nur das Startline-Design verwendet dies.
+      <string id="R_ColorTheme">System folgt dem hellen oder dunklen App-Modus von Windows mit den Designs aus ColorThemeLight und ColorThemeDark und wechselt, sobald er sich ändert. Nur das Startline-Aussehen verwendet dies.
 
 Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
-      <string id="I_ColorTheme_0">Stein</string>
-      <string id="I_ColorTheme_1">Graphit</string>
-      <string id="I_ColorTheme_2">Moos</string>
-      <string id="I_ColorTheme_3">Hafen</string>
-      <string id="I_ColorTheme_4">Ton</string>
-      <string id="I_ColorTheme_5">Schwarz</string>
-      <string id="I_ColorTheme_6">Tageslicht</string>
-      <string id="I_ColorTheme_7">Papier</string>
+      <string id="I_ColorTheme_0">Windows folgen</string>
+      <string id="I_ColorTheme_1">Stein</string>
+      <string id="I_ColorTheme_2">Graphit</string>
+      <string id="I_ColorTheme_3">Moos</string>
+      <string id="I_ColorTheme_4">Hafen</string>
+      <string id="I_ColorTheme_5">Ton</string>
+      <string id="I_ColorTheme_6">Schwarz</string>
+      <string id="I_ColorTheme_7">Tageslicht</string>
+      <string id="I_ColorTheme_8">Papier</string>
+      <string id="P_ColorThemeLight">Farbdesign im hellen Modus</string>
+      <string id="E_ColorThemeLight">Das Design, das das Farbdesign System verwendet, solange Windows im hellen Modus ist. Nur das Startline-Aussehen verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_ColorThemeLight">Das Design, das das Farbdesign System verwendet, solange Windows im hellen Modus ist. Nur das Startline-Aussehen verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="I_ColorThemeLight_0">Stein</string>
+      <string id="I_ColorThemeLight_1">Graphit</string>
+      <string id="I_ColorThemeLight_2">Moos</string>
+      <string id="I_ColorThemeLight_3">Hafen</string>
+      <string id="I_ColorThemeLight_4">Ton</string>
+      <string id="I_ColorThemeLight_5">Schwarz</string>
+      <string id="I_ColorThemeLight_6">Tageslicht</string>
+      <string id="I_ColorThemeLight_7">Papier</string>
+      <string id="P_ColorThemeDark">Farbdesign im dunklen Modus</string>
+      <string id="E_ColorThemeDark">Das Design, das das Farbdesign System verwendet, solange Windows im dunklen Modus ist. Nur das Startline-Aussehen verwendet dies.
+
+Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_ColorThemeDark">Das Design, das das Farbdesign System verwendet, solange Windows im dunklen Modus ist. Nur das Startline-Aussehen verwendet dies.
+
+Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="I_ColorThemeDark_0">Stein</string>
+      <string id="I_ColorThemeDark_1">Graphit</string>
+      <string id="I_ColorThemeDark_2">Moos</string>
+      <string id="I_ColorThemeDark_3">Hafen</string>
+      <string id="I_ColorThemeDark_4">Ton</string>
+      <string id="I_ColorThemeDark_5">Schwarz</string>
+      <string id="I_ColorThemeDark_6">Tageslicht</string>
+      <string id="I_ColorThemeDark_7">Papier</string>
       <string id="P_Color_Background">Hintergrundfarbe</string>
       <string id="E_Color_Background">Als #RRGGBB geschrieben. Ersetzt diese Farbe des Farbschemas. Nur das Startline-Design verwendet dies.
 
@@ -186,10 +217,17 @@ Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer könne
 
 Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_MediaControls">Aktuelle Wiedergabe</string>
-      <string id="E_MediaControls">Eine kleine Karte mit dem, was gerade läuft, über die Mediensteuerung von Windows: Cover, Titel, Interpret und App, Wiedergabe oder Pause, zurück und weiter, und ein Wechsel zwischen Apps, wenn mehrere abspielen. Funktioniert mit Spotify, Browsern und jedem Player, der es Windows mitteilt, ohne Anmeldung. Aus, wenn nicht konfiguriert.
+      <string id="E_MediaControls">Eine kleine Karte mit dem, was gerade läuft, über die Mediensteuerung von Windows: Titel, Interpret und App, Wiedergabe oder Pause, zurück und weiter, und ein Wechsel zwischen Apps, wenn mehrere abspielen. Funktioniert mit Spotify, Browsern und jedem Player, der es Windows mitteilt, ohne Anmeldung. Ausgeblendet, solange nichts läuft.
 
 Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
-      <string id="R_MediaControls">Eine kleine Karte mit dem, was gerade läuft, über die Mediensteuerung von Windows: Cover, Titel, Interpret und App, Wiedergabe oder Pause, zurück und weiter, und ein Wechsel zwischen Apps, wenn mehrere abspielen. Funktioniert mit Spotify, Browsern und jedem Player, der es Windows mitteilt, ohne Anmeldung. Aus, wenn nicht konfiguriert.
+      <string id="R_MediaControls">Eine kleine Karte mit dem, was gerade läuft, über die Mediensteuerung von Windows: Titel, Interpret und App, Wiedergabe oder Pause, zurück und weiter, und ein Wechsel zwischen Apps, wenn mehrere abspielen. Funktioniert mit Spotify, Browsern und jedem Player, der es Windows mitteilt, ohne Anmeldung. Ausgeblendet, solange nichts läuft.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_MediaCovers">Cover in der aktuellen Wiedergabe</string>
+      <string id="E_MediaCovers">Das Album- oder Videobild neben dem, was gerade läuft.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_MediaCovers">Das Album- oder Videobild neben dem, was gerade läuft.
 
 Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_HorizontalPosition">Wo es sich waagerecht öffnet</string>
@@ -312,10 +350,10 @@ Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer könne
 
 Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_SearchResults">Arten von Ergebnissen</string>
-      <string id="E_SearchResults">Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. Eine nicht genannte Art wird nie angezeigt. Actions sind die Schnellaktionen: der Rechner, der Zwischenablageverlauf und die Tonausgaben. Bookmarks braucht auch SearchBookmarks, People und Mail ihre Microsoft 365-Richtlinien.
+      <string id="E_SearchResults">Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Bookmarks, Actions, Files, People, Mail, Web. Eine nicht genannte Art wird nie angezeigt. Actions sind die Schnellaktionen: der Rechner, der Zwischenablageverlauf und die Tonausgaben. Bookmarks braucht auch SearchBookmarks, People und Mail ihre Microsoft 365-Richtlinien.
 
 Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
-      <string id="R_SearchResults">Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. Eine nicht genannte Art wird nie angezeigt. Actions sind die Schnellaktionen: der Rechner, der Zwischenablageverlauf und die Tonausgaben. Bookmarks braucht auch SearchBookmarks, People und Mail ihre Microsoft 365-Richtlinien.
+      <string id="R_SearchResults">Eine pro Zeile, von der ersten bis zur letzten: Apps, Settings, Bookmarks, Actions, Files, People, Mail, Web. Eine nicht genannte Art wird nie angezeigt. Actions sind die Schnellaktionen: der Rechner, der Zwischenablageverlauf und die Tonausgaben. Bookmarks braucht auch SearchBookmarks, People und Mail ihre Microsoft 365-Richtlinien.
 
 Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_SearchMaxApps">Höchstzahl angezeigter Apps</string>
@@ -607,6 +645,12 @@ Aktiviert wendet die Häkchen unten an. Deaktiviert oder Nicht konfiguriert läs
       </presentation>
       <presentation id="P_ColorTheme">
         <dropdownList refId="Value" noSort="true" defaultItem="0">Farbschema:</dropdownList>
+      </presentation>
+      <presentation id="P_ColorThemeLight">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Farbdesign im hellen Modus:</dropdownList>
+      </presentation>
+      <presentation id="P_ColorThemeDark">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Farbdesign im dunklen Modus:</dropdownList>
       </presentation>
       <presentation id="P_Color_Background">
         <textBox refId="Value">

@@ -2099,7 +2099,7 @@ dependencies = [
 
 [[package]]
 name = "startline"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "ed25519-dalek",
  "eframe",

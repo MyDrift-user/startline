@@ -191,11 +191,8 @@ impl Index {
         let mut wanted = filter.clone();
         wanted.exts.extend(parsed.typed.iter().cloned());
         let mode = if parsed.needle.is_empty() { Mode::Browse } else { Mode::Direct };
-        let (mut hits, mut facets) = self.scan(&parsed, &wanted, limit, cancel, mode);
-        // Nothing direct: allow letters with gaps, so small typos and shorthand still land.
-        if facets.total == 0 && parsed.needle.len() >= 3 && !cancel() {
-            (hits, facets) = self.scan(&parsed, &wanted, limit, cancel, Mode::Fuzzy);
-        }
+        // Letters scattered through a name are never a match, not even when nothing else is.
+        let (mut hits, facets) = self.scan(&parsed, &wanted, limit, cancel, mode);
         hits.sort_unstable_by_key(|h| std::cmp::Reverse(h.1));
         hits.truncate(limit);
         let hits = hits
@@ -331,7 +328,6 @@ impl Index {
             return None;
         }
         let mut score = match mode {
-            Mode::Fuzzy => matching::subsequence_score(name, q.needle.as_bytes())?,
             Mode::Direct => matching::score_token(name, q.needle.as_bytes())?,
             // Only a file type was typed: every name qualifies and the filter picks.
             Mode::Browse => 300,
@@ -472,7 +468,6 @@ impl SyncCancel<'_> {
 #[derive(Clone, Copy, PartialEq)]
 enum Mode {
     Direct,
-    Fuzzy,
     Browse,
 }
 
@@ -1174,8 +1169,9 @@ mod tests {
     }
 
     #[test]
-    fn gaps_are_only_a_fallback() {
-        assert_eq!(sample().search("hldy", 10, &|| false)[0].name, "holiday.jpg");
+    fn letters_with_gaps_never_match() {
+        assert!(sample().search("hldy", 10, &|| false).is_empty(), "holiday isn't found by scattered letters");
+        assert_eq!(sample().search("holi", 10, &|| false)[0].name, "holiday.jpg");
     }
 
     #[test]
@@ -1186,7 +1182,8 @@ mod tests {
         let hits = index.search("note", 10, &|| false);
         assert_eq!(hits.len(), 1);
         assert_eq!(hits[0].name, "keynote.json");
-        assert_eq!(index.search("nwnmrk", 10, &|| false)[0].name, "known_marketplaces.json");
+        assert!(index.search("nwnmrk", 10, &|| false).is_empty());
+        assert_eq!(index.search("market", 10, &|| false)[0].name, "known_marketplaces.json", "a piece of it finds it");
     }
 
     #[test]

@@ -393,6 +393,21 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
             }
         }
     });
+    // The quick actions and bookmarks under the places, so both columns are about as long.
+    crate::bookmarks_page::draw_quick_actions(menu, ui, pal);
+    crate::bookmarks_page::draw_bookmarks(menu, ui, pal);
+
+    heading(ui, tr("Search box"), pal);
+    card(ui, pal, |ui| {
+        policy.lock(ui, &["SearchRegex"], |ui| switch_line(ui, tr("Treat searches as regular expressions"), tr("The whole search is one pattern, matched against names whatever the case."), &mut menu.cfg.regex_search, pal));
+        policy.lock(ui, &["SearchShowRegexSwitch"], |ui| {
+            ui.indent("regex-switch", |ui| switch_line(ui, tr("Its switch in the search box"), tr("Hidden, searches are never regular expressions."), &mut menu.cfg.show_regex_switch, pal))
+        });
+        policy.lock(ui, &["SearchShowHelp"], |ui| switch_line(ui, tr("Help button (?) in the search box"), tr("Shows what you can type: \"exact text\", wildcards, -without, ext:, kind:, size:, modified: and regular expressions."), &mut menu.cfg.show_search_help, pal));
+        policy.lock(ui, &["SearchFileTypeButtons"], |ui| switch_line(ui, tr("File type buttons"), tr("Narrow the results to one kind of file."), &mut menu.cfg.show_file_buttons, pal));
+        policy.lock(ui, &["SearchShowTime"], |ui| switch_line(ui, tr("How long a search took"), "", &mut menu.cfg.show_timing, pal));
+        policy.lock(ui, &["SearchShowHints"], |ui| switch_line(ui, tr("Keyboard hints under the results"), "", &mut menu.cfg.show_search_hints, pal));
+    });
     }, |menu, ui| {
     heading(ui, tr("Never found"), pal);
     card(ui, pal, |ui| {
@@ -484,7 +499,12 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         ui.indent("web-address", |ui| {
             policy.lock(ui, &["SearchWebName"], |ui| ui.add_enabled_ui(fixed, |ui| ui.horizontal(|ui| {
                 ui.label(RichText::new(tr("Name of the web search")).size(13.5).color(pal.text));
-                text_box(ui, None, TextEdit::singleline(&mut menu.cfg.web_name).desired_width(ui.available_width()));
+                // The default is kept in English and shown in the language of the menu; a name of one's own stays as written.
+                let default = tr("the web");
+                let mut shown = if menu.cfg.web_name == "the web" { default.to_string() } else { menu.cfg.web_name.clone() }; // i18n-ignore: the saved default
+                if text_box(ui, None, TextEdit::singleline(&mut shown).desired_width(ui.available_width())).changed() {
+                    menu.cfg.web_name = if shown == default { "the web".to_string() } else { shown }; // i18n-ignore: the saved default
+                }
             })));
             policy.lock(ui, &["SearchWebAddress"], |ui| ui.horizontal(|ui| {
                 ui.label(RichText::new(tr("Web search address")).size(13.5).color(pal.text));
@@ -493,20 +513,6 @@ pub fn draw(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         });
     });
 
-    crate::bookmarks_page::draw_quick_actions(menu, ui, pal);
-    crate::bookmarks_page::draw_bookmarks(menu, ui, pal);
-
-    heading(ui, tr("Search box"), pal);
-    card(ui, pal, |ui| {
-        policy.lock(ui, &["SearchRegex"], |ui| switch_line(ui, tr("Treat searches as regular expressions"), tr("The whole search is one pattern, matched against names whatever the case."), &mut menu.cfg.regex_search, pal));
-        policy.lock(ui, &["SearchShowRegexSwitch"], |ui| {
-            ui.indent("regex-switch", |ui| switch_line(ui, tr("Its switch in the search box"), tr("Hidden, searches are never regular expressions."), &mut menu.cfg.show_regex_switch, pal))
-        });
-        policy.lock(ui, &["SearchShowHelp"], |ui| switch_line(ui, tr("Help button (?) in the search box"), tr("Shows what you can type: \"exact text\", wildcards, -without, ext:, kind:, size:, modified: and regular expressions."), &mut menu.cfg.show_search_help, pal));
-        policy.lock(ui, &["SearchFileTypeButtons"], |ui| switch_line(ui, tr("File type buttons"), tr("Narrow the results to one kind of file."), &mut menu.cfg.show_file_buttons, pal));
-        policy.lock(ui, &["SearchShowTime"], |ui| switch_line(ui, tr("How long a search took"), "", &mut menu.cfg.show_timing, pal));
-        policy.lock(ui, &["SearchShowHints"], |ui| switch_line(ui, tr("Keyboard hints under the results"), "", &mut menu.cfg.show_search_hints, pal));
-    });
     });
 
     if let Some(path) = menu.scope_ui.toggle.take() {

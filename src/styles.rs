@@ -133,7 +133,7 @@ pub fn look_of(cfg: &Config, system: SystemLook) -> Look {
     let shaded = |bg, surface, text, subtext| Theme { bg, surface, text, subtext, accent };
     let base = Look {
         experience,
-        theme: cfg.theme,
+        theme: crate::config::theme_of(cfg, system.dark),
         opacity: 1.0,
         blur: false,
         corner: 0.0,
@@ -248,7 +248,7 @@ mod tests {
 
     #[test]
     fn custom_colors_only_reach_the_startline_look() {
-        let mut cfg = Config { roots: vec![], ..Default::default() };
+        let mut cfg = Config { roots: vec![], preset: "Custom".into(), ..Default::default() };
         cfg.theme.bg = [1, 2, 3];
         for experience in [Experience::Windows11, Experience::Windows10, Experience::Windows7, Experience::WindowsXp] {
             cfg.experience = experience;

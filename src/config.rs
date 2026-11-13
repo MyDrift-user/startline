@@ -39,6 +39,21 @@ pub const PRESETS: &[(&str, Theme)] = &[
     (tx("Paper"), Theme { bg: [240, 234, 222], surface: [250, 245, 235], text: [48, 40, 30], subtext: [122, 110, 94], accent: [140, 84, 40] }),
 ];
 
+/// The color theme that follows Windows' light or dark mode for apps, switching as soon as it changes.
+pub const SYSTEM_THEME: &str = "System"; // i18n-ignore: saved name of a theme
+/// The light theme it uses unless the person picks another.
+pub const LIGHT_THEME: &str = "Daylight"; // i18n-ignore: saved name of a theme
+
+/// The colors the Startline look uses now: the chosen theme, or with SYSTEM_THEME the light or dark one picked for it.
+pub fn theme_of(cfg: &Config, dark: bool) -> Theme {
+    if cfg.preset != SYSTEM_THEME {
+        return cfg.theme;
+    }
+    let wanted = if dark { &cfg.theme_dark } else { &cfg.theme_light };
+    let fallback = if dark { PRESETS[0].1 } else { PRESETS.iter().find(|(n, _)| *n == LIGHT_THEME).map_or(PRESETS[0].1, |(_, t)| *t) };
+    PRESETS.iter().find(|(name, _)| name == wanted).map_or(fallback, |(_, theme)| *theme)
+}
+
 /// How the window's corners are shaped in the Startline look.
 #[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Debug, Default)]
 pub enum CornerKind {
@@ -119,7 +134,7 @@ pub struct ResultKind {
 }
 
 impl Category {
-    pub const ALL: [Category; 8] = [Category::Apps, Category::Settings, Category::Actions, Category::Files, Category::Bookmarks, Category::People, Category::Mail, Category::Web];
+    pub const ALL: [Category; 8] = [Category::Apps, Category::Settings, Category::Bookmarks, Category::Actions, Category::Files, Category::People, Category::Mail, Category::Web];
 
     pub fn from_name(name: &str) -> Option<Category> {
         Category::ALL.into_iter().find(|c| format!("{c:?}").eq_ignore_ascii_case(name.trim()))
@@ -162,8 +177,11 @@ pub struct Config {
     pub mica_light: bool,
 
     // The Startline look. The Windows looks are fixed and don't use these.
+    /// The color theme by name; SYSTEM_THEME follows Windows' light or dark mode with `theme_light` and `theme_dark`.
     pub preset: String,
     pub theme: Theme,
+    pub theme_light: String,
+    pub theme_dark: String,
     pub opacity: f32,
     pub blur: bool,
     pub corners: CornerKind,
@@ -173,6 +191,8 @@ pub struct Config {
     pub compact_rows: bool,
     /// What's playing, with its controls, in the menu.
     pub media_controls: bool,
+    /// The cover beside what's playing.
+    pub media_cover: bool,
 
     // Layout
     pub h_anchor: HAnchor,
@@ -303,8 +323,10 @@ impl Default for Config {
             language: "system".into(),
             mica: false,
             mica_light: true,
-            preset: PRESETS[0].0.into(),
+            preset: SYSTEM_THEME.into(),
             theme: PRESETS[0].1,
+            theme_light: LIGHT_THEME.into(),
+            theme_dark: PRESETS[0].0.into(),
             opacity: 0.96,
             blur: true,
             corners: CornerKind::Round,
@@ -312,7 +334,8 @@ impl Default for Config {
             tile_size: 84.0,
             show_labels: true,
             compact_rows: false,
-            media_controls: false,
+            media_controls: true,
+            media_cover: true,
             h_anchor: HAnchor::Center,
             v_anchor: VAnchor::Bottom,
             width: 660.0,
@@ -452,7 +475,7 @@ impl Config {
             // Search used to default to the top; nobody had chosen that on purpose yet.
             self.search_at_bottom = true;
         }
-        if self.version < 2 && !PRESETS.iter().any(|(name, _)| *name == self.preset) && self.preset != "Custom" { // i18n-ignore: saved name of an own theme
+        if self.version < 2 && !PRESETS.iter().any(|(name, _)| *name == self.preset) && self.preset != "Custom" && self.preset != SYSTEM_THEME { // i18n-ignore: saved name of an own theme
             // A color theme that no longer exists moves to the new default.
             self.preset = PRESETS[0].0.into();
             self.theme = PRESETS[0].1;
@@ -587,8 +610,23 @@ mod tests {
         let mut old = Config::parse(br#"{"version": 3, "results": [{"kind": "Files", "on": true}, {"kind": "Apps", "on": true}, {"kind": "Settings", "on": false}, {"kind": "Web", "on": true}]}"#).unwrap();
         old.repair();
         let kinds: Vec<Category> = old.results.iter().map(|r| r.kind).collect();
-        assert_eq!(kinds, [Category::Files, Category::Apps, Category::Settings, Category::Actions, Category::Bookmarks, Category::People, Category::Mail, Category::Web]);
+        assert_eq!(kinds, [Category::Files, Category::Apps, Category::Settings, Category::Bookmarks, Category::Actions, Category::People, Category::Mail, Category::Web]);
         assert!(!old.results[2].on, "the person's own choices stay");
+    }
+
+    #[test]
+    fn the_system_theme_follows_light_and_dark_and_an_own_choice_stays() {
+        let cfg = Config::default();
+        assert_eq!(cfg.preset, SYSTEM_THEME, "following Windows is where people start");
+        let daylight = PRESETS.iter().find(|(n, _)| *n == "Daylight").unwrap().1;
+        assert_eq!(theme_of(&cfg, false), daylight);
+        assert_eq!(theme_of(&cfg, true), PRESETS[0].1);
+        let picked = Config { theme_light: "Paper".into(), theme_dark: "Moss".into(), ..cfg.clone() };
+        assert_eq!(theme_of(&picked, false), PRESETS.iter().find(|(n, _)| *n == "Paper").unwrap().1);
+        assert_eq!(theme_of(&picked, true), PRESETS.iter().find(|(n, _)| *n == "Moss").unwrap().1);
+        let own = Config::parse(br#"{"version": 3, "preset": "Harbor", "theme": {"bg": [1,2,3], "surface": [1,2,3], "text": [1,2,3], "subtext": [1,2,3], "accent": [1,2,3]}}"#).unwrap();
+        assert_eq!(theme_of(&own, true).bg, [1, 2, 3], "a theme chosen before keeps working, light or dark");
+        assert_eq!(theme_of(&own, false).bg, [1, 2, 3]);
     }
 
     #[test]

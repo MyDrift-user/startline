@@ -11,6 +11,7 @@ use crate::popup::{self, Entry};
 use crate::search::{FILE_KINDS, Icon, Row, RowKind};
 use crate::settings::{Control, QuickId, Value};
 use crate::styles::Experience;
+use crate::system;
 use crate::ui::{Intent, Menu, NavEntry, NavKind, Page};
 use crate::widgets::*;
 use egui::*;
@@ -25,14 +26,32 @@ impl Menu {
         let in_settings = matches!(self.page, Page::Customize(_));
         let style = look.experience;
         let opacity = if in_settings && style != Experience::Startline { 1.0 } else { look.opacity };
-        // Over Mica the window is clear: Windows paints the material, already tinted for light or dark.
-        let alpha = if look.mica && (!in_settings || style == Experience::Startline) { 0 } else { (opacity.clamp(0.25, 1.0) * 255.0) as u8 };
-        let fill = Color32::from_rgba_unmultiplied(pal.bg.r(), pal.bg.g(), pal.bg.b(), alpha);
+        let mica = look.mica && (!in_settings || style == Experience::Startline);
+        let fill = Color32::from_rgba_unmultiplied(pal.bg.r(), pal.bg.g(), pal.bg.b(), (opacity.clamp(0.25, 1.0) * 255.0) as u8);
         // Exactly the window's own corner, so no second shape can show around the paint.
         let round = look.corner_points(ui.ctx().pixels_per_point()).round() as u8;
         let radius = if look.round_bottom { CornerRadius::same(round) } else { CornerRadius { nw: round, ne: round, sw: 0, se: 0 } };
-        // Windows 7's menu is glass all the way to the edge and paints its own.
-        if in_settings || style != Experience::Windows7 {
+        if mica {
+            // Mica: the desktop picture behind the menu, blurred and tinted, until it's ready Mica's own plain color.
+            let dark = (pal.bg.r() as u32 + pal.bg.g() as u32 + pal.bg.b() as u32) < 384;
+            match self.mica.texture(ui.ctx(), dark) {
+                Some((texture, size)) => {
+                    let uv = match system::window_and_monitor(self.shared.window_id()) {
+                        Some((w, m)) if w.right > w.left && m.right > m.left => crate::mica::uv_for(
+                            [w.left as f32, w.top as f32, (w.right - w.left) as f32, (w.bottom - w.top) as f32],
+                            [m.left as f32, m.top as f32, (m.right - m.left) as f32, (m.bottom - m.top) as f32],
+                            size,
+                        ),
+                        _ => Rect::from_min_max(pos2(0.3, 0.55), pos2(0.7, 1.0)),
+                    };
+                    ui.painter().add(epaint::RectShape::filled(full, radius, Color32::WHITE).with_texture(texture, uv));
+                }
+                None => {
+                    ui.painter().rect_filled(full, radius, if dark { Color32::from_rgb(32, 32, 32) } else { Color32::from_rgb(243, 243, 243) });
+                }
+            }
+        } else if in_settings || style != Experience::Windows7 {
+            // Windows 7's menu is glass all the way to the edge and paints its own.
             ui.painter().rect_filled(full, radius, fill);
         }
         if look.native_corner.is_none() {
@@ -454,7 +473,32 @@ impl Menu {
                 ui.painter().rect_filled(rect, rect.width() * 0.22, mix(pal.surface, pal.accent, 0.20));
                 ui.painter().text(rect.center(), Align2::CENTER_CENTER, *glyph, icon_font(rect.height() * 0.56), pal.text);
             }
+            Icon::Site { url, glyph } => match self.favicon_texture(ui.ctx(), url) {
+                Some(texture) => {
+                    let uv = Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0));
+                    ui.painter().image(texture, rect.shrink(rect.width() * 0.1), uv, Color32::WHITE);
+                }
+                None => self.draw_icon(ui, rect, &Icon::Glyph(*glyph), name, pal),
+            },
         }
+    }
+
+    /// A site's picture, as a browser keeps it, ready to draw. Made once, and again when the browsers are read again.
+    pub(crate) fn favicon_texture(&mut self, ctx: &Context, url: &str) -> Option<TextureId> {
+        let generation = self.providers.bookmarks.generation();
+        if self.favicons.0 != generation {
+            self.favicons = (generation, std::collections::HashMap::new());
+        }
+        if let Some(made) = self.favicons.1.get(url) {
+            return made.as_ref().map(|t| t.id());
+        }
+        let made = {
+            let library = self.providers.bookmarks.library.read().unwrap();
+            library.favicon(url).map(|f| ctx.load_texture(format!("favicon:{url}"), ColorImage::from_rgba_unmultiplied(f.size, &f.rgba), TextureOptions::LINEAR))
+        };
+        let id = made.as_ref().map(|t| t.id());
+        self.favicons.1.insert(url.to_string(), made);
+        id
     }
 
 
@@ -781,7 +825,7 @@ impl Menu {
             RowKind::Person(person) => Some(Intent::Link(crate::m365::chat_link(person.teams_id(), self.teams_installed))),
             RowKind::Link(url) => Some(Intent::Link(url.clone())),
             RowKind::Copy(text) => Some(Intent::CopyAnswer(text.clone())),
-            RowKind::Paste(text) => Some(Intent::Paste(text.clone())),
+            RowKind::Clip(text) => Some(Intent::CopyClip(text.clone())),
             RowKind::Output(id) => Some(Intent::UseOutput(id.clone())),
             RowKind::Quick(..) => None,
         };
@@ -930,8 +974,8 @@ impl Menu {
                 tr("Enter opens the message, Esc clears")
             } else if matches!(current, Some(RowKind::Copy(_))) {
                 tr("Enter copies the result, Esc clears")
-            } else if matches!(current, Some(RowKind::Paste(_))) {
-                tr("Enter pastes it where you were, Esc clears")
+            } else if matches!(current, Some(RowKind::Clip(_))) {
+                tr("Enter copies it to the clipboard, Esc clears")
             } else if matches!(current, Some(RowKind::Output(_))) {
                 tr("Enter plays sound there, Esc clears")
             } else if matches!(current, Some(RowKind::Open(_))) && self.rows.iter().find(|row| Some(row.nav_id()) == target).is_some_and(|row| row.category == Category::Bookmarks) {

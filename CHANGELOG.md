@@ -2,30 +2,40 @@
 
 What changed for people using Startline, compared with the version before. A release's notes on GitHub are its section here.
 
-## Unreleased
+## 0.0.2
 
-- A Best match at the top of the results: the one result whose name fits what you typed best, whatever its kind, so typing a folder's name and pressing Enter opens that folder. It can be turned off, also by policy
-- Web searches open your default browser with the search engine you set up there, instead of a fixed address. A fixed address is still there as a setting and a policy
-- Newly installed apps show up in the list and in search within seconds, and uninstalled ones go, Store apps included, without restarting Startline
-- Microsoft 365, optional and off until you turn it on: sign in with a work or school account on the new Microsoft 365 page of Settings, through Windows's own account sign-in
-- Today's calendar beside the menu in the Windows 11 and Startline looks: a timeline with the time now, all-day events on top, the day before and after, Join for online meetings, Accept, Tentative and Decline for invitations, and new events. It shows the last copy at once and while offline
-- People in search: colleagues from your organization, with Enter starting a Teams chat and buttons to call or mail them
-- Mail in search, by subject, opening the message in Outlook on the web
-- Startline asks Microsoft only for what's switched on, talks to nothing but Microsoft's sign-in and Graph, and signing out forgets the account, its tokens and the cached calendar
-- Where an organization doesn't let people approve apps themselves, Startline says so and copies the approval link for the administrator. Organizations can switch the account and each part on or off by policy
-- An organization's own app registration and tenant can be given by Group Policy, when installing (M365CLIENTID and M365TENANTID for the MSI and setup.exe, kept by upgrades), or when building; Settings says which one is in use
-- Only one copy of Startline runs per user session: copies started together, by two autostart entries at logon, by several clicks, or the installed copy beside another build, used to all keep running. A second copy now opens the running one's menu and ends; one started at logon just ends
-- An invitation squeezed beside another event in the calendar can still be answered: a button opens Accept, Tentative and Decline as a menu, and a right click on any invitation does too
-- People and mail are looked for in what you typed before your Microsoft 365 account was ready, as soon as it is
-- The keyboard hint under the results fits the result: Enter starts a Teams chat for a person and opens the message for mail, instead of offering to show them in a folder
-- While your organization hasn't approved Startline yet, the Microsoft 365 page says it's waiting for that approval, with Sign in again and Cancel, instead of "Signed in" and Sign out
-- Clicking the search button or box on the taskbar opens Startline's search and keeps it open (#2). Windows Search no longer starts underneath and takes the focus back, on every taskbar; if it starts some other way, Startline closes it without a stray Escape and opens its search
-- Now playing, off until you turn it on: what's playing in Spotify, a browser or any player that tells Windows, with its cover, title, artist and app, play or pause, previous and next, and a switch between apps when several play
-- Bookmarks in search, off until you turn it on: every profile's bookmarks from Chrome, Edge, Brave, Vivaldi, Opera, Helium and other Chromium browsers and from Firefox, only ever read and opening in the browser and profile they're from; your own bookmarks of web addresses, files, folders and commands, in folders, added in Settings or from a result's right-click menu; and an organization's, by policy
-- A calculator in search, off until you turn it on: sums, conversions of length, weight, temperature, volume, data sizes and time, and dates such as today + 30 days. Enter copies the result
-- Clipboard history in search, off until you turn it on: find what you copied by its words and paste it again with Enter, when clipboard history is on in Windows
-- Do not disturb and switching the sound to another output join the Windows settings search can change, and the power actions in search get a switch of their own
-- New policies for all of these: MediaControls, SearchBookmarks, BookmarksFromBrowsers, BookmarksLeftOut, Bookmarks, SearchCalculator, SearchClipboardHistory and SearchPowerActions
+Released 2026-11-14.
+
+Search finds more and finds it better: a Best match first, stricter matching, bookmarks, a calculator, your clipboard history and quick switches, all in your language. The menu gets a Now playing card, a theme that follows Windows' light and dark mode, Mica that works on every Windows 11 PC, and an optional Microsoft 365 account for your calendar, colleagues and mail. Clicking the taskbar's search button now opens Startline's search and keeps it open.
+
+### Start menu
+- Now playing, on at first: what plays in Spotify, a browser or any player that tells Windows, with its cover, title, artist and app, play or pause, previous and next, and a switch between apps when several play. Out of sight when nothing plays; the cover can be switched off
+- A new color theme, System, now the default for the Startline look: it follows Windows' light or dark mode for apps as soon as it changes, with a light and a dark theme you pick. Themes chosen before stay as they were
+- Mica works on every Windows 11 PC: the menu paints it itself from your desktop picture, blurred and tinted, instead of a plain black or white sheet that hid the menu
+- Scroll bars show while you scroll and whenever a list isn't at its top, and fade away at the top, as in Windows 11, instead of whenever the pointer is over the menu
+- Only one copy of Startline runs per user session, however it's started; a second one opens the running one's menu and ends
+- Clicking the search button or box on the taskbar opens Startline's search and keeps it open (#2), on every taskbar, without Windows Search starting underneath
+
+### Search
+- A Best match at the top: the one result whose name fits what you typed best, whatever its kind. It can be turned off, also by policy
+- Stricter matching everywhere: a name is found by a piece of it, the start of a word, or the first letters of its words ("vsc" for Visual Studio Code), but no longer by letters scattered through it, so "wifi" doesn't find "Windows-Fotoanzeige"
+- Web searches open your default browser with its own search engine, show that browser's icon, and their name is in your language. A fixed address is still there as a setting and a policy
+- Newly installed apps show up within seconds, and uninstalled ones go, Store apps included
+- Bookmarks, off until you turn them on: every profile's bookmarks from Chrome, Edge, Brave, Vivaldi, Opera, Helium and other Chromium browsers and from Firefox, with each site's own icon, only ever read and opening in the browser and profile they're from; your own bookmarks of web addresses, files, folders and commands, in folders, added in Settings or from a result's right-click menu; and your organization's
+- A calculator, off until you turn it on: sums, conversions of length, weight, temperature, volume, data sizes and time, and dates such as today + 30 days. Enter copies the result
+- Clipboard history, off until you turn it on: find what you copied by its words, from three letters on, and copy it again with Enter. At most three show in an ordinary search, below apps, settings and bookmarks; start with "clipboard" for more
+- Do not disturb and switching the sound to another output join the Windows settings search can change; Wi-Fi and Bluetooth only show on PCs that have them; power actions in search get a switch of their own
+- The keyboard hint under the results fits the result: Enter starts a Teams chat for a person, opens a message, copies a result or opens a bookmark
+
+### Microsoft 365
+- Optional and off until you turn it on: sign in with a work or school account on the new Microsoft 365 page of Settings, through Windows' own account sign-in
+- Today's calendar beside the menu in the Windows 11 and Startline looks, with Join for online meetings, Accept, Tentative and Decline for invitations (also from a menu where an invitation is too narrow), and new events. It shows the last copy at once and offline
+- People and mail in search: colleagues to chat with, call or mail, and your mail by subject, also for what you typed before the account was ready
+- Startline asks Microsoft only for what's switched on, talks to nothing but Microsoft's sign-in and Graph, and signing out forgets everything. Where an organization has to approve Startline first, the page says so and copies the approval link
+
+### For IT departments
+- Policies for everything new: MediaControls, MediaCovers, ColorThemeLight, ColorThemeDark and System for ColorTheme, SearchBookmarks, BookmarksFromBrowsers, BookmarksLeftOut, Bookmarks, SearchCalculator, SearchClipboardHistory, SearchPowerActions and the Microsoft 365 ones
+- An organization's own Microsoft 365 app registration and tenant can be given by Group Policy, when installing (M365CLIENTID and M365TENANTID for the MSI and setup.exe, kept by upgrades), or when building; Settings says which one is in use
 
 ## 0.0.1
 

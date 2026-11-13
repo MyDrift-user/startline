@@ -171,8 +171,16 @@ MicaLight
     With Mica on, lets a lighter shade of it through the search box and the selected item instead of covering them.
 ColorTheme
     Color theme
+    REG_SZ, one of: System, Stone, Graphite, Moss, Harbor, Clay, Black, Daylight, Paper
+    System follows Windows' light or dark mode for apps with the themes of ColorThemeLight and ColorThemeDark, and switches as soon as it changes. Only the Startline look uses this.
+ColorThemeLight
+    Color theme in light mode
     REG_SZ, one of: Stone, Graphite, Moss, Harbor, Clay, Black, Daylight, Paper
-    Only the Startline look uses this.
+    The theme the System color theme uses while Windows is in light mode. Only the Startline look uses this.
+ColorThemeDark
+    Color theme in dark mode
+    REG_SZ, one of: Stone, Graphite, Moss, Harbor, Clay, Black, Daylight, Paper
+    The theme the System color theme uses while Windows is in dark mode. Only the Startline look uses this.
 Color_Background
     Background color
     REG_SZ, #RRGGBB
@@ -241,7 +249,11 @@ CompactRows
 MediaControls
     Now playing
     REG_DWORD, 1 on, 0 off
-    A small card with what's playing, through Windows' own media controls: the cover, title, artist and app, play or pause, previous and next, and a switch between apps when several play. Works with Spotify, browsers and any player that tells Windows, with no sign-in. Off unless set.
+    A small card with what's playing, through Windows' own media controls: the title, artist and app, play or pause, previous and next, and a switch between apps when several play. Works with Spotify, browsers and any player that tells Windows, with no sign-in. Hidden while nothing plays.
+MediaCovers
+    Covers in Now playing
+    REG_DWORD, 1 on, 0 off
+    The album or video picture beside what's playing.
 HorizontalPosition
     Where it opens across the screen
     REG_SZ, one of: Left, Center, Right, FollowStart
@@ -345,7 +357,7 @@ SEARCH: RESULTS
 SearchResults
     Kinds of results
     list: REG_DWORD 1, its items in a subkey of the same name
-    One per line, first to last: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. A kind left out is never shown. Actions are the quick actions: the calculator, clipboard history and sound outputs. Bookmarks also need SearchBookmarks, People and Mail their Microsoft 365 policies.
+    One per line, first to last: Apps, Settings, Bookmarks, Actions, Files, People, Mail, Web. A kind left out is never shown. Actions are the quick actions: the calculator, clipboard history and sound outputs. Bookmarks also need SearchBookmarks, People and Mail their Microsoft 365 policies.
 SearchMaxApps
     Most apps shown in the results
     REG_DWORD, 1 to 30

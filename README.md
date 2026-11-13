@@ -42,7 +42,7 @@ Type what you want and act on it from the result: "dark mode", "volume 40", "lou
 ### 🧮 Quick actions
 Each one has its own switch under **Settings > Search > Quick actions**:
 - **Calculator** (off at first): sums like `12 * (3 + 4)` or `15% of 80`, conversions of length, weight, temperature, volume, data sizes and time like `5 km in mi`, `70 f to c` or `2 gib in mb`, and dates like `today + 30 days`. No currencies, nothing online. Enter copies the result
-- **Clipboard history** (off at first): what you copied, found by its words, from Windows's own clipboard history when it's switched on in Windows. Enter pastes it where you were
+- **Clipboard history** (off at first): what you copied, found by its words from three letters on, from Windows's own clipboard history when it's switched on in Windows. Enter copies it again. Start a search with "clipboard" to see more of it
 - **Windows settings** and their pages by name in your language, and **power actions**: lock, sleep, sign out, restart and shut down, where restart and shut down ask you to press again. These were in search before and stay on
 
 ### 🔖 Bookmarks
@@ -54,7 +54,7 @@ Off until you turn it on under **Settings > Search > Bookmarks**. Then search al
 Bookmarks take part in the Best match.
 
 ### 🎵 Now playing
-Off until you turn it on under **Settings > Start menu**. A small card above the footer (under the tiles in the Windows 10 look) with what's playing: cover, title, artist and app, play or pause, previous and next, and a button to switch between apps when several play. It uses Windows's own media controls, the ones the volume flyout shows, so Spotify, browsers and any player that tells Windows work without keys or signing in. It's out of sight when nothing plays.
+On at first, under **Settings > Start menu**, where the cover can be switched off too. A small card above the footer (under the tiles in the Windows 10 look) with what's playing: cover, title, artist and app, play or pause, previous and next, and a button to switch between apps when several play. It uses Windows's own media controls, the ones the volume flyout shows, so Spotify, browsers and any player that tells Windows work without keys or signing in. It's out of sight when nothing plays.
 
 ### 📅 Microsoft 365, if you want it
 Off until you turn it on. Sign in with a work or school account on the **Microsoft 365** page of Settings, through Windows's own account sign-in, and switch on what you'd like:
@@ -69,7 +69,7 @@ Startline asks Microsoft only for what's switched on, keeps only which account i
 - Presets that set a look in one go: like Windows 11 Start, Startline's own, or compact. Each setting stays yours to change afterwards
 - Mica behind the menu on Windows 11 (22H2 and later), with a lighter Mica through the search box and the selected item if you like
 - English, German and Italian, following the language Windows is shown in, or chosen in Settings
-- Colour presets (Stone, Graphite, Moss, Harbor, Clay, Black, Daylight and Paper) or your own colours
+- Colour presets (Stone, Graphite, Moss, Harbor, Clay, Black, Daylight and Paper), your own colours, or, from the start, a theme that follows Windows' light or dark mode with a light and a dark preset you pick
 - Pin apps, files, folders, web addresses and programs with arguments, in the order you like
 - Choose which sections the menu shows (Pinned, Recent files, Most used, All apps) and how many
 - Size, position, corners and transparency
@@ -88,8 +88,8 @@ Every setting can be fixed, or given as a default people can change, by **Group 
 1. **Group Policy**: **M365ClientId** and **M365TenantId**, fixed or as defaults, under Startline > Microsoft 365.
 2. **When installing**, for this PC or one account:
    ```bat
-   msiexec /i startline-v0.0.1-windows-x64.msi /qn ALLUSERS=1 M365CLIENTID=<client ID> M365TENANTID=<tenant>
-   startline-v0.0.1-windows-x64-setup.exe /VERYSILENT /ALLUSERS /M365CLIENTID=<client ID> /M365TENANTID=<tenant>
+   msiexec /i startline-v0.0.2-windows-x64.msi /qn ALLUSERS=1 M365CLIENTID=<client ID> M365TENANTID=<tenant>
+   startline-v0.0.2-windows-x64-setup.exe /VERYSILENT /ALLUSERS /M365CLIENTID=<client ID> /M365TENANTID=<tenant>
    ```
    They're written to Startline's own key, `HKLM\Software\Startline` for this PC or `HKCU\Software\Startline` for one account (values `M365ClientId` and `M365TenantId`). An upgrade that doesn't give them again keeps them, and uninstalling removes them.
 3. **When building**: set `STARTLINE_M365_CLIENT_ID` and `STARTLINE_M365_TENANT_ID` before `cargo build`, or build ready installers with your own registration:
@@ -126,16 +126,16 @@ Download what you need from **[Releases](../../releases)**, for Windows 10 or 11
 | `startline-v<version>-windows-x64.zip` | The same portable program, zipped |
 | `startline-v<version>-policy-definitions.zip` | Group Policy templates |
 
-Both installers can install for this PC or for just your account. To install without any screens, here for version 0.0.1:
+Both installers can install for this PC or for just your account. To install without any screens, here for version 0.0.2:
 
 ```bat
 :: For this PC, from an administrator prompt. The folder is optional.
-msiexec /i startline-v0.0.1-windows-x64.msi /qn ALLUSERS=1 APPLICATIONFOLDER="D:\Apps\Startline"
-startline-v0.0.1-windows-x64-setup.exe /VERYSILENT /ALLUSERS /DIR="D:\Apps\Startline"
+msiexec /i startline-v0.0.2-windows-x64.msi /qn ALLUSERS=1 APPLICATIONFOLDER="D:\Apps\Startline"
+startline-v0.0.2-windows-x64-setup.exe /VERYSILENT /ALLUSERS /DIR="D:\Apps\Startline"
 
 :: For one account, without admin rights.
-msiexec /i startline-v0.0.1-windows-x64.msi /qn ALLUSERS=2 MSIINSTALLPERUSER=1
-startline-v0.0.1-windows-x64-setup.exe /VERYSILENT /CURRENTUSER
+msiexec /i startline-v0.0.2-windows-x64.msi /qn ALLUSERS=2 MSIINSTALLPERUSER=1
+startline-v0.0.2-windows-x64-setup.exe /VERYSILENT /CURRENTUSER
 ```
 
 Nothing is signed by a known publisher, so SmartScreen may show a warning. Uninstalling closes Startline and removes its Start with Windows entry.
@@ -191,8 +191,9 @@ src/
   apps.rs, icons.rs       installed apps and their icons
   intent.rs, settings.rs, actions.rs   settings you can change from a search
   providers.rs, quick.rs, calc.rs   where results come from, and the quick actions: calculator, clipboard, sound outputs
-  bookmarks.rs, bookmarks_page.rs, sqlite.rs   bookmarks: the browsers' (Firefox's through Windows's own SQLite) and your own
+  bookmarks.rs, bookmarks_page.rs, favicons.rs, sqlite.rs   bookmarks: the browsers' (Firefox's through Windows's own SQLite) with their sites' icons, and your own
   media.rs, now_playing.rs   what's playing, through Windows's media controls, and its card
+  mica.rs                 Mica, painted from the desktop picture
   system.rs, platform.rs  the Start key, tray icon and Windows calls
   customize.rs, pins_page.rs, setting_list.rs, widgets.rs, styles.rs   Settings and the looks
   config.rs               what's saved

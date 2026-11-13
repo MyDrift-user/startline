@@ -271,40 +271,45 @@
         <enum id="Value" valueName="ColorTheme" required="true">
           <item displayName="$(string.I_ColorTheme_0)">
             <value>
-              <string>Stone</string>
+              <string>System</string>
             </value>
           </item>
           <item displayName="$(string.I_ColorTheme_1)">
             <value>
-              <string>Graphite</string>
+              <string>Stone</string>
             </value>
           </item>
           <item displayName="$(string.I_ColorTheme_2)">
             <value>
-              <string>Moss</string>
+              <string>Graphite</string>
             </value>
           </item>
           <item displayName="$(string.I_ColorTheme_3)">
             <value>
-              <string>Harbor</string>
+              <string>Moss</string>
             </value>
           </item>
           <item displayName="$(string.I_ColorTheme_4)">
             <value>
-              <string>Clay</string>
+              <string>Harbor</string>
             </value>
           </item>
           <item displayName="$(string.I_ColorTheme_5)">
             <value>
-              <string>Black</string>
+              <string>Clay</string>
             </value>
           </item>
           <item displayName="$(string.I_ColorTheme_6)">
             <value>
-              <string>Daylight</string>
+              <string>Black</string>
             </value>
           </item>
           <item displayName="$(string.I_ColorTheme_7)">
+            <value>
+              <string>Daylight</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorTheme_8)">
             <value>
               <string>Paper</string>
             </value>
@@ -319,40 +324,237 @@
         <enum id="Value" valueName="ColorTheme" required="true">
           <item displayName="$(string.I_ColorTheme_0)">
             <value>
-              <string>Stone</string>
+              <string>System</string>
             </value>
           </item>
           <item displayName="$(string.I_ColorTheme_1)">
             <value>
-              <string>Graphite</string>
+              <string>Stone</string>
             </value>
           </item>
           <item displayName="$(string.I_ColorTheme_2)">
             <value>
-              <string>Moss</string>
+              <string>Graphite</string>
             </value>
           </item>
           <item displayName="$(string.I_ColorTheme_3)">
             <value>
-              <string>Harbor</string>
+              <string>Moss</string>
             </value>
           </item>
           <item displayName="$(string.I_ColorTheme_4)">
             <value>
-              <string>Clay</string>
+              <string>Harbor</string>
             </value>
           </item>
           <item displayName="$(string.I_ColorTheme_5)">
             <value>
-              <string>Black</string>
+              <string>Clay</string>
             </value>
           </item>
           <item displayName="$(string.I_ColorTheme_6)">
             <value>
-              <string>Daylight</string>
+              <string>Black</string>
             </value>
           </item>
           <item displayName="$(string.I_ColorTheme_7)">
+            <value>
+              <string>Daylight</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorTheme_8)">
+            <value>
+              <string>Paper</string>
+            </value>
+          </item>
+        </enum>
+      </elements>
+    </policy>
+    <policy name="ColorThemeLight" class="Both" displayName="$(string.P_ColorThemeLight)" explainText="$(string.E_ColorThemeLight)" presentation="$(presentation.P_ColorThemeLight)" key="Software\Policies\Startline">
+      <parentCategory ref="Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <enum id="Value" valueName="ColorThemeLight" required="true">
+          <item displayName="$(string.I_ColorThemeLight_0)">
+            <value>
+              <string>Stone</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeLight_1)">
+            <value>
+              <string>Graphite</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeLight_2)">
+            <value>
+              <string>Moss</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeLight_3)">
+            <value>
+              <string>Harbor</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeLight_4)">
+            <value>
+              <string>Clay</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeLight_5)">
+            <value>
+              <string>Black</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeLight_6)">
+            <value>
+              <string>Daylight</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeLight_7)">
+            <value>
+              <string>Paper</string>
+            </value>
+          </item>
+        </enum>
+      </elements>
+    </policy>
+    <policy name="Rec_ColorThemeLight" class="Both" displayName="$(string.P_ColorThemeLight)" explainText="$(string.R_ColorThemeLight)" presentation="$(presentation.P_ColorThemeLight)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <enum id="Value" valueName="ColorThemeLight" required="true">
+          <item displayName="$(string.I_ColorThemeLight_0)">
+            <value>
+              <string>Stone</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeLight_1)">
+            <value>
+              <string>Graphite</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeLight_2)">
+            <value>
+              <string>Moss</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeLight_3)">
+            <value>
+              <string>Harbor</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeLight_4)">
+            <value>
+              <string>Clay</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeLight_5)">
+            <value>
+              <string>Black</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeLight_6)">
+            <value>
+              <string>Daylight</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeLight_7)">
+            <value>
+              <string>Paper</string>
+            </value>
+          </item>
+        </enum>
+      </elements>
+    </policy>
+    <policy name="ColorThemeDark" class="Both" displayName="$(string.P_ColorThemeDark)" explainText="$(string.E_ColorThemeDark)" presentation="$(presentation.P_ColorThemeDark)" key="Software\Policies\Startline">
+      <parentCategory ref="Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <enum id="Value" valueName="ColorThemeDark" required="true">
+          <item displayName="$(string.I_ColorThemeDark_0)">
+            <value>
+              <string>Stone</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeDark_1)">
+            <value>
+              <string>Graphite</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeDark_2)">
+            <value>
+              <string>Moss</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeDark_3)">
+            <value>
+              <string>Harbor</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeDark_4)">
+            <value>
+              <string>Clay</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeDark_5)">
+            <value>
+              <string>Black</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeDark_6)">
+            <value>
+              <string>Daylight</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeDark_7)">
+            <value>
+              <string>Paper</string>
+            </value>
+          </item>
+        </enum>
+      </elements>
+    </policy>
+    <policy name="Rec_ColorThemeDark" class="Both" displayName="$(string.P_ColorThemeDark)" explainText="$(string.R_ColorThemeDark)" presentation="$(presentation.P_ColorThemeDark)" key="Software\Policies\Startline\Recommended">
+      <parentCategory ref="Rec_Appearance"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <elements>
+        <enum id="Value" valueName="ColorThemeDark" required="true">
+          <item displayName="$(string.I_ColorThemeDark_0)">
+            <value>
+              <string>Stone</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeDark_1)">
+            <value>
+              <string>Graphite</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeDark_2)">
+            <value>
+              <string>Moss</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeDark_3)">
+            <value>
+              <string>Harbor</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeDark_4)">
+            <value>
+              <string>Clay</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeDark_5)">
+            <value>
+              <string>Black</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeDark_6)">
+            <value>
+              <string>Daylight</string>
+            </value>
+          </item>
+          <item displayName="$(string.I_ColorThemeDark_7)">
             <value>
               <string>Paper</string>
             </value>
@@ -663,6 +865,26 @@
       </disabledValue>
     </policy>
     <policy name="Rec_MediaControls" class="Both" displayName="$(string.P_MediaControls)" explainText="$(string.R_MediaControls)" key="Software\Policies\Startline\Recommended" valueName="MediaControls">
+      <parentCategory ref="Rec_StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="MediaCovers" class="Both" displayName="$(string.P_MediaCovers)" explainText="$(string.E_MediaCovers)" key="Software\Policies\Startline" valueName="MediaCovers">
+      <parentCategory ref="StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_MediaCovers" class="Both" displayName="$(string.P_MediaCovers)" explainText="$(string.R_MediaCovers)" key="Software\Policies\Startline\Recommended" valueName="MediaCovers">
       <parentCategory ref="Rec_StartMenu"/>
       <supportedOn ref="SUPPORTED_Startline"/>
       <enabledValue>

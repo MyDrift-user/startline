@@ -74,6 +74,8 @@ impl FileSearch {
 pub enum Icon {
     Image { key: String, source: String },
     Glyph(char),
+    /// A web site's own picture, as a browser keeps it; the glyph where there's none.
+    Site { url: String, glyph: char },
 }
 
 impl Icon {
@@ -102,8 +104,8 @@ pub enum RowKind {
     Link(String),
     /// The calculator's answer: Enter copies it.
     Copy(String),
-    /// A text from the clipboard history: Enter pastes it where the person was.
-    Paste(String),
+    /// A text from the clipboard history: Enter puts it back on the clipboard.
+    Clip(String),
     /// A sound output, by Windows' id for it: Enter plays everything there.
     Output(String),
 }
@@ -264,10 +266,23 @@ pub fn web_row(query: &str, cfg: &Config) -> Option<Row> {
         category: Category::Web,
         name,
         detail: String::new(),
-        icon: Icon::Glyph('\u{E774}'),
+        icon: browser_icon().unwrap_or(Icon::Glyph('\u{E774}')),
         kind: RowKind::Web(query.trim().to_string()),
         path: None,
     })
+}
+
+/// The icon of the browser web searches open in, Windows' default for web addresses. Asked again at most every half
+/// minute, so a new default shows up without asking the Registry at every key press.
+fn browser_icon() -> Option<Icon> {
+    static CACHE: Mutex<Option<(std::time::Instant, Option<String>)>> = Mutex::new(None);
+    let mut cache = CACHE.lock().ok()?;
+    if cache.as_ref().is_none_or(|(at, _)| at.elapsed() > std::time::Duration::from_secs(30)) {
+        let program = crate::browser::default_browser().map(|(_, program)| program).filter(|p| std::path::Path::new(p).is_file());
+        *cache = Some((std::time::Instant::now(), program));
+    }
+    let program = cache.as_ref()?.1.clone()?;
+    Some(Icon::Image { key: crate::icons::file_icon_key(&program, false), source: program })
 }
 
 /// How well a name fits what was typed: 4 the whole name (a file's name without its type counts too), 3 the name
@@ -303,7 +318,7 @@ pub fn best_match(rows: &[Row], typed: &str, kind_order: &[Category], other_name
     };
     rows.iter()
         .enumerate()
-        .filter(|(_, row)| row.category != Category::Web)
+        .filter(|(_, row)| row.category != Category::Web && !matches!(row.kind, RowKind::Clip(_)))
         .map(|(at, row)| (at, fit(row), kind_order.iter().position(|k| *k == row.category).unwrap_or(usize::MAX), uses(row)))
         .filter(|(_, fit, _, _)| *fit > 0)
         .max_by(|a, b| a.1.cmp(&b.1).then(b.2.cmp(&a.2)).then(a.3.cmp(&b.3)).then(b.0.cmp(&a.0)))
@@ -390,8 +405,10 @@ mod tests {
         let rows = app_rows(&apps, &cfg, &matching::tokens("note"));
         assert_eq!(rows.len(), 1);
         assert_eq!(rows[0].name, "Git Release Notes");
-        let rows = app_rows(&apps[1..], &cfg, &matching::tokens("note"));
-        assert_eq!(rows[0].name, "Systeminformationen");
+        assert!(app_rows(&apps[1..], &cfg, &matching::tokens("note")).is_empty(), "letters scattered through a name never match");
+        let fotos = [app("Windows-Fotoanzeige", "f"), app("WLAN-Einstellungen", "w")];
+        assert!(app_rows(&fotos, &cfg, &matching::tokens("wifi")).is_empty());
+        assert_eq!(app_rows(&fotos, &cfg, &matching::tokens("wf"))[0].name, "Windows-Fotoanzeige");
     }
 
     #[test]

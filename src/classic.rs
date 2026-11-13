@@ -28,7 +28,7 @@ impl Menu {
     pub(crate) fn scroll_in(&mut self, ui: &mut Ui, rect: Rect, salt: &str, draw: impl FnOnce(&mut Menu, &mut Ui)) {
         let mut child = ui.new_child(UiBuilder::new().max_rect(rect).layout(Layout::top_down(Align::Min)));
         child.set_clip_rect(rect.expand(1.0));
-        ScrollArea::vertical().id_salt(salt).auto_shrink([false, false]).show(&mut child, |ui| {
+        quiet_scroll(&mut child, ScrollArea::vertical().id_salt(salt).auto_shrink([false, false]), Id::unique(("bar", salt)), |ui| {
             ui.set_width(ui.available_width());
             draw(self, ui);
         });

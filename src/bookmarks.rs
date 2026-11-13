@@ -12,7 +12,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-use std::sync::{Arc, RwLock};
+use crate::favicons::Favicons;
+use std::collections::HashSet;
+use std::sync::{Arc, Mutex, RwLock};
 use std::time::{Duration, Instant, SystemTime};
 
 /// One of Startline's own bookmarks: a web address, a file, a folder or a command.
@@ -111,6 +113,15 @@ pub struct Library {
     pub profiles: Vec<Profile>,
     /// Each with the index of its profile.
     pub marks: Vec<(usize, Found)>,
+    /// The sites' pictures the browsers keep, by address and by site.
+    pub favicons: Favicons,
+}
+
+impl Library {
+    /// The site's picture for an address, if a browser keeps one.
+    pub fn favicon(&self, url: &str) -> Option<&Arc<crate::favicons::Favicon>> {
+        crate::favicons::lookup(&self.favicons, url)
+    }
 }
 
 /// Whether a browser bookmark can be opened from here: not a script and not one of Firefox's saved searches.
@@ -405,36 +416,51 @@ fn firefox_profiles() -> Vec<Profile> {
 /// The biggest Bookmarks file read. Firefox's places, which holds the history too, may be four times as big.
 const MOST_BYTES: u64 = 64 * 1024 * 1024;
 
-/// Reads one profile's bookmarks. Firefox's are read from a copy in the temp folder, deleted after.
-fn read_profile(profile: &Profile) -> Vec<Found> {
-    match profile.engine {
+/// Reads a browser's database from a copy in the temp folder, with its -wal beside it, and deletes the copy after:
+/// the browser keeps its own locked while it runs, and it's never written to.
+fn with_copy<T>(source: &Path, name: &str, read: impl FnOnce(&crate::sqlite::Db) -> T) -> Option<T> {
+    let copy = std::env::temp_dir().join(format!("startline-{name}-{}.sqlite", std::process::id())); // i18n-ignore: file name
+    let wal = PathBuf::from(format!("{}-wal", copy.display()));
+    let shm = PathBuf::from(format!("{}-shm", copy.display()));
+    let journal = PathBuf::from(format!("{}-journal", copy.display()));
+    let clean = || {
+        for file in [&copy, &wal, &shm, &journal] {
+            let _ = std::fs::remove_file(file);
+        }
+    };
+    clean();
+    if std::fs::metadata(source).map_or(true, |m| m.len() > 4 * MOST_BYTES) || std::fs::copy(source, &copy).is_err() {
+        clean();
+        return None;
+    }
+    let _ = std::fs::copy(PathBuf::from(format!("{}-wal", source.display())), &wal);
+    let result = crate::sqlite::Db::open(&copy, false).map(|db| read(&db));
+    clean();
+    result
+}
+
+/// Reads one profile's bookmarks, and the pictures it keeps for their sites and for `also` (the person's own).
+/// Firefox's and the pictures come from copies in the temp folder, deleted after.
+fn read_profile(profile: &Profile, also: &HashSet<String>) -> (Vec<Found>, Favicons) {
+    let found = match profile.engine {
         Engine::Chromium => {
             let file = profile.dir.join("Bookmarks"); // i18n-ignore: names on disk, in files and on the command line
             // A file far bigger than any real bookmarks isn't read.
             if std::fs::metadata(&file).map_or(true, |m| m.len() > MOST_BYTES) {
-                return Vec::new();
+                Vec::new()
+            } else {
+                std::fs::read_to_string(file).map(|text| parse_chromium(&text)).unwrap_or_default()
             }
-            std::fs::read_to_string(file).map(|text| parse_chromium(&text)).unwrap_or_default()
         }
-        Engine::Firefox => {
-            let copy = std::env::temp_dir().join(format!("startline-places-{}.sqlite", std::process::id())); // i18n-ignore: file name
-            let wal = PathBuf::from(format!("{}-wal", copy.display()));
-            let shm = PathBuf::from(format!("{}-shm", copy.display()));
-            let _ = std::fs::remove_file(&wal);
-            let _ = std::fs::remove_file(&shm);
-            let places = profile.dir.join("places.sqlite");
-            if std::fs::metadata(&places).map_or(true, |m| m.len() > 4 * MOST_BYTES) || std::fs::copy(&places, &copy).is_err() {
-                let _ = std::fs::remove_file(&copy);
-                return Vec::new();
-            }
-            let _ = std::fs::copy(profile.dir.join("places.sqlite-wal"), &wal);
-            let found = crate::sqlite::Db::open(&copy, false).map(|db| read_firefox(&db)).unwrap_or_default();
-            for file in [&copy, &wal, &shm] {
-                let _ = std::fs::remove_file(file);
-            }
-            found
-        }
-    }
+        Engine::Firefox => with_copy(&profile.dir.join("places.sqlite"), "places", read_firefox).unwrap_or_default(),
+    };
+    let mut urls: HashSet<String> = found.iter().map(|f| f.url.clone()).collect();
+    urls.extend(also.iter().cloned());
+    let favicons = match profile.engine {
+        Engine::Chromium => with_copy(&profile.dir.join("Favicons"), "favicons", |db| crate::favicons::read_chromium(db, &urls)), // i18n-ignore: names on disk, in files and on the command line
+        Engine::Firefox => with_copy(&profile.dir.join("favicons.sqlite"), "favicons", |db| crate::favicons::read_firefox(db, &urls)),
+    };
+    (found, favicons.unwrap_or_default())
 }
 
 /// When and how big each file is: a change means reading again.
@@ -452,7 +478,8 @@ fn stamp(profiles: &[Profile]) -> Vec<(PathBuf, Option<SystemTime>, u64)> {
 
 /// Keeps the browsers' bookmarks read while `on`: looks for profiles now and then, and reads them again when their
 /// files change.
-pub fn watch(ctx: egui::Context, on: Arc<AtomicBool>) -> (Arc<RwLock<Library>>, Arc<AtomicU64>) {
+/// `own_urls` are the person's and the organization's web bookmarks, whose sites' pictures are looked for too.
+pub fn watch(ctx: egui::Context, on: Arc<AtomicBool>, own_urls: Arc<Mutex<HashSet<String>>>) -> (Arc<RwLock<Library>>, Arc<AtomicU64>) {
     let library: Arc<RwLock<Library>> = Arc::default();
     let generation = Arc::new(AtomicU64::new(0));
     let (shared, changed) = (library.clone(), generation.clone());
@@ -461,6 +488,7 @@ pub fn watch(ctx: egui::Context, on: Arc<AtomicBool>) -> (Arc<RwLock<Library>>, 
         let mut looked: Option<Instant> = None;
         let mut last = Vec::new();
         let mut read_at: Option<Instant> = None;
+        let mut read_for: HashSet<String> = HashSet::new();
         loop {
             std::thread::sleep(Duration::from_secs(if last.is_empty() { 1 } else { 4 }));
             if !on.load(Ordering::Relaxed) {
@@ -479,7 +507,8 @@ pub fn watch(ctx: egui::Context, on: Arc<AtomicBool>) -> (Arc<RwLock<Library>>, 
                 profiles.extend(firefox_profiles());
             }
             let now = stamp(&profiles);
-            if now == last {
+            // A web bookmark of one's own added since gets its site's picture at the next reading.
+            if now == last && *own_urls.lock().unwrap() == read_for {
                 continue;
             }
             // Firefox's places changes with every page visited: it's copied and read at most twice a minute.
@@ -488,8 +517,18 @@ pub fn watch(ctx: egui::Context, on: Arc<AtomicBool>) -> (Arc<RwLock<Library>>, 
             }
             read_at = Some(Instant::now());
             last = now;
-            let marks = profiles.iter().enumerate().flat_map(|(at, profile)| read_profile(profile).into_iter().map(move |found| (at, found))).collect();
-            *shared.write().unwrap() = Library { profiles: profiles.clone(), marks };
+            let also = own_urls.lock().unwrap().clone();
+            let mut marks = Vec::new();
+            let mut favicons = Favicons::new();
+            for (at, profile) in profiles.iter().enumerate() {
+                let (found, pictures) = read_profile(profile, &also);
+                marks.extend(found.into_iter().map(|found| (at, found)));
+                for (key, picture) in pictures {
+                    favicons.entry(key).or_insert(picture);
+                }
+            }
+            read_for = also;
+            *shared.write().unwrap() = Library { profiles: profiles.clone(), marks, favicons };
             changed.fetch_add(1, Ordering::Relaxed);
             ctx.request_repaint();
         }
@@ -504,8 +543,9 @@ pub fn probe_report() -> String {
     let mut out = format!("bookmark profiles={}\n", profiles.len()); // i18n-ignore: probe report for tests
     for profile in &profiles {
         let started = Instant::now();
-        let count = read_profile(profile).len();
-        out.push_str(&format!("  {} bookmarks={count} program={} read in {:?}\n", profile.key, profile.program.is_some(), started.elapsed())); // i18n-ignore: probe report for tests
+        let (found, pictures) = read_profile(profile, &HashSet::new());
+        let pictured = found.iter().filter(|f| crate::favicons::lookup(&pictures, &f.url).is_some()).count();
+        out.push_str(&format!("  {} bookmarks={} with pictures={pictured} program={} read in {:?}\n", profile.key, found.len(), profile.program.is_some(), started.elapsed())); // i18n-ignore: probe report for tests
     }
     out
 }
@@ -519,6 +559,8 @@ pub struct Bookmarks {
     seen: u64,
     /// Keeps the browser reader going.
     pub on: Arc<AtomicBool>,
+    /// The web addresses of the person's and the organization's own bookmarks, for the reader to find their pictures.
+    pub own_urls: Arc<Mutex<HashSet<String>>>,
     /// What the last search needs to be worked out again when the browsers' bookmarks change.
     last: Option<(Vec<String>, Config, Vec<Bookmark>)>,
     rows: Vec<Row>,
@@ -527,8 +569,26 @@ pub struct Bookmarks {
 impl Bookmarks {
     pub fn start(ctx: egui::Context) -> Bookmarks {
         let on = Arc::new(AtomicBool::new(false));
-        let (library, generation) = watch(ctx, on.clone());
-        Bookmarks { library, generation, seen: 0, on, last: None, rows: Vec::new() }
+        let own_urls: Arc<Mutex<HashSet<String>>> = Arc::default();
+        let (library, generation) = watch(ctx, on.clone(), own_urls.clone());
+        Bookmarks { library, generation, seen: 0, on, own_urls, last: None, rows: Vec::new() }
+    }
+
+    /// Tells the reader which web addresses of one's own to find pictures for.
+    pub fn keep_own(&self, cfg: &Config, managed: &[Bookmark]) {
+        let urls: HashSet<String> = cfg.bookmarks.iter().chain(managed).filter_map(|b| match &b.target {
+            Target::Path { path, .. } if path.contains("://") => Some(path.clone()),
+            _ => None,
+        }).collect();
+        let mut own = self.own_urls.lock().unwrap();
+        if *own != urls {
+            *own = urls;
+        }
+    }
+
+    /// Counts each reading of the browsers.
+    pub fn generation(&self) -> u64 {
+        self.generation.load(Ordering::Relaxed)
     }
 
     fn work_out(&mut self) {
@@ -547,7 +607,7 @@ pub fn rows(tokens: &[String], cfg: &Config, managed: &[Bookmark], library: &Lib
         let detail = if mark.folder.is_empty() { tr("Bookmark").to_string() } else { crate::trf!("Bookmark in {folder}", folder = mark.folder) };
         let detail = if theirs { detail } else { crate::trf!("{detail}, from your organization", detail = detail) };
         let icon = match &mark.target {
-            Target::Path { path, .. } if path.contains("://") => Icon::Glyph('\u{E734}'),
+            Target::Path { path, .. } if path.contains("://") => Icon::Site { url: path.clone(), glyph: '\u{E734}' },
             other => Icon::for_target(other),
         };
         Some((score + cfg.usage_boost(&mark.target.key()), Row { category: Category::Bookmarks, name: mark.name.clone(), detail, icon, kind: RowKind::Open(mark.target.clone()), path: None }))
@@ -567,7 +627,7 @@ pub fn rows(tokens: &[String], cfg: &Config, managed: &[Bookmark], library: &Lib
                 category: Category::Bookmarks,
                 name: found.name.clone(),
                 detail: format!("{folder}{}", profile.label()),
-                icon: Icon::Glyph('\u{E728}'),
+                icon: Icon::Site { url: found.url.clone(), glyph: '\u{E728}' },
                 kind: RowKind::Open(target.clone()),
                 path: None,
             };
@@ -751,7 +811,7 @@ mod tests {
         let managed = bookmarks_of(&["Company|Intranet|https://intranet.example.com/".into(), "not a bookmark".into()]);
         assert_eq!(managed.len(), 1);
         let chrome = Profile { key: "Chrome/Default".into(), browser: "Chrome".into(), name: String::new(), engine: Engine::Chromium, dir: PathBuf::new(), arg: "Default".into(), program: None };
-        let library = Library { profiles: vec![chrome], marks: vec![(0, Found { folder: "Bookmarks bar".into(), name: "Build logs".into(), url: "https://logs.example.com/".into() })] };
+        let library = Library { profiles: vec![chrome], marks: vec![(0, Found { folder: "Bookmarks bar".into(), name: "Build logs".into(), url: "https://logs.example.com/".into() })], favicons: Favicons::new() };
         let names = |query: &str, cfg: &Config| rows(&matching::tokens(query), cfg, &managed, &library).into_iter().map(|r| (r.name, r.detail)).collect::<Vec<_>>();
         let found = names("build", &cfg);
         assert_eq!(found.len(), 2);

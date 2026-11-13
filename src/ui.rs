@@ -53,8 +53,8 @@ pub enum Intent {
     RemoveSection(usize),
     /// Copies the calculator's answer; the menu stays open for the next sum.
     CopyAnswer(String),
-    /// Puts a clipboard history text back on the clipboard and pastes it where the person was.
-    Paste(String),
+    /// Puts a clipboard history text back on the clipboard, and closes the menu.
+    CopyClip(String),
     /// Plays sound on this output from now on.
     UseOutput(String),
     AddBookmark { name: String, target: Target },
@@ -112,7 +112,7 @@ pub struct Menu {
     /// Policies the watcher read while Startline runs, waiting to be taken in.
     policy_slot: Arc<Mutex<Option<Policies>>>,
     applied: Option<Config>,
-    system_look: SystemLook,
+    pub(crate) system_look: SystemLook,
     pub look: Look,
     look_shown: Option<Look>,
     glass_shown: Option<(bool, [u8; 3], f32, bool)>,
@@ -179,6 +179,10 @@ pub struct Menu {
     /// What's playing, while the setting is on.
     pub(crate) media: crate::media::Media,
     pub(crate) bookmark_ui: crate::bookmarks_page::BookmarkUi,
+    /// Sites' pictures made ready to draw, with the reading of the browsers they come from.
+    pub(crate) favicons: (u64, std::collections::HashMap<String, Option<egui::TextureHandle>>),
+    /// Mica: the desktop picture, blurred and tinted, made ready to draw behind the menu.
+    pub(crate) mica: crate::mica::Material,
 
     /// Not running for pictures and tests.
     pub(crate) updater: Option<crate::update::Updater>,
@@ -312,6 +316,8 @@ impl Menu {
             teams_installed: crate::m365::teams_installed(),
             media: crate::media::Media::start(ctx.clone()),
             bookmark_ui: Default::default(),
+            favicons: (0, std::collections::HashMap::new()),
+            mica: Default::default(),
             updater: None,
             auto_update: Arc::new(AtomicBool::new(true)),
             update_requested: false,
@@ -548,6 +554,11 @@ impl Menu {
         for &category in &order {
             listed.extend(self.providers.of(category).rows(&self.cfg));
         }
+        // A PC without a Wi-Fi or Bluetooth radio isn't offered a switch for it.
+        listed.retain(|row| match row.kind {
+            RowKind::Quick(id @ (QuickId::Wifi | QuickId::Bluetooth), _) => self.settings.get(id) != Value::Unavailable,
+            _ => true,
+        });
         // The one result whose name fits best goes first, whatever its kind, and isn't listed again below.
         if self.cfg.best_match && !self.regex_on() {
             let uses = |row: &Row| match &row.kind {
@@ -651,13 +662,9 @@ impl Menu {
             Intent::CopyAnswer(text) => {
                 let _ = platform::copy_text(&text);
             }
-            Intent::Paste(text) => {
+            Intent::CopyClip(text) => {
                 let _ = platform::copy_text(&text);
-                if !self.is_shot() {
-                    // The menu hands the focus back first, then Ctrl+V lands where the person was.
-                    self.close_menu();
-                    system::paste_after(Duration::from_millis(180));
-                }
+                self.close_menu();
             }
             Intent::UseOutput(id) => {
                 self.providers.quick.use_output(id);
@@ -947,20 +954,11 @@ impl Menu {
         let glass_on = self.look.blur && (!in_settings || style == Experience::Startline);
         // Windows 7's window color is its white list; its glass is blue.
         let (tint, strength) = if style == Experience::Windows7 { ([28, 66, 104], 0.5) } else { (self.look.theme.bg, (self.look.opacity - 0.25).max(0.0)) };
-        // Mica takes the place of the glass, where Windows has it. Only one of the two is ever asked for.
+        // Mica takes the place of the glass. The menu paints it itself (see mica.rs), so Windows' glass is off under it.
         let mica = self.look.mica && (!in_settings || style == Experience::Startline);
         let glass = (glass_on && !mica, tint, strength, mica);
         if self.glass_shown != Some(glass) {
-            let dark = (self.look.theme.bg[0] as u32 + self.look.theme.bg[1] as u32 + self.look.theme.bg[2] as u32) < 384;
-            if mica {
-                self.shared.set_blur(false, tint, strength);
-                self.shared.set_mica(true, dark);
-            } else {
-                if self.glass_shown.is_some_and(|shown| shown.3) {
-                    self.shared.set_mica(false, dark);
-                }
-                self.shared.set_blur(glass.0, tint, strength);
-            }
+            self.shared.set_blur(glass.0, tint, strength);
             self.glass_shown = Some(glass);
         }
         if self.applied.as_ref() == Some(&self.cfg) {
@@ -1202,7 +1200,7 @@ impl Row {
             RowKind::Person(person) => format!("person:{}", person.upn),
             RowKind::Link(url) => url.clone(),
             RowKind::Copy(text) => format!("copy:{text}"),
-            RowKind::Paste(text) => format!("paste:{}", text.chars().take(200).collect::<String>()),
+            RowKind::Clip(text) => format!("clip:{}", text.chars().take(200).collect::<String>()),
             RowKind::Output(id) => format!("output:{id}"),
         }
     }
@@ -1251,10 +1249,18 @@ impl eframe::App for Menu {
             }
             None => {}
         }
+        // Windows switched between light and dark mode, or its accent color: the looks that follow it follow at once.
+        if system::take_look_changed() {
+            self.system_look = SystemLook::read();
+            self.mica.desktop_changed();
+        }
         // The helpers for bookmarks and what's playing only run while their settings are on.
         let shot = self.is_shot();
         self.media.set_on(self.cfg.media_controls && !shot);
         self.providers.bookmarks.on.store(self.cfg.bookmarks_search && self.cfg.bookmarks_browsers && !shot, Ordering::Relaxed);
+        if self.cfg.bookmarks_search {
+            self.providers.bookmarks.keep_own(&self.cfg, &crate::bookmarks::bookmarks_of(self.policy.added("/bookmarks")));
+        }
         // Folder choices take effect by themselves, a moment after the last change.
         if self.index_dirty_at.is_some_and(|at| at.elapsed() > Duration::from_millis(1200)) {
             self.index_dirty_at = None;

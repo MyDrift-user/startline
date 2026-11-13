@@ -669,10 +669,39 @@ pub fn apply_style(ctx: &Context, look: &Look) {
         style.spacing.button_padding = vec2(10.0, 5.0);
         style.spacing.interact_size.y = 26.0;
         style.spacing.slider_width = 200.0;
-        style.spacing.scroll = style::ScrollStyle::floating();
+        // Thin bars over the content. Whether one shows is decided by `quiet_scroll`, not by where the pointer is.
+        let mut scroll = style::ScrollStyle::floating();
+        scroll.dormant_handle_opacity = scroll.active_handle_opacity;
+        style.spacing.scroll = scroll;
         style.text_styles.insert(TextStyle::Body, FontId::proportional(13.5));
         style.text_styles.insert(TextStyle::Button, FontId::proportional(13.5));
     });
+}
+
+/// Shows a scrolling list the way Windows 11 does: its bar appears while it's scrolled and whenever the list isn't at
+/// its top, and fades away at the top a moment after the scrolling stops. Hovering the list doesn't bring it up.
+pub fn quiet_scroll<R>(ui: &mut Ui, area: ScrollArea, key: Id, add: impl FnOnce(&mut Ui) -> R) -> scroll_area::ScrollAreaOutput<R> {
+    const LINGER: f64 = 0.9;
+    let ctx = ui.ctx().clone();
+    let now = ctx.input(|i| i.time);
+    let (last, moved_at): (f32, f64) = ctx.data(|d| d.get_temp(key)).unwrap_or((0.0, f64::NEG_INFINITY));
+    let shown = scroll_bar_shown(last, now - moved_at, LINGER);
+    let visibility = if shown { scroll_area::ScrollBarVisibility::VisibleWhenNeeded } else { scroll_area::ScrollBarVisibility::AlwaysHidden };
+    let output = area.scroll_bar_visibility(visibility).show(ui, add);
+    let offset = output.state.clamped_offset().y;
+    let moved = (offset - last).abs() > 0.5;
+    let moved_at = if moved { now } else { moved_at };
+    ctx.data_mut(|d| d.insert_temp(key, (offset, moved_at)));
+    // Looked at again once the bar is due to go.
+    if now - moved_at < LINGER {
+        ctx.request_repaint_after(std::time::Duration::from_secs_f64(LINGER - (now - moved_at) + 0.02));
+    }
+    output
+}
+
+/// Whether a list's bar shows: away from the top, or moved within the last `linger` seconds.
+pub fn scroll_bar_shown(offset: f32, since_moved: f64, linger: f64) -> bool {
+    offset > 0.5 || since_moved < linger
 }
 
 pub fn save_png(path: &std::path::Path, image: &ColorImage) -> Result<(), Box<dyn std::error::Error>> {
@@ -695,4 +724,16 @@ pub fn save_png(path: &std::path::Path, image: &ColorImage) -> Result<(), Box<dy
     encoder.set_depth(png::BitDepth::Eight);
     encoder.write_header()?.write_image_data(&bytes)?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_scroll_bar_shows_while_scrolling_and_away_from_the_top() {
+        assert!(!scroll_bar_shown(0.0, 60.0, 0.9), "at the top and still: out of sight, however the pointer moves");
+        assert!(scroll_bar_shown(0.0, 0.3, 0.9), "just scrolled back to the top: it lingers, then fades");
+        assert!(scroll_bar_shown(120.0, 60.0, 0.9), "away from the top it stays");
+    }
 }

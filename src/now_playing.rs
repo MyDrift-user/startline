@@ -25,9 +25,9 @@ impl Menu {
         ui.painter().rect_filled(rect, pal.radius.min(8), mix(pal.surface, pal.bg, 0.2));
         ui.painter().rect_stroke(rect, pal.radius.min(8), Stroke::new(1.0, pal.line), StrokeKind::Inside);
         let inner = rect.shrink(8.0);
-        // The cover, or a note where there's none.
+        // The cover, or a note where there's none or it's switched off.
         let cover_rect = Rect::from_min_size(inner.left_top(), Vec2::splat(inner.height()));
-        let texture = shown.cover.as_ref().map(|cover| {
+        let texture = shown.cover.as_ref().filter(|_| self.cfg.media_cover).map(|cover| {
             self.media
                 .textures
                 .entry(cover.key.clone())

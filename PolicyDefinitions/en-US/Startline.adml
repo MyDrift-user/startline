@@ -64,20 +64,51 @@ Enabled turns this on and Disabled turns it off, and people can't change it. Not
 
 A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_ColorTheme">Color theme</string>
-      <string id="E_ColorTheme">Only the Startline look uses this.
+      <string id="E_ColorTheme">System follows Windows' light or dark mode for apps with the themes of ColorThemeLight and ColorThemeDark, and switches as soon as it changes. Only the Startline look uses this.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
-      <string id="R_ColorTheme">Only the Startline look uses this.
+      <string id="R_ColorTheme">System follows Windows' light or dark mode for apps with the themes of ColorThemeLight and ColorThemeDark, and switches as soon as it changes. Only the Startline look uses this.
 
 A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
-      <string id="I_ColorTheme_0">Stone</string>
-      <string id="I_ColorTheme_1">Graphite</string>
-      <string id="I_ColorTheme_2">Moss</string>
-      <string id="I_ColorTheme_3">Harbor</string>
-      <string id="I_ColorTheme_4">Clay</string>
-      <string id="I_ColorTheme_5">Black</string>
-      <string id="I_ColorTheme_6">Daylight</string>
-      <string id="I_ColorTheme_7">Paper</string>
+      <string id="I_ColorTheme_0">Follow Windows</string>
+      <string id="I_ColorTheme_1">Stone</string>
+      <string id="I_ColorTheme_2">Graphite</string>
+      <string id="I_ColorTheme_3">Moss</string>
+      <string id="I_ColorTheme_4">Harbor</string>
+      <string id="I_ColorTheme_5">Clay</string>
+      <string id="I_ColorTheme_6">Black</string>
+      <string id="I_ColorTheme_7">Daylight</string>
+      <string id="I_ColorTheme_8">Paper</string>
+      <string id="P_ColorThemeLight">Color theme in light mode</string>
+      <string id="E_ColorThemeLight">The theme the System color theme uses while Windows is in light mode. Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_ColorThemeLight">The theme the System color theme uses while Windows is in light mode. Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
+      <string id="I_ColorThemeLight_0">Stone</string>
+      <string id="I_ColorThemeLight_1">Graphite</string>
+      <string id="I_ColorThemeLight_2">Moss</string>
+      <string id="I_ColorThemeLight_3">Harbor</string>
+      <string id="I_ColorThemeLight_4">Clay</string>
+      <string id="I_ColorThemeLight_5">Black</string>
+      <string id="I_ColorThemeLight_6">Daylight</string>
+      <string id="I_ColorThemeLight_7">Paper</string>
+      <string id="P_ColorThemeDark">Color theme in dark mode</string>
+      <string id="E_ColorThemeDark">The theme the System color theme uses while Windows is in dark mode. Only the Startline look uses this.
+
+Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
+      <string id="R_ColorThemeDark">The theme the System color theme uses while Windows is in dark mode. Only the Startline look uses this.
+
+A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
+      <string id="I_ColorThemeDark_0">Stone</string>
+      <string id="I_ColorThemeDark_1">Graphite</string>
+      <string id="I_ColorThemeDark_2">Moss</string>
+      <string id="I_ColorThemeDark_3">Harbor</string>
+      <string id="I_ColorThemeDark_4">Clay</string>
+      <string id="I_ColorThemeDark_5">Black</string>
+      <string id="I_ColorThemeDark_6">Daylight</string>
+      <string id="I_ColorThemeDark_7">Paper</string>
       <string id="P_Color_Background">Background color</string>
       <string id="E_Color_Background">Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.
 
@@ -186,10 +217,17 @@ Enabled turns this on and Disabled turns it off, and people can't change it. Not
 
 A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_MediaControls">Now playing</string>
-      <string id="E_MediaControls">A small card with what's playing, through Windows' own media controls: the cover, title, artist and app, play or pause, previous and next, and a switch between apps when several play. Works with Spotify, browsers and any player that tells Windows, with no sign-in. Off unless set.
+      <string id="E_MediaControls">A small card with what's playing, through Windows' own media controls: the title, artist and app, play or pause, previous and next, and a switch between apps when several play. Works with Spotify, browsers and any player that tells Windows, with no sign-in. Hidden while nothing plays.
 
 Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
-      <string id="R_MediaControls">A small card with what's playing, through Windows' own media controls: the cover, title, artist and app, play or pause, previous and next, and a switch between apps when several play. Works with Spotify, browsers and any player that tells Windows, with no sign-in. Off unless set.
+      <string id="R_MediaControls">A small card with what's playing, through Windows' own media controls: the title, artist and app, play or pause, previous and next, and a switch between apps when several play. Works with Spotify, browsers and any player that tells Windows, with no sign-in. Hidden while nothing plays.
+
+A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
+      <string id="P_MediaCovers">Covers in Now playing</string>
+      <string id="E_MediaCovers">The album or video picture beside what's playing.
+
+Enabled turns this on and Disabled turns it off, and people can't change it. Not configured leaves it to them.</string>
+      <string id="R_MediaCovers">The album or video picture beside what's playing.
 
 A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_HorizontalPosition">Where it opens across the screen</string>
@@ -312,10 +350,10 @@ Enabled turns this on and Disabled turns it off, and people can't change it. Not
 
 A default people can change: Enabled turns this on and Disabled turns it off until they change it themselves. Not configured leaves Startline's own default.</string>
       <string id="P_SearchResults">Kinds of results</string>
-      <string id="E_SearchResults">One per line, first to last: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. A kind left out is never shown. Actions are the quick actions: the calculator, clipboard history and sound outputs. Bookmarks also need SearchBookmarks, People and Mail their Microsoft 365 policies.
+      <string id="E_SearchResults">One per line, first to last: Apps, Settings, Bookmarks, Actions, Files, People, Mail, Web. A kind left out is never shown. Actions are the quick actions: the calculator, clipboard history and sound outputs. Bookmarks also need SearchBookmarks, People and Mail their Microsoft 365 policies.
 
 Enabled sets it to the value below, and people can't change it. Disabled or Not configured leaves it to them.</string>
-      <string id="R_SearchResults">One per line, first to last: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. A kind left out is never shown. Actions are the quick actions: the calculator, clipboard history and sound outputs. Bookmarks also need SearchBookmarks, People and Mail their Microsoft 365 policies.
+      <string id="R_SearchResults">One per line, first to last: Apps, Settings, Bookmarks, Actions, Files, People, Mail, Web. A kind left out is never shown. Actions are the quick actions: the calculator, clipboard history and sound outputs. Bookmarks also need SearchBookmarks, People and Mail their Microsoft 365 policies.
 
 A default people can change: Enabled sets it to the value below until they change it themselves. Disabled or Not configured leaves Startline's own default.</string>
       <string id="P_SearchMaxApps">Most apps shown in the results</string>
@@ -607,6 +645,12 @@ Enabled applies the ticks below. Disabled or Not configured allows everything.</
       </presentation>
       <presentation id="P_ColorTheme">
         <dropdownList refId="Value" noSort="true" defaultItem="0">Color theme:</dropdownList>
+      </presentation>
+      <presentation id="P_ColorThemeLight">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Color theme in light mode:</dropdownList>
+      </presentation>
+      <presentation id="P_ColorThemeDark">
+        <dropdownList refId="Value" noSort="true" defaultItem="0">Color theme in dark mode:</dropdownList>
       </presentation>
       <presentation id="P_Color_Background">
         <textBox refId="Value">

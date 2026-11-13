@@ -188,28 +188,31 @@ pub fn output_rows(tokens: &[String], outputs: &[Output]) -> Vec<Row> {
     rows
 }
 
-/// Clipboard texts holding every word, or the latest ones when the clipboard itself is asked for.
+/// Clipboard texts holding every word. A search that starts with "clipboard" or another of its words is about the
+/// clipboard itself: it lists more, the latest first when nothing else is typed. Otherwise it takes three letters, and
+/// at most three texts show, so the clipboard doesn't crowd an ordinary search.
 pub fn clip_rows(tokens: &[String], clips: &[Clip]) -> Vec<Row> {
-    let asked = tokens.len() == 1 && CLIPBOARD_WORDS.contains(&tokens[0].as_str());
-    let words: Vec<&String> = if asked { Vec::new() } else { tokens.iter().filter(|t| t.chars().count() >= 2).collect() };
-    if !asked && words.is_empty() {
+    let asked = tokens.first().is_some_and(|t| CLIPBOARD_WORDS.contains(&t.as_str()));
+    let words: Vec<&String> = tokens.iter().skip(usize::from(asked)).collect();
+    let typed: usize = words.iter().map(|w| w.chars().count()).sum::<usize>() + words.len().saturating_sub(1);
+    if !asked && typed < 3 {
         return Vec::new();
     }
     clips
         .iter()
         .filter(|clip| {
             let lower = matching::lower(&clip.text);
-            asked || words.iter().all(|w| lower.contains(w.as_str()))
+            words.iter().all(|w| lower.contains(w.as_str()))
         })
-        .take(if asked { 8 } else { 4 })
+        .take(if asked { 8 } else { 3 })
         .map(|clip| {
             let line: String = clip.text.split(['\r', '\n']).map(str::trim).find(|l| !l.is_empty()).unwrap_or_default().chars().take(90).collect();
             Row {
                 category: Category::Actions,
                 name: line,
-                detail: tr("Clipboard history, Enter pastes it").to_string(),
+                detail: tr("Clipboard history, Enter copies it").to_string(),
                 icon: Icon::Glyph('\u{E77F}'),
-                kind: RowKind::Paste(clip.text.clone()),
+                kind: RowKind::Clip(clip.text.clone()),
                 path: None,
             }
         })
@@ -336,8 +339,12 @@ mod tests {
         assert_eq!(names("monday notes"), ["Meeting notes"], "the first line is shown, every word is looked for in all of it");
         assert_eq!(names("report"), ["https://example.com/report"]);
         assert_eq!(names("clipboard").len(), 3, "asked for itself, the latest are listed");
-        assert!(names("x").is_empty(), "one letter isn't enough");
-        assert_eq!(clip_rows(&matching::tokens("report"), &clips)[0].kind, RowKind::Paste("https://example.com/report".into()));
+        assert!(names("x").is_empty() && names("no").is_empty(), "it takes three letters");
+        assert_eq!(names("clipboard report"), ["https://example.com/report"], "after its word, the rest is looked for");
+        assert_eq!(clip_rows(&matching::tokens("report"), &clips)[0].kind, RowKind::Clip("https://example.com/report".into()));
+        let many: Vec<Clip> = (0..10).map(|i| Clip { text: format!("invoice {i}") }).collect();
+        assert_eq!(clip_rows(&matching::tokens("invoice"), &many).len(), 3, "an ordinary search shows at most three");
+        assert_eq!(clip_rows(&matching::tokens("clipboard invoice"), &many).len(), 8);
     }
 
     #[test]

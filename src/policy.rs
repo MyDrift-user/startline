@@ -11,7 +11,7 @@
 //! templates and the admin guide in policy_templates.rs.
 
 use crate::actions::{ACTIONS, Do};
-use crate::config::PRESETS;
+use crate::config::{PRESETS, SYSTEM_THEME};
 use crate::customize::Tab;
 use crate::i18n::{self, Lang, tr_in, tx};
 use crate::scope::SKIP_PRESETS;
@@ -174,7 +174,9 @@ fn build(lang: Lang) -> Vec<Policy> {
         entry("TextAndIconSize", "/ui_scale", Appearance, t(tx("Text and icon size")), t(tx("In percent. The settings window offers 90 (small), 100 (normal) and 115 (large).")), Kind::Number { min: 80, max: 150, divide: 100, default: 100 }),
         switch("Mica", "/mica", Appearance, t(tx("Mica behind the Start menu")), t(tx("Windows 11's Mica material behind the Start menu, tinted by the desktop picture, instead of frosted glass. Windows 11 version 22H2 and later; older Windows ignores it. For the Windows 11 and Startline looks."))), // i18n-ignore: registry value name
         switch("MicaLight", "/mica_light", Appearance, t(tx("Lighter Mica through the search box and the selected item")), t(tx("With Mica on, lets a lighter shade of it through the search box and the selected item instead of covering them."))),
-        entry("ColorTheme", "/preset", Appearance, t(tx("Color theme")), startline_only, Kind::Choice(PRESETS.iter().map(|(name, _)| (name.to_string(), t(name).to_string())).collect())),
+        entry("ColorTheme", "/preset", Appearance, t(tx("Color theme")), t(tx("System follows Windows' light or dark mode for apps with the themes of ColorThemeLight and ColorThemeDark, and switches as soon as it changes. Only the Startline look uses this.")), Kind::Choice(std::iter::once((SYSTEM_THEME.to_string(), t(tx("Follow Windows")).to_string())).chain(PRESETS.iter().map(|(name, _)| (name.to_string(), t(name).to_string()))).collect())),
+        entry("ColorThemeLight", "/theme_light", Appearance, t(tx("Color theme in light mode")), t(tx("The theme the System color theme uses while Windows is in light mode. Only the Startline look uses this.")), Kind::Choice(PRESETS.iter().map(|(name, _)| (name.to_string(), t(name).to_string())).collect())),
+        entry("ColorThemeDark", "/theme_dark", Appearance, t(tx("Color theme in dark mode")), t(tx("The theme the System color theme uses while Windows is in dark mode. Only the Startline look uses this.")), Kind::Choice(PRESETS.iter().map(|(name, _)| (name.to_string(), t(name).to_string())).collect())),
         entry("Color_Background", "/theme/bg", Appearance, t(tx("Background color")), t(tx("Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.")), Kind::Color("#1B1B1A")),
         entry("Color_Panels", "/theme/surface", Appearance, t(tx("Panel color")), t(tx("Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.")), Kind::Color("#272725")),
         entry("Color_Text", "/theme/text", Appearance, t(tx("Text color")), t(tx("Written as #RRGGBB. Replaces this color of the theme. Only the Startline look uses this.")), Kind::Color("#ECEAE5")),
@@ -192,7 +194,8 @@ fn build(lang: Lang) -> Vec<Policy> {
         number("TileSize", "/tile_size", StartMenu, t(tx("Pinned app size")), startline_only, 52, 132, 84),
         switch("ShowLabels", "/show_labels", StartMenu, t(tx("Names under pinned apps")), startline_only),
         switch("CompactRows", "/compact_rows", StartMenu, t(tx("Compact lists")), startline_only),
-        switch("MediaControls", "/media_controls", StartMenu, t(tx("Now playing")), t(tx("A small card with what's playing, through Windows' own media controls: the cover, title, artist and app, play or pause, previous and next, and a switch between apps when several play. Works with Spotify, browsers and any player that tells Windows, with no sign-in. Off unless set."))),
+        switch("MediaControls", "/media_controls", StartMenu, t(tx("Now playing")), t(tx("A small card with what's playing, through Windows' own media controls: the title, artist and app, play or pause, previous and next, and a switch between apps when several play. Works with Spotify, browsers and any player that tells Windows, with no sign-in. Hidden while nothing plays."))),
+        switch("MediaCovers", "/media_cover", StartMenu, t(tx("Covers in Now playing")), t(tx("The album or video picture beside what's playing."))),
         entry("HorizontalPosition", "/h_anchor", StartMenu, t(tx("Where it opens across the screen")), startline_only, options(&[("Left", t(tx("Left"))), ("Center", t(tx("Center"))), ("Right", t(tx("Right"))), ("FollowStart", t(tx("Beside the Start button")))])), // i18n-ignore: registry values
         entry("VerticalPosition", "/v_anchor", StartMenu, t(tx("Where it opens up and down the screen")), startline_only, options(&[("Top", t(tx("Top"))), ("Middle", t(tx("Middle"))), ("Bottom", t(tx("Bottom")))])), // i18n-ignore: registry values
         number("Margin", "/margin", StartMenu, t(tx("Gap from the screen edge")), startline_only, 0, 80, 12), // i18n-ignore: registry value name
@@ -213,7 +216,7 @@ fn build(lang: Lang) -> Vec<Policy> {
         switch("SearchSkipHidden", "/skip_hidden", SearchSkip, t(tx("Hidden files and folders are never found")), t(tx("Things Windows keeps out of sight. Disabled finds them."))),
         switch("SearchSkipSystem", "/skip_system", SearchSkip, t(tx("System files are never found")), t(tx("Files and folders Windows marks as part of the system, such as desktop.ini. Disabled finds them."))),
         // Search: results
-        list("SearchResults", "/results", SearchResults, t(tx("Kinds of results")), t(tx("One per line, first to last: Apps, Settings, Actions, Files, Bookmarks, People, Mail, Web. A kind left out is never shown. Actions are the quick actions: the calculator, clipboard history and sound outputs. Bookmarks also need SearchBookmarks, People and Mail their Microsoft 365 policies."))),
+        list("SearchResults", "/results", SearchResults, t(tx("Kinds of results")), t(tx("One per line, first to last: Apps, Settings, Bookmarks, Actions, Files, People, Mail, Web. A kind left out is never shown. Actions are the quick actions: the calculator, clipboard history and sound outputs. Bookmarks also need SearchBookmarks, People and Mail their Microsoft 365 policies."))),
         number("SearchMaxApps", "/max_apps", SearchResults, t(tx("Most apps shown in the results")), "", 1, 30, 8),
         number("SearchMaxSettings", "/max_settings", SearchResults, t(tx("Most settings shown in the results")), "", 1, 30, 6),
         number("SearchMaxFiles", "/max_files", SearchResults, t(tx("Most files shown in the results")), "", 5, 200, 30),
