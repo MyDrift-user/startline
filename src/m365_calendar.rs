@@ -218,8 +218,8 @@ pub struct Placed {
     pub columns: usize,
 }
 
-/// Events too short to read get this much room.
-const SHORTEST: u32 = 20;
+/// Events too short to read get this much room: enough for their title on the panel's timeline.
+const SHORTEST: u32 = 25;
 
 /// The timed events on this day, side by side where they overlap.
 pub fn place(events: &[Event], day: Day) -> Vec<Placed> {

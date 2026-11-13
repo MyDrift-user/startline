@@ -178,7 +178,7 @@ fn overlapping_events_share_the_width_and_short_ones_stay_readable() {
     let of = |index: usize| *placed.iter().find(|p| p.index == index).unwrap();
     assert_eq!((of(0).column, of(1).column, of(2).column), (0, 1, 0), "the third takes the column the first left");
     assert!([of(0), of(1), of(2)].iter().all(|p| p.columns == 2));
-    assert_eq!((of(3).top, of(3).bottom, of(3).columns), (14 * 60, 14 * 60 + 20, 1), "five minutes get room to read");
+    assert_eq!((of(3).top, of(3).bottom, of(3).columns), (14 * 60, 14 * 60 + 25, 1), "five minutes get room to read");
     assert_eq!((of(4).top, of(4).bottom), (0, 60), "from yesterday, it starts at midnight");
     assert!(calendar::place(&events, DAY.offset(1)).is_empty());
 }
