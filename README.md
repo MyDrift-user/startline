@@ -13,6 +13,10 @@ Native, written in Rust, with no web view and no runtime to install.
 ![Rust](https://img.shields.io/badge/rust-2024-CE422B?logo=rust&logoColor=white)
 ![UI](https://img.shields.io/badge/UI-egui-4C6EF5)
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue)
+[![Release](https://img.shields.io/github/v/release/MyDrift-user/startline?include_prereleases&label=release)](../../releases)
+[![Downloads](https://img.shields.io/github/downloads/MyDrift-user/startline/total)](../../releases)
+
+**[⬇️ Download](../../releases)** · [Features](#-features) · [Install](#-install) · [For IT departments](#-ready-for-it-departments) · [Build](#%EF%B8%8F-build-from-source)
 
 <img src="assets/screenshots/home-light.png" width="280" alt="Startline's own look in light mode, with pinned apps and recent files">&nbsp;<img src="assets/screenshots/search-best-match.png" width="280" alt="Searching for lisbon: the Lisbon trip folder as Best match, then files with filter chips">&nbsp;<img src="assets/screenshots/home-dark.png" width="280" alt="The same menu in dark mode">
 
@@ -87,9 +91,13 @@ Startline asks Microsoft only for what's switched on, keeps only which account i
 - Size, position, corners and transparency
 - Start with Windows, on by default
 
-<img src="assets/screenshots/look-windows11.png" width="200" alt="The Windows 11 look">&nbsp;<img src="assets/screenshots/look-windows10.png" width="200" alt="The Windows 10 look">&nbsp;<img src="assets/screenshots/look-windows7.png" width="200" alt="The Windows 7 look">&nbsp;<img src="assets/screenshots/look-windows-xp.png" width="200" alt="The Windows XP look">
+| Windows 11 | Windows 10 | Windows 7 | Windows XP |
+|:---:|:---:|:---:|:---:|
+| <img src="assets/screenshots/look-windows11.png" width="200" alt="The Windows 11 look"> | <img src="assets/screenshots/look-windows10.png" width="200" alt="The Windows 10 look"> | <img src="assets/screenshots/look-windows7.png" width="200" alt="The Windows 7 look"> | <img src="assets/screenshots/look-windows-xp.png" width="200" alt="The Windows XP look"> |
 
-<img src="assets/screenshots/mica.png" width="300" alt="Mica behind the Windows 11 look, tinted by the desktop picture">&nbsp;<img src="assets/screenshots/settings.png" width="520" alt="Startline's settings, Appearance page">
+| Mica on Windows 11 | Settings |
+|:---:|:---:|
+| <img src="assets/screenshots/mica.png" width="300" alt="Mica behind the Windows 11 look, tinted by the desktop picture"> | <img src="assets/screenshots/settings.png" width="520" alt="Startline's settings, Appearance page"> |
 
 ### 🏢 Ready for IT departments
 Every setting can be fixed, or given as a default people can change, by **Group Policy** or straight in the Registry (`Software\Policies\Startline` and its `Recommended` subkey, under HKLM or HKCU), for computers or users. ADMX templates come with ADML in English, German and Italian. Pins and their sections, the layout and size, what the menu shows, how search behaves and whether updates install by themselves can all be deployed this way, without copying `start2.bin` around. Fixed settings show greyed out with "Managed by your organization", and running copies pick up changes within a minute. [`PolicyDefinitions/README.txt`](PolicyDefinitions/README.txt) lists every value.
