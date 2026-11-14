@@ -18,7 +18,13 @@ Native, written in Rust, with no web view and no runtime to install.
 
 **[⬇️ Download](../../releases)** · [Features](#-features) · [Install](#-install) · [For IT departments](#-ready-for-it-departments) · [Build](#%EF%B8%8F-build-from-source)
 
-<img src="assets/screenshots/home-light.png" width="280" alt="Startline's own look in light mode, with pinned apps and recent files">&nbsp;<img src="assets/screenshots/search-best-match.png" width="280" alt="Searching for lisbon: the Lisbon trip folder as Best match, then files with filter chips">&nbsp;<img src="assets/screenshots/home-dark.png" width="280" alt="The same menu in dark mode">
+| 🧮 Calculator and conversions | 🎵 Now playing |
+|:---:|:---:|
+| <img src="assets/screenshots/hero-calc.png" width="400" alt="5 km converted to miles right in the search"> | <img src="assets/screenshots/hero-media.png" width="400" alt="Now playing card with cover, title and playback buttons"> |
+| 🔖 **Bookmarks with their site icons** | 👥 **Colleagues, one click from a Teams chat** |
+| <img src="assets/screenshots/hero-bookmarks.png" width="400" alt="Bookmarks from Edge with their site icons"> | <img src="assets/screenshots/hero-people.png" width="400" alt="People search with chat, call and mail buttons"> |
+| 🎚️ **Settings you change from the result** | 📅 **Today's calendar beside the menu** |
+| <img src="assets/screenshots/hero-settings.png" width="400" alt="Dark mode, Game Mode and power mode switches in the search results"> | <img src="assets/screenshots/hero-calendar.png" width="260" alt="Today's Microsoft 365 calendar with Join and Accept buttons"> |
 
 </div>
 
