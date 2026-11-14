@@ -14,9 +14,11 @@ Native, written in Rust, with no web view and no runtime to install.
 ![UI](https://img.shields.io/badge/UI-egui-4C6EF5)
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 
-<img src="assets/screenshot.png" width="420" alt="Startline's Start menu with pinned apps and recent files">&nbsp;<img src="assets/screenshot-search.png" width="420" alt="Startline searching files for lisbon">
+<img src="assets/screenshots/home-light.png" width="280" alt="Startline's own look in light mode, with pinned apps and recent files">&nbsp;<img src="assets/screenshots/search-best-match.png" width="280" alt="Searching for lisbon: the Lisbon trip folder as Best match, then files with filter chips">&nbsp;<img src="assets/screenshots/home-dark.png" width="280" alt="The same menu in dark mode">
 
 </div>
+
+**At a glance:** a Start menu in five looks (Windows 11, 10, 7, XP or Startline's own) that follows Windows' light and dark mode · search that answers as you type, with a Best match, files, apps, settings you can change right from the result, bookmarks with their site icons, a calculator and your clipboard · Now playing · an optional Microsoft 365 calendar, colleagues and mail · every setting manageable by Group Policy.
 
 ---
 
@@ -39,11 +41,15 @@ While Startline runs, the Start key and the Start button open it instead of the 
 ### 🎚️ Settings right in the search
 Type what you want and act on it from the result: "dark mode", "volume 40", "louder", "bluetooth off", "wlan aus". There are dozens of switches and sliders, from dark mode, Wi-Fi, Bluetooth, do not disturb, mute, volume and brightness to file extensions, hidden files, the clock's seconds, Game Mode and keeping the PC awake, each showing how it's set now. "audio output" or a device's name switches the sound to another output. Nothing changes until you act on the row.
 
+<img src="assets/screenshots/settings-in-search.png" width="380" alt="Searching for mode: dark mode, Game Mode and power mode with their switches">
+
 ### 🧮 Quick actions
 Each one has its own switch under **Settings > Search > Quick actions**:
 - **Calculator** (off at first): sums like `12 * (3 + 4)` or `15% of 80`, conversions of length, weight, temperature, volume, data sizes and time like `5 km in mi`, `70 f to c` or `2 gib in mb`, and dates like `today + 30 days`. No currencies, nothing online. Enter copies the result
 - **Clipboard history** (off at first): what you copied, found by its words from three letters on, from Windows's own clipboard history when it's switched on in Windows. Enter copies it again. Start a search with "clipboard" to see more of it
 - **Windows settings** and their pages by name in your language, and **power actions**: lock, sleep, sign out, restart and shut down, where restart and shut down ask you to press again. These were in search before and stay on
+
+<img src="assets/screenshots/calculator.png" width="380" alt="The calculator converting 5 km to miles">
 
 ### 🔖 Bookmarks
 Off until you turn it on under **Settings > Search > Bookmarks**. Then search also finds:
@@ -51,10 +57,14 @@ Off until you turn it on under **Settings > Search > Bookmarks**. Then search al
 - Your own bookmarks: web addresses, files, folders and commands, in folders, added in Settings or with **Add to bookmarks** on a result's right-click menu, where you can also change or remove them
 - Bookmarks your organization adds with the Bookmarks policy, shown to you but not removable
 
-Bookmarks take part in the Best match.
+Each browser bookmark shows its site's icon, read from what the browser already keeps on disk, never downloaded. Bookmarks take part in the Best match.
+
+<img src="assets/screenshots/bookmarks.png" width="380" alt="Searching for contoso: bookmarks from Edge with their site icons">
 
 ### 🎵 Now playing
 On at first, under **Settings > Start menu**, where the cover can be switched off too. A small card above the footer (under the tiles in the Windows 10 look) with what's playing: cover, title, artist and app, play or pause, previous and next, and a button to switch between apps when several play. It uses Windows's own media controls, the ones the volume flyout shows, so Spotify, browsers and any player that tells Windows work without keys or signing in. It's out of sight when nothing plays.
+
+<img src="assets/screenshots/now-playing.png" width="380" alt="The Windows 11 look in dark mode with Neon Harbor by The Paper Satellites playing">
 
 ### 📅 Microsoft 365, if you want it
 Off until you turn it on. Sign in with a work or school account on the **Microsoft 365** page of Settings, through Windows's own account sign-in, and switch on what you'd like:
@@ -62,7 +72,9 @@ Off until you turn it on. Sign in with a work or school account on the **Microso
 - **People** in search: colleagues from your organization, with Enter starting a Teams chat and buttons to call or mail them
 - **Mail** in search, by subject, opening in Outlook on the web
 
-Startline asks Microsoft only for what's switched on, keeps only which account it is (Windows keeps the sign-in), and talks to nothing but Microsoft's sign-in and Microsoft Graph. Signing out forgets all of it.
+Startline asks Microsoft only for what's switched on, keeps only which account it is (Windows keeps the sign-in), and talks to nothing but Microsoft's sign-in and Microsoft Graph. Signing out forgets all of it. Where people may not approve apps themselves, an administrator approves Startline once, and organizations can use their own app registration (see **Microsoft 365 for admins** below).
+
+<img src="assets/screenshots/calendar.png" width="420" alt="Today's calendar beside the Windows 11 look">&nbsp;<img src="assets/screenshots/people.png" width="420" alt="Searching for Sam: colleagues with chat, call and mail buttons">
 
 ### 🎨 Make it yours
 - Five looks: Windows 11, Windows 10, Windows 7, Windows XP, or Startline's own, which you can place anywhere on screen
@@ -74,6 +86,10 @@ Startline asks Microsoft only for what's switched on, keeps only which account i
 - Choose which sections the menu shows (Pinned, Recent files, Most used, All apps) and how many
 - Size, position, corners and transparency
 - Start with Windows, on by default
+
+<img src="assets/screenshots/look-windows11.png" width="200" alt="The Windows 11 look">&nbsp;<img src="assets/screenshots/look-windows10.png" width="200" alt="The Windows 10 look">&nbsp;<img src="assets/screenshots/look-windows7.png" width="200" alt="The Windows 7 look">&nbsp;<img src="assets/screenshots/look-windows-xp.png" width="200" alt="The Windows XP look">
+
+<img src="assets/screenshots/mica.png" width="300" alt="Mica behind the Windows 11 look, tinted by the desktop picture">&nbsp;<img src="assets/screenshots/settings.png" width="520" alt="Startline's settings, Appearance page">
 
 ### 🏢 Ready for IT departments
 Every setting can be fixed, or given as a default people can change, by **Group Policy** or straight in the Registry (`Software\Policies\Startline` and its `Recommended` subkey, under HKLM or HKCU), for computers or users. ADMX templates come with ADML in English, German and Italian. Pins and their sections, the layout and size, what the menu shows, how search behaves and whether updates install by themselves can all be deployed this way, without copying `start2.bin` around. Fixed settings show greyed out with "Managed by your organization", and running copies pick up changes within a minute. [`PolicyDefinitions/README.txt`](PolicyDefinitions/README.txt) lists every value.
