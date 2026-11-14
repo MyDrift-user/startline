@@ -166,6 +166,7 @@ fn build(lang: Lang) -> Vec<Policy> {
     use Group::*;
     let t = |en: &'static str| tr_in(lang, en);
     let startline_only = t(tx("Only the Startline look uses this."));
+    let custom_place = t(tx("Used while AlignToTaskbar is disabled, in every look."));
     let languages: Vec<(&str, &str)> = i18n::CHOICES.iter().map(|(code, name)| (*code, if *code == "system" { t(tx("The language Windows is shown in")) } else { *name })).collect();
     let mut list = vec![
         // Appearance
@@ -196,9 +197,10 @@ fn build(lang: Lang) -> Vec<Policy> {
         switch("CompactRows", "/compact_rows", StartMenu, t(tx("Compact lists")), startline_only),
         switch("MediaControls", "/media_controls", StartMenu, t(tx("Now playing")), t(tx("A small card with what's playing, through Windows' own media controls: the title, artist and app, play or pause, previous and next, and a switch between apps when several play. Works with Spotify, browsers and any player that tells Windows, with no sign-in. Hidden while nothing plays."))),
         switch("MediaCovers", "/media_cover", StartMenu, t(tx("Covers in Now playing")), t(tx("The album or video picture beside what's playing."))),
-        entry("HorizontalPosition", "/h_anchor", StartMenu, t(tx("Where it opens across the screen")), startline_only, options(&[("Left", t(tx("Left"))), ("Center", t(tx("Center"))), ("Right", t(tx("Right"))), ("FollowStart", t(tx("Beside the Start button")))])), // i18n-ignore: registry values
-        entry("VerticalPosition", "/v_anchor", StartMenu, t(tx("Where it opens up and down the screen")), startline_only, options(&[("Top", t(tx("Top"))), ("Middle", t(tx("Middle"))), ("Bottom", t(tx("Bottom")))])), // i18n-ignore: registry values
-        number("Margin", "/margin", StartMenu, t(tx("Gap from the screen edge")), startline_only, 0, 80, 12), // i18n-ignore: registry value name
+        switch("AlignToTaskbar", "/align_to_taskbar", StartMenu, t(tx("Align to the taskbar")), t(tx("Opens the menu where Windows' own Start menu would be: against the taskbar on whichever edge of the monitor it is, at its start or its middle as the taskbar's alignment in Windows says, and following it when it moves. Without that setting, Windows 11 centers it and older Windows puts it at the start. Disabled, HorizontalPosition and VerticalPosition place it. On unless set."))),
+        entry("HorizontalPosition", "/h_anchor", StartMenu, t(tx("Where it opens across the screen")), custom_place, options(&[("Left", t(tx("Left"))), ("Center", t(tx("Center"))), ("Right", t(tx("Right"))), ("FollowStart", t(tx("Beside the Start button")))])), // i18n-ignore: registry values
+        entry("VerticalPosition", "/v_anchor", StartMenu, t(tx("Where it opens up and down the screen")), custom_place, options(&[("Top", t(tx("Top"))), ("Middle", t(tx("Middle"))), ("Bottom", t(tx("Bottom")))])), // i18n-ignore: registry values
+        number("Margin", "/margin", StartMenu, t(tx("Gap from the screen edge")), t(tx("The gap between the menu and the edge of the screen, or the taskbar, in the Startline look; and from the edge of the screen in every look while AlignToTaskbar is disabled.")), 0, 80, 12), // i18n-ignore: registry value name
         number("Width", "/width", StartMenu, t(tx("Menu width")), startline_only, 420, 1200, 660), // i18n-ignore: registry value name
         number("Height", "/height", StartMenu, t(tx("Menu height")), startline_only, 420, 1100, 720), // i18n-ignore: registry value name
         // Pinned apps

@@ -47,6 +47,32 @@ pub struct Placement {
     pub margin: f32,
     /// A menu floats above everything; the settings window is a normal window.
     pub on_top: bool,
+    /// Opens where Windows' own Start menu would, against the taskbar, `margin` away from it; `h` and `v` don't count.
+    pub taskbar: bool,
+}
+
+const EXPLORER_ADVANCED: &str = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced";
+
+/// Where the taskbar on this monitor is: the main one as the shell reports it, the others from their windows. A
+/// taskbar that hides itself is reported where it hides, mostly off the screen.
+fn taskbar_on(monitor: HMONITOR) -> Option<RECT> {
+    unsafe {
+        let mut data = APPBARDATA { cbSize: std::mem::size_of::<APPBARDATA>() as u32, ..Default::default() };
+        let main = FindWindowW(w!("Shell_TrayWnd"), PCWSTR::null()).ok();
+        for bar in taskbars() {
+            if MonitorFromWindow(bar, MONITOR_DEFAULTTONEAREST) != monitor {
+                continue;
+            }
+            if Some(bar) == main && SHAppBarMessage(ABM_GETTASKBARPOS, &mut data) != 0 {
+                return Some(data.rc);
+            }
+            let mut rect = RECT::default();
+            if GetWindowRect(bar, &mut rect).is_ok() && rect.right > rect.left && rect.bottom > rect.top {
+                return Some(rect);
+            }
+        }
+        None
+    }
 }
 
 /// The outline of the window itself.
@@ -158,14 +184,16 @@ impl Shared {
         }
     }
 
-    /// Moves the window to its spot on the monitor where the pointer is.
+    /// Moves the window to its spot: when it opens, on the monitor where the pointer is (the one whose Start button or
+    /// taskbar was clicked); placed again while it's open, on the monitor it's already on.
     pub fn place_window(&self, show: bool) {
         let Some(hwnd) = self.window() else { return };
         let placement = *self.placement.lock().unwrap();
         unsafe {
             let mut cursor = POINT::default();
             let _ = GetCursorPos(&mut cursor);
-            let monitor = MonitorFromPoint(cursor, MONITOR_DEFAULTTOPRIMARY);
+            let open = show || !IsWindowVisible(hwnd).as_bool();
+            let monitor = if open { MonitorFromPoint(cursor, MONITOR_DEFAULTTOPRIMARY) } else { MonitorFromWindow(hwnd, MONITOR_DEFAULTTOPRIMARY) };
             let mut info = MONITORINFO { cbSize: std::mem::size_of::<MONITORINFO>() as u32, ..Default::default() };
             if !GetMonitorInfoW(monitor, &mut info).as_bool() {
                 return;
@@ -173,6 +201,18 @@ impl Shared {
             let (mut dpi_x, mut dpi_y) = (96u32, 96u32);
             let _ = GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, &mut dpi_x, &mut dpi_y);
             let scale = dpi_x as f32 / 96.0;
+            let flags = if show { SWP_SHOWWINDOW } else { SWP_NOACTIVATE };
+            let layer = if placement.on_top { HWND_TOPMOST } else { HWND_NOTOPMOST };
+            if placement.taskbar {
+                // Where Windows' own Start menu would be: against this monitor's taskbar, at its start or its middle.
+                let rect = |r: RECT| [r.left, r.top, r.right, r.bottom];
+                let start = crate::taskbar::at_start(crate::settings::reg_dword(EXPLORER_ADVANCED, "TaskbarAl"), platform::windows_build() >= 22000);
+                let size = [(placement.width * scale) as i32, (placement.height * scale) as i32];
+                let [x, y, w, h] = crate::taskbar::spot(rect(info.rcMonitor), rect(info.rcWork), taskbar_on(monitor).map(rect), start, size, (placement.margin * scale) as i32);
+                let _ = SetWindowPos(hwnd, Some(layer), x, y, w, h, flags);
+                cut_to_shape(hwnd, *self.shape.lock().unwrap(), w, h, scale);
+                return;
+            }
             let area = info.rcWork;
             let (area_w, area_h) = (area.right - area.left, area.bottom - area.top);
             let margin = (placement.margin * scale) as i32;
@@ -192,8 +232,6 @@ impl Shared {
                 VAnchor::Middle => area.top + (area_h - h) / 2,
                 VAnchor::Top => area.top + margin,
             };
-            let flags = if show { SWP_SHOWWINDOW } else { SWP_NOACTIVATE };
-            let layer = if placement.on_top { HWND_TOPMOST } else { HWND_NOTOPMOST };
             let _ = SetWindowPos(hwnd, Some(layer), x, y, w, h, flags);
             cut_to_shape(hwnd, *self.shape.lock().unwrap(), w, h, scale);
         }
@@ -835,8 +873,9 @@ unsafe extern "system" fn system_wndproc(hwnd: HWND, message: u32, wparam: WPARA
         let shared = SHARED.get();
         match message {
             // Locked, unlocked, or another account switched to: keys let go meanwhile never reached the hook.
-            // Light or dark mode, the accent color or the taskbar changed: the menu looks again, even while it's open.
-            WM_SETTINGCHANGE | WM_THEMECHANGED | WM_DWMCOLORIZATIONCOLORCHANGED => {
+            // Light or dark mode, the accent color, the taskbar or the monitors changed: the menu looks again and finds its
+            // place again, even while it's open.
+            WM_SETTINGCHANGE | WM_THEMECHANGED | WM_DWMCOLORIZATIONCOLORCHANGED | WM_DISPLAYCHANGE => {
                 LOOK_CHANGED.store(true, Ordering::SeqCst);
                 if let Some(ctx) = shared.and_then(|s| s.ctx.get()) {
                     ctx.request_repaint();

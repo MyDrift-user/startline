@@ -148,6 +148,11 @@ pub fn local_midnight(year: i32, month: u32, day: u32) -> Option<u64> {
 
 /// Whether Windows has Mica for apps: Windows 11 22H2, build 22621, and later.
 pub fn has_mica() -> bool {
+    windows_build() >= 22621
+}
+
+/// Windows' build number: 22000 and later is Windows 11.
+pub fn windows_build() -> u32 {
     static BUILD: std::sync::OnceLock<u32> = std::sync::OnceLock::new();
     *BUILD.get_or_init(|| {
         let mut info = windows::Win32::System::SystemInformation::OSVERSIONINFOW { dwOSVersionInfoSize: std::mem::size_of::<windows::Win32::System::SystemInformation::OSVERSIONINFOW>() as u32, ..Default::default() };
@@ -162,7 +167,7 @@ pub fn has_mica() -> bool {
             }
         }
         info.dwBuildNumber
-    }) >= 22621
+    })
 }
 
 /// Whether the item has any of these attributes, such as [`HIDDEN`] or [`SYSTEM`].

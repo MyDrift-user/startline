@@ -230,11 +230,18 @@ Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modifi
       <string id="R_MediaCovers">L'immagine dell'album o del video accanto a ciò che è in riproduzione.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
+      <string id="P_AlignToTaskbar">Allinea alla barra delle applicazioni</string>
+      <string id="E_AlignToTaskbar">Apre il menu dove si aprirebbe il menu Start di Windows: accanto alla barra delle applicazioni, su qualunque bordo dello schermo sia, all'inizio o al centro come indica l'allineamento della barra in Windows, e la segue quando si sposta. Senza questa impostazione, Windows 11 lo centra e le versioni precedenti lo mettono all'inizio. Disattivato, lo posizionano HorizontalPosition e VerticalPosition. Attivato se non configurato.
+
+Abilitato lo attiva e Disabilitato lo disattiva, e gli utenti non possono modificarlo. Non configurato lascia la scelta a loro.</string>
+      <string id="R_AlignToTaskbar">Apre il menu dove si aprirebbe il menu Start di Windows: accanto alla barra delle applicazioni, su qualunque bordo dello schermo sia, all'inizio o al centro come indica l'allineamento della barra in Windows, e la segue quando si sposta. Senza questa impostazione, Windows 11 lo centra e le versioni precedenti lo mettono all'inizio. Disattivato, lo posizionano HorizontalPosition e VerticalPosition. Attivato se non configurato.
+
+Un valore predefinito che gli utenti possono modificare: Abilitato lo attiva e Disabilitato lo disattiva finché non lo cambiano loro. Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_HorizontalPosition">Dove si apre in orizzontale</string>
-      <string id="E_HorizontalPosition">Usato solo dall'aspetto Startline.
+      <string id="E_HorizontalPosition">Vale mentre AlignToTaskbar è disattivato, in ogni aspetto.
 
 Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
-      <string id="R_HorizontalPosition">Usato solo dall'aspetto Startline.
+      <string id="R_HorizontalPosition">Vale mentre AlignToTaskbar è disattivato, in ogni aspetto.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
       <string id="I_HorizontalPosition_0">A sinistra</string>
@@ -242,20 +249,20 @@ Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta su
       <string id="I_HorizontalPosition_2">A destra</string>
       <string id="I_HorizontalPosition_3">Accanto al pulsante Start</string>
       <string id="P_VerticalPosition">Dove si apre in verticale</string>
-      <string id="E_VerticalPosition">Usato solo dall'aspetto Startline.
+      <string id="E_VerticalPosition">Vale mentre AlignToTaskbar è disattivato, in ogni aspetto.
 
 Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
-      <string id="R_VerticalPosition">Usato solo dall'aspetto Startline.
+      <string id="R_VerticalPosition">Vale mentre AlignToTaskbar è disattivato, in ogni aspetto.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
       <string id="I_VerticalPosition_0">In alto</string>
       <string id="I_VerticalPosition_1">Al centro</string>
       <string id="I_VerticalPosition_2">In basso</string>
       <string id="P_Margin">Distanza dal bordo dello schermo</string>
-      <string id="E_Margin">Usato solo dall'aspetto Startline.
+      <string id="E_Margin">La distanza tra il menu e il bordo dello schermo, o la barra delle applicazioni, nell'aspetto Startline; e dal bordo dello schermo in ogni aspetto mentre AlignToTaskbar è disattivato.
 
 Abilitato lo imposta sul valore qui sotto, e gli utenti non possono modificarlo. Disabilitato o Non configurato lascia la scelta a loro.</string>
-      <string id="R_Margin">Usato solo dall'aspetto Startline.
+      <string id="R_Margin">La distanza tra il menu e il bordo dello schermo, o la barra delle applicazioni, nell'aspetto Startline; e dal bordo dello schermo in ogni aspetto mentre AlignToTaskbar è disattivato.
 
 Un valore predefinito che gli utenti possono modificare: Abilitato lo imposta sul valore qui sotto finché non lo cambiano loro. Disabilitato o Non configurato lascia il valore predefinito di Startline.</string>
       <string id="P_Width">Larghezza del menu</string>

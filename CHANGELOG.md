@@ -6,9 +6,12 @@ What changed for people using Startline, compared with the version before. A rel
 
 Released 2026-11-14.
 
-Search finds more and finds it better: a Best match first, stricter matching, bookmarks, a calculator, your clipboard history and quick switches, all in your language. The menu gets a Now playing card, a theme that follows Windows' light and dark mode, Mica that works on every Windows 11 PC, and an optional Microsoft 365 account for your calendar, colleagues and mail. Clicking the taskbar's search button now opens Startline's search and keeps it open.
+Search finds more and finds it better: a Best match first, stricter matching, bookmarks, a calculator, your clipboard history and quick switches, all in your language. The menu gets a Now playing card, a theme that follows Windows' light and dark mode, Mica that works on every Windows 11 PC, and an optional Microsoft 365 account for your calendar, colleagues and mail. Clicking the taskbar's search button now opens Startline's search and keeps it open, and the menu opens next to the taskbar, wherever it is.
 
 ### Start menu
+- The menu opens where Windows' own Start menu would, in every look: against the taskbar on whichever edge it is (bottom, top, left or right), at its start or in its middle as the taskbar's alignment in Windows says, on the monitor whose taskbar or Start button you used. It follows the taskbar when it moves, its alignment changes, it hides itself, or monitors and display sizes change, without a restart
+- Under Settings > Start menu, Position is now "Align to taskbar" or "Custom": Custom keeps the spot on the screen you pick, in every look, center of the screen included. If you had picked a spot before, it stays; if you never changed it, the menu now follows the taskbar
+- A new policy, AlignToTaskbar, as a fixed setting or a default
 - Now playing, on at first: what plays in Spotify, a browser or any player that tells Windows, with its cover, title, artist and app, play or pause, previous and next, and a switch between apps when several play. Out of sight when nothing plays; the cover can be switched off
 - A new color theme, System, now the default for the Startline look: it follows Windows' light or dark mode for apps as soon as it changes, with a light and a dark theme you pick. Themes chosen before stay as they were
 - Mica works on every Windows 11 PC: the menu paints it itself from your desktop picture, blurred and tinted, instead of a plain black or white sheet that hid the menu
@@ -40,6 +43,9 @@ Search finds more and finds it better: a Best match first, stricter matching, bo
 ## 0.0.1
 
 ### Start menu
+- The menu opens where Windows' own Start menu would, in every look: against the taskbar on whichever edge it is (bottom, top, left or right), at its start or in its middle as the taskbar's alignment in Windows says, on the monitor whose taskbar or Start button you used. It follows the taskbar when it moves, its alignment changes, it hides itself, or monitors and display sizes change, without a restart
+- Under Settings > Start menu, Position is now "Align to taskbar" or "Custom": Custom keeps the spot on the screen you pick, in every look, center of the screen included. If you had picked a spot before, it stays; if you never changed it, the menu now follows the taskbar
+- A new policy, AlignToTaskbar, as a fixed setting or a default
 - The first release: a Start menu for Windows 10 and 11 that the Start key and the Start button open instead of Windows's own, while Shift + Start still opens that one
 - Pinned apps, files, folders, web addresses and programs with arguments, in sections of your own, plus Recent files, Most used and All apps
 - Five looks: Windows 11, Windows 10, Windows 7, Windows XP, and Startline's own, which can sit anywhere on screen

@@ -498,6 +498,7 @@ impl Preset {
         match self {
             Preset::Windows11 => {
                 cfg.experience = Experience::Windows11;
+                cfg.align_to_taskbar = true;
                 cfg.mica = platform::has_mica();
                 cfg.mica_light = true;
                 cfg.ui_scale = 1.0;
@@ -515,6 +516,7 @@ impl Preset {
                 cfg.blur = true;
                 cfg.opacity = 0.96;
                 cfg.search_at_bottom = true;
+                cfg.align_to_taskbar = true;
                 cfg.h_anchor = HAnchor::Center;
                 cfg.v_anchor = VAnchor::Bottom;
                 cfg.margin = 12.0;
@@ -564,10 +566,8 @@ fn start_menu(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         });
     }, |menu, ui| {
         if pal.style != Experience::Startline {
-            heading(ui, tr("Size and position"), pal);
-            card(ui, pal, |ui| {
-                note(ui, tr("This look opens where that version of Windows did. Choose the Startline look under Appearance to place it freely."), pal);
-            });
+            heading(ui, tr("Where it opens"), pal);
+            card(ui, pal, |ui| place_choice(menu, ui, pal));
             return;
         }
         heading(ui, tr("Layout"), pal);
@@ -582,25 +582,44 @@ fn start_menu(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
         });
         heading(ui, tr("Where it opens"), pal);
         card(ui, pal, |ui| {
-            let h_options = [HAnchor::Left, HAnchor::Center, HAnchor::Right];
-            let h_now = h_options.iter().position(|a| *a == menu.cfg.h_anchor).unwrap_or(1);
-            policy.lock(ui, &["HorizontalPosition"], |ui| row(ui, tr("Across"), "", pal, |ui| {
-                if let Some(i) = segmented(ui, "h-anchor", &[tr("Left"), tr("Center"), tr("Right")], h_now, 210.0, pal) {
-                    menu.cfg.h_anchor = h_options[i];
-                }
-            }));
-            let v_options = [VAnchor::Top, VAnchor::Middle, VAnchor::Bottom];
-            let v_now = v_options.iter().position(|a| *a == menu.cfg.v_anchor).unwrap_or(2);
-            policy.lock(ui, &["VerticalPosition"], |ui| row(ui, tr("Up and down"), "", pal, |ui| {
-                if let Some(i) = segmented(ui, "v-anchor", &[tr("Top"), tr("Middle"), tr("Bottom")], v_now, 210.0, pal) {
-                    menu.cfg.v_anchor = v_options[i];
-                }
-            }));
-            policy.lock(ui, &["Margin"], |ui| slider(ui, tr("Gap from the edge"), "", &mut menu.cfg.margin, 0.0..=80.0, pal)); // i18n-ignore: policy name
+            place_choice(menu, ui, pal);
             policy.lock(ui, &["Width"], |ui| slider(ui, tr("Width"), "", &mut menu.cfg.width, 420.0..=1200.0, pal)); // i18n-ignore: policy name
             policy.lock(ui, &["Height"], |ui| slider(ui, tr("Height"), "", &mut menu.cfg.height, 420.0..=1100.0, pal)); // i18n-ignore: policy name
         });
     });
+}
+
+/// Against the taskbar, as Windows' own Start menu, or a spot of one's own on the screen: Custom.
+fn place_choice(menu: &mut Menu, ui: &mut Ui, pal: Pal) {
+    let policy = menu.policy.clone();
+    let custom = !menu.cfg.align_to_taskbar;
+    policy.lock(ui, &["AlignToTaskbar"], |ui| row(ui, tr("Position"), "", pal, |ui| {
+        if let Some(i) = segmented(ui, "menu-place", &[tr("Align to taskbar"), tr("Custom")], usize::from(custom), 260.0, pal) {
+            menu.cfg.align_to_taskbar = i == 0;
+        }
+    }));
+    if menu.cfg.align_to_taskbar {
+        note(ui, tr("Opens where Windows' own Start menu would: against the taskbar, on whichever edge it is, at its start or in its middle as the taskbar's alignment in Windows says. It follows the taskbar when it moves."), pal);
+        if pal.style == Experience::Startline {
+            policy.lock(ui, &["Margin"], |ui| slider(ui, tr("Gap from the taskbar"), "", &mut menu.cfg.margin, 0.0..=80.0, pal)); // i18n-ignore: policy name
+        }
+        return;
+    }
+    let h_options = [HAnchor::Left, HAnchor::Center, HAnchor::Right];
+    let h_now = h_options.iter().position(|a| *a == menu.cfg.h_anchor).unwrap_or(1);
+    policy.lock(ui, &["HorizontalPosition"], |ui| row(ui, tr("Across"), "", pal, |ui| {
+        if let Some(i) = segmented(ui, "h-anchor", &[tr("Left"), tr("Center"), tr("Right")], h_now, 210.0, pal) {
+            menu.cfg.h_anchor = h_options[i];
+        }
+    }));
+    let v_options = [VAnchor::Top, VAnchor::Middle, VAnchor::Bottom];
+    let v_now = v_options.iter().position(|a| *a == menu.cfg.v_anchor).unwrap_or(2);
+    policy.lock(ui, &["VerticalPosition"], |ui| row(ui, tr("Up and down"), "", pal, |ui| {
+        if let Some(i) = segmented(ui, "v-anchor", &[tr("Top"), tr("Middle"), tr("Bottom")], v_now, 210.0, pal) {
+            menu.cfg.v_anchor = v_options[i];
+        }
+    }));
+    policy.lock(ui, &["Margin"], |ui| slider(ui, tr("Gap from the edge"), "", &mut menu.cfg.margin, 0.0..=80.0, pal)); // i18n-ignore: policy name
 }
 
 fn general(menu: &mut Menu, ui: &mut Ui, pal: Pal) {

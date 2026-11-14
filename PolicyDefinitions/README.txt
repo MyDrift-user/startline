@@ -254,18 +254,22 @@ MediaCovers
     Covers in Now playing
     REG_DWORD, 1 on, 0 off
     The album or video picture beside what's playing.
+AlignToTaskbar
+    Align to the taskbar
+    REG_DWORD, 1 on, 0 off
+    Opens the menu where Windows' own Start menu would be: against the taskbar on whichever edge of the monitor it is, at its start or its middle as the taskbar's alignment in Windows says, and following it when it moves. Without that setting, Windows 11 centers it and older Windows puts it at the start. Disabled, HorizontalPosition and VerticalPosition place it. On unless set.
 HorizontalPosition
     Where it opens across the screen
     REG_SZ, one of: Left, Center, Right, FollowStart
-    Only the Startline look uses this.
+    Used while AlignToTaskbar is disabled, in every look.
 VerticalPosition
     Where it opens up and down the screen
     REG_SZ, one of: Top, Middle, Bottom
-    Only the Startline look uses this.
+    Used while AlignToTaskbar is disabled, in every look.
 Margin
     Gap from the screen edge
     REG_DWORD, 0 to 80
-    Only the Startline look uses this.
+    The gap between the menu and the edge of the screen, or the taskbar, in the Startline look; and from the edge of the screen in every look while AlignToTaskbar is disabled.
 Width
     Menu width
     REG_DWORD, 420 to 1200

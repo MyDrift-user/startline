@@ -58,12 +58,11 @@ impl Experience {
 pub struct SystemLook {
     pub dark: bool,
     pub accent: [u8; 3],
-    pub taskbar_left: bool,
 }
 
 impl Default for SystemLook {
     fn default() -> Self {
-        SystemLook { dark: true, accent: [0, 120, 212], taskbar_left: false }
+        SystemLook { dark: true, accent: [0, 120, 212] }
     }
 }
 
@@ -71,14 +70,12 @@ impl SystemLook {
     pub fn read() -> SystemLook {
         use crate::settings::reg_dword;
         const PERSONALIZE: &str = "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
-        const ADVANCED: &str = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced";
         let accent = reg_dword("Software\\Microsoft\\Windows\\DWM", "AccentColor")
             .map(|abgr| [(abgr & 0xFF) as u8, (abgr >> 8 & 0xFF) as u8, (abgr >> 16 & 0xFF) as u8])
             .unwrap_or(SystemLook::default().accent);
         SystemLook {
             dark: reg_dword(PERSONALIZE, "AppsUseLightTheme").is_none_or(|v| v == 0),
             accent,
-            taskbar_left: reg_dword(ADVANCED, "TaskbarAl") == Some(0),
         }
     }
 }
@@ -198,26 +195,27 @@ pub fn look_of(cfg: &Config, system: SystemLook) -> Look {
 /// Only for pictures of the settings pages, which are otherwise a window of their own.
 const SETTINGS_SIZE: [f32; 2] = [1040.0, 720.0];
 
-pub fn placement_of(cfg: &Config, system: SystemLook, in_settings: bool) -> Placement {
+pub fn placement_of(cfg: &Config, _system: SystemLook, in_settings: bool) -> Placement {
     if in_settings {
-        return Placement { h: HAnchor::Center, v: VAnchor::Middle, width: SETTINGS_SIZE[0], height: SETTINGS_SIZE[1], margin: 0.0, on_top: false };
+        return Placement { h: HAnchor::Center, v: VAnchor::Middle, width: SETTINGS_SIZE[0], height: SETTINGS_SIZE[1], margin: 0.0, on_top: false, taskbar: false };
     }
-    let flush = |width, height| Placement { h: HAnchor::FollowStart, v: VAnchor::Bottom, width, height, margin: 0.0, on_top: true };
+    // Against the taskbar where Windows' own menu would be, with the gap that version of Windows has; or, chosen in
+    // Settings, the spot on the screen picked there.
+    let place = |width, height, gap| {
+        if cfg.align_to_taskbar {
+            Placement { h: HAnchor::Center, v: VAnchor::Bottom, width, height, margin: gap, on_top: true, taskbar: true }
+        } else {
+            Placement { h: cfg.h_anchor, v: cfg.v_anchor, width, height, margin: cfg.margin, on_top: true, taskbar: false }
+        }
+    };
     // The calendar panel makes the menu wider, only while it's switched on.
     let panel = if crate::m365::panel_shown(cfg) { crate::m365::PANEL_WIDTH } else { 0.0 };
     match cfg.experience {
-        Experience::Windows11 => Placement {
-            h: if system.taskbar_left { HAnchor::Left } else { HAnchor::Center },
-            v: VAnchor::Bottom,
-            width: 660.0 + panel,
-            height: 720.0,
-            margin: 12.0,
-            on_top: true,
-        },
-        Experience::Windows10 => flush(660.0, 640.0),
-        Experience::Windows7 => flush(430.0, 560.0),
-        Experience::WindowsXp => flush(420.0, 540.0),
-        Experience::Startline => Placement { h: cfg.h_anchor, v: cfg.v_anchor, width: cfg.width + panel, height: cfg.height, margin: cfg.margin, on_top: true },
+        Experience::Windows11 => place(660.0 + panel, 720.0, 12.0),
+        Experience::Windows10 => place(660.0, 640.0, 0.0),
+        Experience::Windows7 => place(430.0, 560.0, 0.0),
+        Experience::WindowsXp => place(420.0, 540.0, 0.0),
+        Experience::Startline => place(cfg.width + panel, cfg.height, cfg.margin),
     }
 }
 

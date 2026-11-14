@@ -894,6 +894,26 @@
         <decimal value="0"/>
       </disabledValue>
     </policy>
+    <policy name="AlignToTaskbar" class="Both" displayName="$(string.P_AlignToTaskbar)" explainText="$(string.E_AlignToTaskbar)" key="Software\Policies\Startline" valueName="AlignToTaskbar">
+      <parentCategory ref="StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
+    <policy name="Rec_AlignToTaskbar" class="Both" displayName="$(string.P_AlignToTaskbar)" explainText="$(string.R_AlignToTaskbar)" key="Software\Policies\Startline\Recommended" valueName="AlignToTaskbar">
+      <parentCategory ref="Rec_StartMenu"/>
+      <supportedOn ref="SUPPORTED_Startline"/>
+      <enabledValue>
+        <decimal value="1"/>
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0"/>
+      </disabledValue>
+    </policy>
     <policy name="HorizontalPosition" class="Both" displayName="$(string.P_HorizontalPosition)" explainText="$(string.E_HorizontalPosition)" presentation="$(presentation.P_HorizontalPosition)" key="Software\Policies\Startline">
       <parentCategory ref="StartMenu"/>
       <supportedOn ref="SUPPORTED_Startline"/>

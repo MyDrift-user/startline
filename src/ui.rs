@@ -1253,6 +1253,10 @@ impl eframe::App for Menu {
         if system::take_look_changed() {
             self.system_look = SystemLook::read();
             self.mica.desktop_changed();
+            // The taskbar may have moved or changed its alignment, or a monitor come or gone.
+            if self.shared.visible.load(Ordering::SeqCst) && !self.is_shot() {
+                self.shared.place_window(false);
+            }
         }
         // The helpers for bookmarks and what's playing only run while their settings are on.
         let shot = self.is_shot();

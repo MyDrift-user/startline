@@ -57,8 +57,6 @@ pub const T: &[(&str, &str)] = &[
     ("How much", "Quanti"),
     ("Recent files", "File recenti"),
     ("Most-used items", "Elementi più usati"),
-    ("Size and position", "Dimensioni e posizione"),
-    ("This look opens where that version of Windows did. Choose the Startline look under Appearance to place it freely.", "Questo aspetto si apre dove si apriva quella versione di Windows. Scegli l'aspetto di Startline in Aspetto per posizionarlo liberamente."),
     ("Layout", "Layout"),
     ("Search bar at the bottom", "Barra di ricerca in basso"),
     ("Pinned apps per row", "App aggiunte per riga"),
@@ -306,4 +304,9 @@ pub const T: &[(&str, &str)] = &[
     ("In dark mode", "In modalità scura"),
     ("Show the cover", "Mostra la copertina"),
     ("The album or video picture beside it.", "L'immagine dell'album o del video accanto."),
+    ("Position", "Posizione"),
+    ("Align to taskbar", "Allinea alla barra delle applicazioni"),
+    ("Custom", "Personalizzata"),
+    ("Gap from the taskbar", "Distanza dalla barra delle applicazioni"),
+    ("Opens where Windows' own Start menu would: against the taskbar, on whichever edge it is, at its start or in its middle as the taskbar's alignment in Windows says. It follows the taskbar when it moves.", "Si apre dove si aprirebbe il menu Start di Windows: accanto alla barra delle applicazioni, su qualunque bordo sia, all'inizio o al centro come indica l'allineamento della barra in Windows. Segue la barra quando si sposta."),
 ];

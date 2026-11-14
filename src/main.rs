@@ -35,6 +35,7 @@ mod settings;
 mod sqlite;
 mod styles;
 mod system;
+mod taskbar;
 mod ui;
 mod update;
 mod widgets;

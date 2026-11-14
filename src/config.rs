@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-const CURRENT_VERSION: u32 = 3;
+const CURRENT_VERSION: u32 = 4;
 
 pub fn data_dir() -> PathBuf {
     let base = std::env::var_os("LOCALAPPDATA")
@@ -195,6 +195,8 @@ pub struct Config {
     pub media_cover: bool,
 
     // Layout
+    /// Opens where Windows' own Start menu would, against the taskbar. Off, `h_anchor` and `v_anchor` place it.
+    pub align_to_taskbar: bool,
     pub h_anchor: HAnchor,
     pub v_anchor: VAnchor,
     pub width: f32,
@@ -336,6 +338,7 @@ impl Default for Config {
             compact_rows: false,
             media_controls: true,
             media_cover: true,
+            align_to_taskbar: true,
             h_anchor: HAnchor::Center,
             v_anchor: VAnchor::Bottom,
             width: 660.0,
@@ -491,6 +494,12 @@ impl Config {
                 }
             }
         }
+        if self.version < 4 {
+            // Before the menu could follow the taskbar, Center and Bottom were where everyone started: those who left them
+            // there follow the taskbar now, and a place someone picked stays theirs. The other looks always opened where
+            // Windows did, whatever was picked for the Startline look, and keep doing so.
+            self.align_to_taskbar = self.experience != Experience::Startline || (self.h_anchor == HAnchor::Center && self.v_anchor == VAnchor::Bottom);
+        }
         self.version = CURRENT_VERSION;
         for section in defaults.sections {
             if !self.sections.iter().any(|s| s.kind == section.kind) {
@@ -612,6 +621,26 @@ mod tests {
         let kinds: Vec<Category> = old.results.iter().map(|r| r.kind).collect();
         assert_eq!(kinds, [Category::Files, Category::Apps, Category::Settings, Category::Bookmarks, Category::Actions, Category::People, Category::Mail, Category::Web]);
         assert!(!old.results[2].on, "the person's own choices stay");
+    }
+
+    #[test]
+    fn the_menu_follows_the_taskbar_unless_a_place_was_picked() {
+        assert!(Config::default().align_to_taskbar, "where everyone starts");
+        let mut old_default = Config::parse(br#"{"version": 3, "h_anchor": "Center", "v_anchor": "Bottom"}"#).unwrap();
+        old_default.repair();
+        assert!(old_default.align_to_taskbar, "still on the old default: it follows the taskbar now");
+        for (h, v) in [("Left", "Bottom"), ("Center", "Middle"), ("FollowStart", "Bottom"), ("Right", "Top")] {
+            let mut picked = Config::parse(format!(r#"{{"version": 3, "experience": "Startline", "h_anchor": "{h}", "v_anchor": "{v}"}}"#).as_bytes()).unwrap();
+            picked.repair();
+            assert!(!picked.align_to_taskbar, "{h} {v} was picked, and stays");
+            assert_eq!((format!("{:?}", picked.h_anchor), format!("{:?}", picked.v_anchor)), (h.to_string(), v.to_string()));
+        }
+        let mut other_look = Config::parse(br#"{"version": 3, "experience": "Windows10", "h_anchor": "Left", "v_anchor": "Top"}"#).unwrap();
+        other_look.repair();
+        assert!(other_look.align_to_taskbar, "that look never used the spot picked for the Startline look");
+        let mut chosen_later = Config::parse(br#"{"version": 4, "align_to_taskbar": false}"#).unwrap();
+        chosen_later.repair();
+        assert!(!chosen_later.align_to_taskbar, "a choice made after the update stays");
     }
 
     #[test]

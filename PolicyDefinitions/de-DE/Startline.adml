@@ -230,11 +230,18 @@ Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer könne
       <string id="R_MediaCovers">Das Album- oder Videobild neben dem, was gerade läuft.
 
 Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
+      <string id="P_AlignToTaskbar">An der Taskleiste ausrichten</string>
+      <string id="E_AlignToTaskbar">Öffnet das Menü dort, wo das Startmenü von Windows wäre: an der Taskleiste, an welchem Rand des Bildschirms sie auch ist, an ihrem Anfang oder in ihrer Mitte, wie es die Ausrichtung der Taskleiste in Windows sagt, und folgt ihr, wenn sie sich bewegt. Ohne diese Einstellung zentriert Windows 11 es und älteres Windows setzt es an den Anfang. Deaktiviert platzieren es HorizontalPosition und VerticalPosition. Ein, wenn nicht konfiguriert.
+
+Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, und Benutzer können es nicht ändern. Nicht konfiguriert überlässt es ihnen.</string>
+      <string id="R_AlignToTaskbar">Öffnet das Menü dort, wo das Startmenü von Windows wäre: an der Taskleiste, an welchem Rand des Bildschirms sie auch ist, an ihrem Anfang oder in ihrer Mitte, wie es die Ausrichtung der Taskleiste in Windows sagt, und folgt ihr, wenn sie sich bewegt. Ohne diese Einstellung zentriert Windows 11 es und älteres Windows setzt es an den Anfang. Deaktiviert platzieren es HorizontalPosition und VerticalPosition. Ein, wenn nicht konfiguriert.
+
+Ein Standard, den Benutzer ändern können: Aktiviert schaltet dies ein und Deaktiviert schaltet es aus, bis sie es selbst ändern. Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_HorizontalPosition">Wo es sich waagerecht öffnet</string>
-      <string id="E_HorizontalPosition">Nur das Startline-Design verwendet dies.
+      <string id="E_HorizontalPosition">Gilt, solange AlignToTaskbar deaktiviert ist, in jedem Aussehen.
 
 Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
-      <string id="R_HorizontalPosition">Nur das Startline-Design verwendet dies.
+      <string id="R_HorizontalPosition">Gilt, solange AlignToTaskbar deaktiviert ist, in jedem Aussehen.
 
 Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="I_HorizontalPosition_0">Links</string>
@@ -242,20 +249,20 @@ Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unte
       <string id="I_HorizontalPosition_2">Rechts</string>
       <string id="I_HorizontalPosition_3">Neben der Startschaltfläche</string>
       <string id="P_VerticalPosition">Wo es sich senkrecht öffnet</string>
-      <string id="E_VerticalPosition">Nur das Startline-Design verwendet dies.
+      <string id="E_VerticalPosition">Gilt, solange AlignToTaskbar deaktiviert ist, in jedem Aussehen.
 
 Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
-      <string id="R_VerticalPosition">Nur das Startline-Design verwendet dies.
+      <string id="R_VerticalPosition">Gilt, solange AlignToTaskbar deaktiviert ist, in jedem Aussehen.
 
 Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="I_VerticalPosition_0">Oben</string>
       <string id="I_VerticalPosition_1">Mitte</string>
       <string id="I_VerticalPosition_2">Unten</string>
       <string id="P_Margin">Abstand zum Bildschirmrand</string>
-      <string id="E_Margin">Nur das Startline-Design verwendet dies.
+      <string id="E_Margin">Der Abstand zwischen dem Menü und dem Bildschirmrand oder der Taskleiste im Startline-Aussehen, und zum Bildschirmrand in jedem Aussehen, solange AlignToTaskbar deaktiviert ist.
 
 Aktiviert setzt es auf den Wert unten, und Benutzer können es nicht ändern. Deaktiviert oder Nicht konfiguriert überlässt es ihnen.</string>
-      <string id="R_Margin">Nur das Startline-Design verwendet dies.
+      <string id="R_Margin">Der Abstand zwischen dem Menü und dem Bildschirmrand oder der Taskleiste im Startline-Aussehen, und zum Bildschirmrand in jedem Aussehen, solange AlignToTaskbar deaktiviert ist.
 
 Ein Standard, den Benutzer ändern können: Aktiviert setzt es auf den Wert unten, bis sie es selbst ändern. Deaktiviert oder Nicht konfiguriert belässt den Standard von Startline.</string>
       <string id="P_Width">Menübreite</string>
