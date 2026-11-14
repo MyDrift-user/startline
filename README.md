@@ -16,7 +16,7 @@ Native, written in Rust, with no web view and no runtime to install.
 [![Release](https://img.shields.io/github/v/release/MyDrift-user/startline?include_prereleases&label=release)](../../releases)
 [![Downloads](https://img.shields.io/github/downloads/MyDrift-user/startline/total)](../../releases)
 
-**[⬇️ Download](../../releases)** · [Features](#-features) · [Install](#-install) · [For IT departments](#-ready-for-it-departments) · [Build](#%EF%B8%8F-build-from-source)
+**[📦 Download](../../releases)** &nbsp;|&nbsp; [Features](#-features) &nbsp;|&nbsp; [Install](#-install) &nbsp;|&nbsp; [For IT departments](#-ready-for-it-departments) &nbsp;|&nbsp; [Build](#%EF%B8%8F-build-from-source)
 
 <img src="assets/screenshots/home-light.png" width="520" alt="Startline in light mode, with pinned apps and recent files">
 
@@ -30,7 +30,7 @@ Native, written in Rust, with no web view and no runtime to install.
 
 </div>
 
-**At a glance:** a Start menu in five looks (Windows 11, 10, 7, XP or Startline's own) that follows Windows' light and dark mode · search that answers as you type, with a Best match, files, apps, settings you can change right from the result, bookmarks with their site icons, a calculator and your clipboard · Now playing · an optional Microsoft 365 calendar, colleagues and mail · every setting manageable by Group Policy.
+**At a glance:** a Start menu in five looks (Windows 11, 10, 7, XP or Startline's own) that follows Windows' light and dark mode; search that answers as you type, with a Best match, files, apps, settings you can change right from the result, bookmarks with their site icons, a calculator and your clipboard; Now playing; an optional Microsoft 365 calendar, colleagues and mail; every setting manageable by Group Policy.
 
 ---
 
