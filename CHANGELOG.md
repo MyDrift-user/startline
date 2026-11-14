@@ -17,6 +17,7 @@ Search finds more and finds it better: a Best match first, stricter matching, bo
 - Mica works on every Windows 11 PC: the menu paints it itself from your desktop picture, blurred and tinted, instead of a plain black or white sheet that hid the menu
 - Scroll bars show while you scroll and whenever a list isn't at its top, and fade away at the top, as in Windows 11, instead of whenever the pointer is over the menu
 - Only one copy of Startline runs per user session, however it's started; a second one opens the running one's menu and ends
+- When Explorer restarts, after a crash or by hand, Startline's tray icon comes back, and the Start and search buttons of the new taskbar open Startline at once, even while Startline runs as administrator
 - Clicking the search button or box on the taskbar opens Startline's search and keeps it open (#2), on every taskbar, without Windows Search starting underneath
 
 ### Search

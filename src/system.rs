@@ -8,7 +8,7 @@ use crate::platform;
 use crate::styles::NativeCorner;
 use std::collections::VecDeque;
 use std::ffi::c_void;
-use std::sync::atomic::{AtomicBool, AtomicIsize, AtomicU8, AtomicU16, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicIsize, AtomicU8, AtomicU16, AtomicU32, AtomicU64, Ordering};
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant};
@@ -609,6 +609,10 @@ static SYSTEM_WINDOW: AtomicIsize = AtomicIsize::new(0);
 static DESKTOP_SWITCHED: AtomicBool = AtomicBool::new(false);
 /// Windows said its look changed: light or dark mode, the accent color.
 static LOOK_CHANGED: AtomicBool = AtomicBool::new(false);
+/// The message Explorer sends every top-level window when it has made a new taskbar.
+static TASKBAR_CREATED: AtomicU32 = AtomicU32::new(0);
+/// The taskbar was made again, so the Start and search buttons are somewhere new.
+static BUTTONS_STALE: AtomicBool = AtomicBool::new(false);
 
 /// Whether Windows' look changed since the last time this was asked.
 pub fn take_look_changed() -> bool {
@@ -871,6 +875,23 @@ fn close_window_with_escape(hwnd: HWND) {
 unsafe extern "system" fn system_wndproc(hwnd: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     unsafe {
         let shared = SHARED.get();
+        // Explorer started again (after a crash, or restarted by hand) with a new taskbar: the tray icon goes back in,
+        // the Start and search buttons are looked for again at once, and the menu finds its place by the new taskbar.
+        // The keyboard and mouse hooks belong to Windows, not to Explorer, and keep working.
+        let taskbar_created = TASKBAR_CREATED.load(Ordering::SeqCst);
+        if taskbar_created != 0 && message == taskbar_created {
+            remove_tray(hwnd);
+            let added = add_tray(hwnd);
+            if let Some(shared) = shared {
+                log_if_testing(shared, &format!("taskbar made again: tray icon added={added}")); // i18n-ignore: test log
+            }
+            BUTTONS_STALE.store(true, Ordering::SeqCst);
+            LOOK_CHANGED.store(true, Ordering::SeqCst);
+            if let Some(ctx) = shared.and_then(|s| s.ctx.get()) {
+                ctx.request_repaint();
+            }
+            return LRESULT(0);
+        }
         match message {
             // Locked, unlocked, or another account switched to: keys let go meanwhile never reached the hook.
             // Light or dark mode, the accent color, the taskbar or the monitors changed: the menu looks again and finds its
@@ -981,7 +1002,8 @@ fn remove_tray(hwnd: HWND) {
     let _ = unsafe { Shell_NotifyIconW(NIM_DELETE, &data) };
 }
 
-fn add_tray(hwnd: HWND) {
+/// Puts the tray icon in; false when Explorer didn't take it.
+fn add_tray(hwnd: HWND) -> bool {
     let mut data = NOTIFYICONDATAW {
         cbSize: std::mem::size_of::<NOTIFYICONDATAW>() as u32,
         hWnd: hwnd,
@@ -993,7 +1015,7 @@ fn add_tray(hwnd: HWND) {
     };
     let tip = platform::wide("Startline"); // i18n-ignore: the app's name
     data.szTip[..tip.len()].copy_from_slice(&tip);
-    let _ = unsafe { Shell_NotifyIconW(NIM_ADD, &data) };
+    unsafe { Shell_NotifyIconW(NIM_ADD, &data) }.as_bool()
 }
 
 fn make_tray_icon() -> HICON {
@@ -1032,7 +1054,7 @@ fn watch_start_buttons(shared: Arc<Shared>) {
             let _ = unsafe { GetWindowRect(*bar, &mut rect) };
             cursor.x >= rect.left && cursor.x < rect.right && cursor.y >= rect.top && cursor.y < rect.bottom
         });
-        if hovering || last_full.elapsed() > Duration::from_secs(5) {
+        if hovering || last_full.elapsed() > Duration::from_secs(5) || BUTTONS_STALE.swap(false, Ordering::SeqCst) {
             last_full = Instant::now();
             let starts = if take_start { find_start_buttons(&automation, &bars) } else { Vec::new() };
             *shared.start_buttons.lock().unwrap() = starts;
@@ -1133,7 +1155,14 @@ pub fn start(shared: Arc<Shared>, hooks: bool) {
                 return;
             };
             SYSTEM_WINDOW.store(window.0 as isize, Ordering::SeqCst);
-            add_tray(window);
+            // Told when Explorer has made its taskbar again, also while Startline runs with administrator rights, whose
+            // windows don't hear from Explorer's otherwise.
+            let taskbar_created = RegisterWindowMessageW(w!("TaskbarCreated"));
+            if taskbar_created != 0 {
+                TASKBAR_CREATED.store(taskbar_created, Ordering::SeqCst);
+                let _ = ChangeWindowMessageFilterEx(window, taskbar_created, MSGFLT_ALLOW, None);
+            }
+            let _ = add_tray(window);
             if hooks {
                 let _ = SetWindowsHookExW(WH_KEYBOARD_LL, Some(keyboard_proc), Some(instance), 0);
                 let _ = SetWindowsHookExW(WH_MOUSE_LL, Some(mouse_proc), Some(instance), 0);
