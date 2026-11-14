@@ -18,6 +18,8 @@ Native, written in Rust, with no web view and no runtime to install.
 
 **[⬇️ Download](../../releases)** · [Features](#-features) · [Install](#-install) · [For IT departments](#-ready-for-it-departments) · [Build](#%EF%B8%8F-build-from-source)
 
+<img src="assets/screenshots/home-light.png" width="520" alt="Startline in light mode, with pinned apps and recent files">
+
 | 🧮 Calculator and conversions | 🎵 Now playing |
 |:---:|:---:|
 | <img src="assets/screenshots/hero-calc.png" width="400" alt="5 km converted to miles right in the search"> | <img src="assets/screenshots/hero-media.png" width="400" alt="Now playing card with cover, title and playback buttons"> |
@@ -47,6 +49,8 @@ While Startline runs, the Start key and the Start button open it instead of the 
 - A Best match at the top: the one result whose name fits what you typed best, whatever its kind, so Enter opens the folder or file you named even when apps come first
 - A web search for what you typed, in your default browser with the search engine you set up there, or at a fixed address if you'd rather
 - New apps show up in the list and search within seconds of being installed, and removed ones go
+
+<img src="assets/screenshots/search-best-match.png" width="380" alt="Searching for lisbon: the Lisbon trip folder as Best match, then files with filter chips">&nbsp;<img src="assets/screenshots/home-dark.png" width="380" alt="The menu in dark mode">
 
 ### 🎚️ Settings right in the search
 Type what you want and act on it from the result: "dark mode", "volume 40", "louder", "bluetooth off", "wlan aus". There are dozens of switches and sliders, from dark mode, Wi-Fi, Bluetooth, do not disturb, mute, volume and brightness to file extensions, hidden files, the clock's seconds, Game Mode and keeping the PC awake, each showing how it's set now. "audio output" or a device's name switches the sound to another output. Nothing changes until you act on the row.
