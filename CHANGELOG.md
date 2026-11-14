@@ -43,9 +43,6 @@ Search finds more and finds it better: a Best match first, stricter matching, bo
 ## 0.0.1
 
 ### Start menu
-- The menu opens where Windows' own Start menu would, in every look: against the taskbar on whichever edge it is (bottom, top, left or right), at its start or in its middle as the taskbar's alignment in Windows says, on the monitor whose taskbar or Start button you used. It follows the taskbar when it moves, its alignment changes, it hides itself, or monitors and display sizes change, without a restart
-- Under Settings > Start menu, Position is now "Align to taskbar" or "Custom": Custom keeps the spot on the screen you pick, in every look, center of the screen included. If you had picked a spot before, it stays; if you never changed it, the menu now follows the taskbar
-- A new policy, AlignToTaskbar, as a fixed setting or a default
 - The first release: a Start menu for Windows 10 and 11 that the Start key and the Start button open instead of Windows's own, while Shift + Start still opens that one
 - Pinned apps, files, folders, web addresses and programs with arguments, in sections of your own, plus Recent files, Most used and All apps
 - Five looks: Windows 11, Windows 10, Windows 7, Windows XP, and Startline's own, which can sit anywhere on screen
